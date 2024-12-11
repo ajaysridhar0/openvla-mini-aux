@@ -114,7 +114,6 @@ class BaseRLDSTransform:
             answer_token_lengths.append(len(tokenized_answer["input_ids"]))
             
         return conversation, answer_token_lengths
-    
 
     def _process_tokens(self, conversation: List[Dict[str, str]], answer_token_lengths: List[int]) -> Tuple[torch.Tensor, torch.Tensor, int]:
         """
@@ -164,7 +163,7 @@ class BaseRLDSTransform:
             # Assign labels to the tokens corresponding to the answer
             for i, (start, end) in enumerate(offset_mapping):
                 if start >= end_idx:
-                    labels[i] = input_ids[i]
+                    labels[i] = input_ids[i] # also learn whens to stop aux prediction
                     break
                 if start >= start_idx and end <= end_idx:
                     labels[i] = input_ids[i]
@@ -179,99 +178,7 @@ class BaseRLDSTransform:
             labels[-num_end_tokens:] = input_ids[-num_end_tokens:]
 
         return input_ids, labels, num_end_tokens
-
-
-    # def _process_tokens(
-    #     self, 
-    #     conversation: List[Dict[str, str]], 
-    #     answer_token_lengths: List[int]
-    # ) -> Tuple[torch.Tensor, torch.Tensor, int]:
-    #     """
-    #     Process tokens and create input_ids and labels with stop tokens after each answer.
-
-    #     Args:
-    #         conversation: List of conversation turns
-    #         answer_token_lengths: List of number of tokens in each answer
-
-    #     Returns:
-    #         input_ids_tensor: Tokenized input IDs
-    #         labels: Labels tensor with target tokens marked and others as IGNORE_INDEX
-    #         num_end_tokens: Number of end tokens added
-    #     """
-    #     prompt_builder = self.prompt_builder_fn("openvla")
-    #     gpt_answers = []
-
-    #     # Build the prompt and keep track of 'gpt' answers
-    #     for turn in conversation:
-    #         prompt_builder.add_turn(turn["from"], turn["value"])
-    #         if turn["from"] == "gpt":
-    #             gpt_answers.append(turn["value"])
-
-    #     full_prompt = prompt_builder.get_prompt()
-
-    #     # Tokenize the full prompt
-    #     tokenized = self.tokenizer(
-    #         full_prompt,
-    #         add_special_tokens=True,
-    #         return_offsets_mapping=True
-    #     )
-    #     input_ids = torch.tensor(tokenized["input_ids"], dtype=torch.long)
-    #     labels = torch.full_like(input_ids, IGNORE_INDEX)
-
-    #     # Assign labels to GPT answers and append stop tokens
-    #     offset_mapping = tokenized["offset_mapping"]
-    #     current_search_start = 0
-    #     num_end_tokens = 1  # Default number of stop tokens
-
-    #     if isinstance(self.tokenizer, Qwen2TokenizerFast):
-    #         num_end_tokens = 2  # Adjust based on tokenizer type
-
-    #     for answer in gpt_answers:
-    #         # Locate the start and end indices of the answer in the full prompt
-    #         start_idx = full_prompt.find(answer, current_search_start)
-    #         if start_idx == -1:
-    #             raise ValueError("Could not find the start of the answer in the prompt.")
-    #         end_idx = start_idx + len(answer)
-    #         current_search_start = end_idx
-
-    #         # Assign labels to the tokens corresponding to the answer
-    #         for i, (start, end) in enumerate(offset_mapping):
-    #             if start >= end_idx:
-    #                 break
-    #             if start >= start_idx and end <= end_idx:
-    #                 labels[i] = input_ids[i]
-
-    #         # Assign label to the stop token after the answer
-    #         if self.predict_stop_token:
-    #             # Calculate the position where the stop token should be
-    #             stop_token_position = end_idx
-
-    #             # Find the token that starts at the stop_token_position
-    #             stop_token_id = self.tokenizer.eos_token_id
-    #             stop_token_assigned = False
-
-    #             for i, (start, end) in enumerate(offset_mapping):
-    #                 if start == stop_token_position:
-    #                     labels[i] = stop_token_id
-    #                     stop_token_assigned = True
-    #                     break
-
-    #             if not stop_token_assigned:
-    #                 # If stop token is not present, append it
-    #                 input_ids = torch.cat(
-    #                     [input_ids, torch.tensor([stop_token_id], dtype=torch.long)]
-    #                 )
-    #                 new_label = torch.tensor([stop_token_id], dtype=torch.long)
-    #                 labels = torch.cat([labels, new_label])
-
-    #     # Handle any additional stop tokens if prediction is required
-    #     if self.predict_stop_token and len(input_ids) >= num_end_tokens:
-    #         labels[-num_end_tokens:] = self.tokenizer.eos_token_id
-
-    #     breakpoint()
-
-    #     return input_ids, labels, num_end_tokens
-
+ 
 
 @dataclass
 class RLDSBatchTransform(BaseRLDSTransform):

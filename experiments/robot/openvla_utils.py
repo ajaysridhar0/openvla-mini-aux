@@ -217,7 +217,7 @@ def get_vla_action(vla, processor, base_vla_name, obs, task_label, unnorm_key, c
     return action
 
 
-def get_prismatic_vla_action(vla, processor, base_vla_name, obs, task_label, unnorm_key, center_crop=False, **kwargs):
+def get_prismatic_vla_action(vla, processor, base_vla_name, obs, task_label, unnorm_key, aux_task_types=None, center_crop=False, **kwargs):
     """Generates an action with the VLA policy."""
     image = Image.fromarray(obs["full_image"])
     image = image.convert("RGB")
@@ -236,5 +236,5 @@ def get_prismatic_vla_action(vla, processor, base_vla_name, obs, task_label, unn
         temp_image = temp_image.resize(image.size, Image.Resampling.BILINEAR)  # IMPORTANT: dlimp uses BILINEAR resize
         image = temp_image
 
-    action = vla.predict_action(image, task_label, unnorm_key=unnorm_key, **kwargs)
+    action = vla.predict_action(image, task_label, unnorm_key=unnorm_key, aux_task_types=aux_task_types, **kwargs)
     return action

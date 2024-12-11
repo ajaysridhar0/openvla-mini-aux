@@ -21,7 +21,7 @@ import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import draccus
 import numpy as np
@@ -87,11 +87,14 @@ class GenerateConfig:
 
     seed: int = 7                                    # Random Seed (for reproducibility)
 
+    aux_task_types: Optional[str] = None     # Auxiliary task types to query before action prediction
+
     # fmt: on
 
 
 @draccus.wrap()
 def eval_libero(cfg: GenerateConfig) -> None:
+
     assert cfg.pretrained_checkpoint is not None, "cfg.pretrained_checkpoint must not be None!"
     if "image_aug" in cfg.pretrained_checkpoint:
         assert cfg.center_crop, "Expecting `center_crop==True` because model was trained with image augmentations!"
@@ -137,6 +140,7 @@ def eval_libero(cfg: GenerateConfig) -> None:
         )
 
     # Initialize LIBERO task suite
+    cfg.task_suite_name = '_'.join(cfg.task_suite_name.split("_")[:2])
     benchmark_dict = benchmark.get_benchmark_dict()
     task_suite = benchmark_dict[cfg.task_suite_name]()
     num_tasks_in_suite = task_suite.n_tasks
@@ -145,6 +149,10 @@ def eval_libero(cfg: GenerateConfig) -> None:
 
     # Get expected image dimensions
     resize_size = get_image_resize_size(cfg)
+
+    # Split aux_task_types by "->"
+    if cfg.aux_task_types is not None:
+        cfg.aux_task_types = cfg.aux_task_types.split("->")
 
     # Start evaluation
     total_episodes, total_successes = 0, 0

@@ -45,6 +45,7 @@ def get_vla_dataset_and_collator(
     ee_pose_2D_stride: int = 1,
     image_window_size: int = 1,
     transform_types: str = "action",
+    transform_weights: str = None,
 ) -> Tuple[Dataset, ActionTokenizer, PaddedCollatorForActionPrediction]:
     """Initialize RLDS Dataset (wraps TFDS), ActionTokenizer, and initialize transform/collation functions."""
 
@@ -69,7 +70,14 @@ def get_vla_dataset_and_collator(
     # remove whitespace
     transform_types = transform_types.replace(" ", "")
     transform_types = transform_types.split(",")
-    for transform_type in transform_types:
+
+    if transform_weights is not None:
+        transform_weights = transform_weights.split(",")
+        transform_weights = [float(weight) for weight in transform_weights]
+    else:
+        transform_weights = [1/len(transform_types)] * len(transform_types) # default to equal weighting
+
+    for transform_type, weight in zip(transform_types, transform_weights):
         if '->' in transform_type:
             chained_transforms = transform_type.split("->")
             if "" in chained_transforms:
@@ -83,7 +91,7 @@ def get_vla_dataset_and_collator(
             rlds_transform = RLDSBatchTransform(**transform_base_args, action_tokenizer=action_tokenizer)
         else:
             rlds_transform = RLDSAuxTransform(**transform_base_args, aux_task_type=transform_type)
-        batch_transforms.append((rlds_transform, 1/len(transform_types)))
+        batch_transforms.append((rlds_transform, weight))
 
     collator = PaddedCollatorForActionPrediction(
         tokenizer.model_max_length, tokenizer.pad_token_id, padding_side=padding_side

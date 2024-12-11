@@ -8,6 +8,7 @@ discretizing actions with the ActionTokenizer.
 from typing import Dict, List, Optional, Union
 
 import numpy as np
+import time
 import torch
 from PIL.Image import Image as Img
 from transformers import LlamaTokenizerFast
@@ -16,6 +17,7 @@ from transformers.models.qwen2.tokenization_qwen2_fast import Qwen2TokenizerFast
 from prismatic.models.vlms.prismatic import PrismaticVLM
 from prismatic.overwatch import initialize_overwatch
 from prismatic.vla.action_tokenizer import ActionTokenizer
+from prismatic.vla.datasets.datasets import AUX_QUESTIONS_PROMPT
 
 # Initialize Overwatch =>> Wraps `logging.Logger`
 overwatch = initialize_overwatch(__name__)
@@ -35,39 +37,26 @@ class OpenVLA(PrismaticVLM):
 
     @torch.inference_mode()
     def predict_action(
-        self, image: Union[Img, List[Img]], instruction: str, unnorm_key: Optional[str] = None, **kwargs: str
-    ) -> np.ndarray:
+        self,
+        image: Union[Img, List[Img]],
+        instruction: str,
+        unnorm_key: Optional[str] = None,
+        aux_task_types: Optional[List[str]] = None,
+        **kwargs: str,
+    ) -> Dict[str, Union[str, np.ndarray]]:
         """
-        Core function for VLA inference; maps input image and task instruction to continuous action (de-tokenizes).
+        Core function for VLA inference; maps input image and task instruction to continuous action
+        (de-tokenizes), along with auxiliary information if provided.
 
         @param image: PIL Image as [height, width, 3]
         @param instruction: Task instruction string
-        @param unnorm_key: Optional dataset name for retrieving un-normalizing statistics; if None, checks that model
-                           was trained only on a single dataset, and retrieves those statistics.
-
-        @return Unnormalized (continuous) action vector --> end-effector deltas.
+        @param unnorm_key: Optional dataset name for retrieving un-normalizing statistics
+        @param aux_questions: Optional list of auxiliary questions to ask before the final action question
+        @return Dictionary containing auxiliary answers and the unnormalized (continuous) action vector
         """
-        image_transform, tokenizer = self.vision_backbone.image_transform, self.llm_backbone.tokenizer
+        start_time = time.time()
 
-        # Build VLA Prompt
-        prompt_builder = self.get_prompt_builder()
-        prompt_builder.add_turn(role="human", message=f"What action should the robot take to {instruction.lower()}?")
-        prompt_text = prompt_builder.get_prompt()
-
-        # Prepare Inputs
-        input_ids = tokenizer(prompt_text, truncation=True, return_tensors="pt").input_ids.to(self.device)
-        if isinstance(tokenizer, LlamaTokenizerFast):
-            # If the special empty token ('') does not already appear after the colon (':') token in the prompt
-            # (after "OUT:" or "ASSISTANT:"), insert it to match the inputs seen at training time
-            if not torch.all(input_ids[:, -1] == 29871):
-                input_ids = torch.cat(
-                    (input_ids, torch.unsqueeze(torch.Tensor([29871]).long(), dim=0).to(input_ids.device)), dim=1
-                )
-        elif isinstance(tokenizer, Qwen2TokenizerFast):
-            # do nothing here. I think...
-            pass
-        else:
-            raise ValueError(f"Unsupported `tokenizer` type = {type(tokenizer)}")
+        image_transform, tokenizer = self.vision_backbone.get_image_transform(), self.llm_backbone.tokenizer
 
         # Preprocess Image
         pixel_values = image_transform(image)
@@ -78,14 +67,55 @@ class OpenVLA(PrismaticVLM):
         else:
             raise ValueError(f"Unsupported `pixel_values` type = {type(pixel_values)}")
 
+        # Build VLA Prompt with Auxiliary Q&A
+        prompt_builder = self.get_prompt_builder()
+
+        # Calculate total max tokens: for each aux Q&A pair, set a reasonable max (e.g., 50 tokens), plus action tokens
+
+        if aux_task_types:
+            max_tokens_per_aux = 250  # Adjust as needed
+            aux_answers = {}
+            for aux_type in aux_task_types:
+                aux_prompt = AUX_QUESTIONS_PROMPT[aux_type] + f" {instruction.lower()}?"
+                prompt_builder.add_turn(role="human", message=aux_prompt)
+                
+                # get response from model
+                prompt_text = prompt_builder.get_prompt()
+                input_ids = self.process_prompt_text(tokenizer, prompt_text)
+                
+                # Use autocast to ensure consistent dtype
+                autocast_dtype = self.llm_backbone.half_precision_dtype
+                with torch.autocast("cuda", dtype=autocast_dtype, enabled=self.enable_mixed_precision_training):
+                    generated_ids = super(PrismaticVLM, self).generate(
+                        input_ids=input_ids,                            # Shape: [1, seq]
+                        pixel_values=pixel_values,                      # Shape: [1, (opt T,) 3, res, res] or Dict[str, ...]
+                        max_new_tokens=max_tokens_per_aux,
+                        eos_token_id=151645,
+                        **kwargs
+                    )
+                generated_text = tokenizer.decode(generated_ids[0, input_ids.shape[1] :])
+                aux_answers[aux_type] = generated_text
+                prompt_builder.add_turn(role="gpt", message=generated_text)
+                
+        # Add Final Action Prompt
+        prompt_builder.add_turn(role="human", message=f"What action should the robot take to {instruction.lower()}?")
+
+        # breakpoint()
+        prompt_text = prompt_builder.get_prompt()
+
+        input_ids = self.process_prompt_text(tokenizer, prompt_text)
+        total_max_tokens = self.get_action_dim(unnorm_key)
+
         # Invoke super().generate --> taps into `GenerationMixin` which (redirects) to `forward()`
         autocast_dtype = self.llm_backbone.half_precision_dtype
         with torch.autocast("cuda", dtype=autocast_dtype, enabled=self.enable_mixed_precision_training):
             # fmt: off
+            # breakpoint()
             generated_ids = super(PrismaticVLM, self).generate(
                 input_ids=input_ids,                            # Shape: [1, seq]
                 pixel_values=pixel_values,                      # Shape: [1, (opt T,) 3, res, res] or Dict[str, ...]
-                max_new_tokens=self.get_action_dim(unnorm_key),
+                max_new_tokens=total_max_tokens,
+                eos_token_id=151645,
                 **kwargs
             )
             # fmt: on
@@ -104,7 +134,61 @@ class OpenVLA(PrismaticVLM):
             normalized_actions,
         )
 
+        elapsed_time = time.time() - start_time
+        overwatch.info(f"predict_action took {elapsed_time:.3f} seconds")
+
         return actions
+    
+
+    def process_prompt_text(self, tokenizer, prompt_text: str):
+        # Prepare Inputs
+        input_ids = tokenizer(prompt_text, truncation=True, return_tensors="pt").input_ids.to(self.device)
+        if isinstance(tokenizer, LlamaTokenizerFast):
+            if not torch.all(input_ids[:, -1] == 29871):  # Updated Token ID
+                input_ids = torch.cat(
+                    (input_ids, torch.unsqueeze(torch.Tensor([29871]).long(), dim=0).to(input_ids.device)), dim=1
+                )
+        elif isinstance(tokenizer, Qwen2TokenizerFast):
+            pass
+        else:
+            raise ValueError(f"Unsupported `tokenizer` type = {type(tokenizer)}")
+        
+        return input_ids
+
+    def split_responses(self, generated_text: str, aux_questions: Optional[List[str]]) -> Dict[str, str]:
+        """
+        Split the generated text into auxiliary answers and final action.
+
+        @param generated_text: The complete generated text from the model
+        @param aux_questions: List of auxiliary questions
+
+        @return Dictionary with auxiliary answers and final action
+        """
+        if not aux_questions:
+            return {'final_action': generated_text}
+
+        aux_answers = {}
+        remaining_text = generated_text
+        for idx, aux_q in enumerate(aux_questions, 1):
+            # Define delimiters based on conversation structure
+            answer_prefix = f"Assistant {idx}:"
+            delimiter = answer_prefix
+
+            # Split based on the answer prefix
+            if delimiter in remaining_text:
+                answer_split = remaining_text.split(delimiter, 1)
+                if len(answer_split) == 2:
+                    answer, remaining_text = answer_split
+                    aux_answers[f'answer_{idx}'] = answer.strip()
+                else:
+                    raise ValueError(f"Expected answer delimiter '{delimiter}' not found.")
+            else:
+                raise ValueError(f"Expected answer prefix '{delimiter}' not found in generated text.")
+
+        final_action = remaining_text.strip()
+        aux_answers['final_action'] = final_action
+
+        return {'aux_answers': aux_answers}
 
     @staticmethod
     def _check_unnorm_key(norm_stats: Dict, unnorm_key: str) -> str:

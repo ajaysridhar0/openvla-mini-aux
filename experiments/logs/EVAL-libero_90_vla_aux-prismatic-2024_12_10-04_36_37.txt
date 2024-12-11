@@ -1,0 +1,83 @@
+Task suite: libero_90
+
+Task: close the top drawer of the cabinet
+Starting episode 1...
+Caught exception: Your model was trained on more than one dataset, please pass a `unnorm_key` from the following options to choose the statistics used for un-normalizing actions: dict_keys(['libero_90_vla_aux', 'libero_object_vla_aux', 'libero_spatial_vla_aux'])
+Saved rollout MP4 at path ./rollouts/2024_12_10/2024_12_10-04_36_37--episode=1--success=False--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: False
+# episodes completed so far: 1
+# successes: 0 (0.0%)
+
+Task: close the top drawer of the cabinet
+Starting episode 2...
+Caught exception: Your model was trained on more than one dataset, please pass a `unnorm_key` from the following options to choose the statistics used for un-normalizing actions: dict_keys(['libero_90_vla_aux', 'libero_object_vla_aux', 'libero_spatial_vla_aux'])
+Saved rollout MP4 at path ./rollouts/2024_12_10/2024_12_10-04_36_37--episode=2--success=False--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: False
+# episodes completed so far: 2
+# successes: 0 (0.0%)
+
+Task: close the top drawer of the cabinet
+Starting episode 3...
+Caught exception: Your model was trained on more than one dataset, please pass a `unnorm_key` from the following options to choose the statistics used for un-normalizing actions: dict_keys(['libero_90_vla_aux', 'libero_object_vla_aux', 'libero_spatial_vla_aux'])
+Saved rollout MP4 at path ./rollouts/2024_12_10/2024_12_10-04_36_37--episode=3--success=False--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: False
+# episodes completed so far: 3
+# successes: 0 (0.0%)
+
+Task: close the top drawer of the cabinet
+Starting episode 4...
+Caught exception: Your model was trained on more than one dataset, please pass a `unnorm_key` from the following options to choose the statistics used for un-normalizing actions: dict_keys(['libero_90_vla_aux', 'libero_object_vla_aux', 'libero_spatial_vla_aux'])
+Saved rollout MP4 at path ./rollouts/2024_12_10/2024_12_10-04_36_37--episode=4--success=False--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: False
+# episodes completed so far: 4
+# successes: 0 (0.0%)
+
+Task: close the top drawer of the cabinet
+Starting episode 5...
+Caught exception: Your model was trained on more than one dataset, please pass a `unnorm_key` from the following options to choose the statistics used for un-normalizing actions: dict_keys(['libero_90_vla_aux', 'libero_object_vla_aux', 'libero_spatial_vla_aux'])
+Saved rollout MP4 at path ./rollouts/2024_12_10/2024_12_10-04_36_37--episode=5--success=False--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: False
+# episodes completed so far: 5
+# successes: 0 (0.0%)
+
+Task: close the top drawer of the cabinet
+Starting episode 6...
+Caught exception: Your model was trained on more than one dataset, please pass a `unnorm_key` from the following options to choose the statistics used for un-normalizing actions: dict_keys(['libero_90_vla_aux', 'libero_object_vla_aux', 'libero_spatial_vla_aux'])
+Saved rollout MP4 at path ./rollouts/2024_12_10/2024_12_10-04_36_37--episode=6--success=False--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: False
+# episodes completed so far: 6
+# successes: 0 (0.0%)
+
+Task: close the top drawer of the cabinet
+Starting episode 7...
+Caught exception: Your model was trained on more than one dataset, please pass a `unnorm_key` from the following options to choose the statistics used for un-normalizing actions: dict_keys(['libero_90_vla_aux', 'libero_object_vla_aux', 'libero_spatial_vla_aux'])
+Saved rollout MP4 at path ./rollouts/2024_12_10/2024_12_10-04_36_37--episode=7--success=False--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: False
+# episodes completed so far: 7
+# successes: 0 (0.0%)
+
+Task: close the top drawer of the cabinet
+Starting episode 8...
+Caught exception: Your model was trained on more than one dataset, please pass a `unnorm_key` from the following options to choose the statistics used for un-normalizing actions: dict_keys(['libero_90_vla_aux', 'libero_object_vla_aux', 'libero_spatial_vla_aux'])
+Saved rollout MP4 at path ./rollouts/2024_12_10/2024_12_10-04_36_37--episode=8--success=False--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: False
+# episodes completed so far: 8
+# successes: 0 (0.0%)
+
+Task: close the top drawer of the cabinet
+Starting episode 9...
+Caught exception: Your model was trained on more than one dataset, please pass a `unnorm_key` from the following options to choose the statistics used for un-normalizing actions: dict_keys(['libero_90_vla_aux', 'libero_object_vla_aux', 'libero_spatial_vla_aux'])
+Saved rollout MP4 at path ./rollouts/2024_12_10/2024_12_10-04_36_37--episode=9--success=False--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: False
+# episodes completed so far: 9
+# successes: 0 (0.0%)
+
+Task: close the top drawer of the cabinet
+Starting episode 10...
+Caught exception: Your model was trained on more than one dataset, please pass a `unnorm_key` from the following options to choose the statistics used for un-normalizing actions: dict_keys(['libero_90_vla_aux', 'libero_object_vla_aux', 'libero_spatial_vla_aux'])
+Saved rollout MP4 at path ./rollouts/2024_12_10/2024_12_10-04_36_37--episode=10--success=False--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: False
+# episodes completed so far: 10
+# successes: 0 (0.0%)
+
+Task: close the top drawer of the cabinet

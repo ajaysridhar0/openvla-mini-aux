@@ -1,0 +1,17 @@
+Task suite: libero_90
+
+Task: close the top drawer of the cabinet
+Starting episode 1...
+Caught exception: 
+Saved rollout MP4 at path ./rollouts/2024_12_11/2024_12_11-03_01_26--episode=1--success=False--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: False
+# episodes completed so far: 1
+# successes: 0 (0.0%)
+
+Task: close the top drawer of the cabinet
+Starting episode 2...
+Caught exception: 
+Saved rollout MP4 at path ./rollouts/2024_12_11/2024_12_11-03_01_26--episode=2--success=False--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: False
+# episodes completed so far: 2
+# successes: 0 (0.0%)

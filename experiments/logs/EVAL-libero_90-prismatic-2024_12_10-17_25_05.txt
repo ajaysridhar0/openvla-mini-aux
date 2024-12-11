@@ -1,0 +1,31 @@
+Task suite: libero_90
+
+Task: close the top drawer of the cabinet
+Starting episode 1...
+Saved rollout MP4 at path ./rollouts/2024_12_10/2024_12_10-17_25_05--episode=1--success=True--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: True
+# episodes completed so far: 1
+# successes: 1 (100.0%)
+
+Task: close the top drawer of the cabinet
+Starting episode 2...
+Saved rollout MP4 at path ./rollouts/2024_12_10/2024_12_10-17_25_05--episode=2--success=True--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: True
+# episodes completed so far: 2
+# successes: 2 (100.0%)
+
+Task: close the top drawer of the cabinet
+Starting episode 3...
+Saved rollout MP4 at path ./rollouts/2024_12_10/2024_12_10-17_25_05--episode=3--success=True--task=close_the_top_drawer_of_the_cabinet.mp4
+Success: True
+# episodes completed so far: 3
+# successes: 3 (100.0%)
+Current task success rate: 1.0
+Current total success rate: 1.0
+
+Task: close the top drawer of the cabinet and put the black bowl on top of it
+Starting episode 1...
+Saved rollout MP4 at path ./rollouts/2024_12_10/2024_12_10-17_25_05--episode=4--success=True--task=close_the_top_drawer_of_the_cabinet_and_put_the_bl.mp4
+Success: True
+# episodes completed so far: 4
+# successes: 4 (100.0%)

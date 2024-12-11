@@ -373,14 +373,13 @@ class TrainingStrategy(ABC):
 
                         # Compute metrics per dataset --> only on rank_zero since we don't log them on other workers anyways
                         if overwatch.is_rank_zero():
-                            datasets = set([batch["dataset_names"][i] for i in range(len(batch["dataset_names"])) if action_mask.tolist()[i]])
+                            filterd_datasets = [batch["dataset_names"][i] for i in range(len(batch["dataset_names"])) if action_mask.tolist()[i]]
+                            datasets = set(filterd_datasets)
                             if len(datasets) > 1:
                                 for ds in datasets:
-                                    ds_mask = torch.tensor([elem == ds for elem in batch["dataset_names"]])
-                                    try:
-                                        action_accuracy_ds = correct_preds[ds_mask].sum().float() / mask[ds_mask].sum().float()
-                                    except:
-                                        breakpoint()
+                                    ds_mask = torch.tensor([elem == ds for elem in filterd_datasets])
+                                    action_accuracy_ds = correct_preds[ds_mask].sum().float() / mask[ds_mask].sum().float()
+                                    
                                     continuous_actions_pred_ds = torch.tensor(
                                         action_tokenizer.decode_token_ids_to_actions(
                                             action_preds[ds_mask][mask[ds_mask]].cpu().numpy()

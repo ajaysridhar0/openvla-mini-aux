@@ -212,6 +212,7 @@ def train(cfg: TrainConfig) -> None:
         default_image_resolution=vlm.vision_backbone.default_image_resolution,
         shuffle_buffer_size=cfg.vla.shuffle_buffer_size,
         transform_types=cfg.vla.transform_types,
+        transform_weights=cfg.vla.transform_weights,
         image_aug=cfg.image_aug,
         action_tokenizer=cfg.action_tokenizer,
         future_obj_pose_window_size=cfg.vla.future_obj_pose_window_size,

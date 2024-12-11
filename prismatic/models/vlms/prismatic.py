@@ -589,9 +589,9 @@ class PrismaticVLM(VLM):
                     gen_probabilities.append(string_probs.cpu().numpy().tolist())
 
         return gen_texts if return_string_probabilities is None else gen_probabilities
-
+    
     @torch.inference_mode()
-    def generate(self, image: Union[Img, List[Img]], prompt_text: str, **kwargs: str) -> str:
+    def generate(self, image: Union[Img, List[Img]], prompt_text: str, max_new_tokens: int, eos_token_id: int=None, **kwargs: str) -> str:
         # For now, only support generation with a batch size of 1 for simplicity
         image_transform, tokenizer = self.vision_backbone.image_transform, self.llm_backbone.tokenizer
 
@@ -613,10 +613,55 @@ class PrismaticVLM(VLM):
                 input_ids=input_ids,            # Shape: [1, seq]
                 pixel_values=pixel_values,      # Shape: [1, 3, res, res] or Dict[str, Shape[1, 3, res, res]]
                                                 #  FOR MULTI-IMAGE Shape: [1, T, 3, res, res]
+                max_new_tokens=max_new_tokens,
+                eos_token_id=eos_token_id,
                 **kwargs
             )
             # fmt: on
-
         generated_text = tokenizer.decode(generated_ids[0, input_ids.shape[1] :], skip_special_tokens=True).strip()
 
         return generated_text
+
+    @torch.inference_mode()
+    def generate_new(
+        self,
+        image: Union[Img, List[Img]],
+        prompt_text: str,
+        max_new_tokens: Optional[int] = None,
+        eos_token_id: Optional[int] = None,
+        **kwargs: str
+    ) -> torch.LongTensor:
+        """
+        Generate text based on the given image and prompt.
+
+        @param image: PIL Image or list of PIL Images
+        @param prompt_text: The prompt text to generate from
+        @param max_new_tokens: Maximum number of tokens to generate
+        @param eos_token_id: Token ID at which to stop generation
+        @return Generated token IDs
+        """
+        # For now, only support generation with a batch size of 1 for simplicity
+        image_transform, tokenizer = self.vision_backbone.image_transform, self.llm_backbone.tokenizer
+
+        # Prepare Inputs
+        input_ids = tokenizer(prompt_text, truncation=True, return_tensors="pt").input_ids.to(self.device)
+        pixel_values = image_transform(image)
+        if isinstance(pixel_values, torch.Tensor):
+            pixel_values = pixel_values[None, ...].to(self.device)
+        elif isinstance(pixel_values, dict):
+            pixel_values = {k: v[None, ...].to(self.device) for k, v in pixel_values.items()}
+        else:
+            raise ValueError(f"Unsupported `pixel_values` type = {type(pixel_values)}")
+
+        # Invoke super().generate --> taps into `GenerationMixin` which (redirects) to `forward()`
+        autocast_dtype = self.llm_backbone.half_precision_dtype
+        with torch.autocast("cuda", dtype=autocast_dtype, enabled=self.enable_mixed_precision_training):
+            generated_ids = super().generate(
+                input_ids=input_ids,            # Shape: [1, seq]
+                pixel_values=pixel_values,      # Shape: [1, 3, res, res] or Dict[str, Shape[1, 3, res, res]]
+                max_new_tokens=max_new_tokens if max_new_tokens else self.get_action_dim(),
+                eos_token_id=eos_token_id,      # Pass the stop token ID if provided
+                **kwargs
+            )
+
+        return generated_ids
