@@ -29,6 +29,9 @@ import tqdm
 from libero.libero import benchmark
 
 import wandb
+import cv2
+from matplotlib import colors
+import random
 
 # Append current directory so that interpreter can find experiments.robot
 sys.path.append("../..")
@@ -88,8 +91,142 @@ class GenerateConfig:
     seed: int = 7                                    # Random Seed (for reproducibility)
 
     aux_task_types: Optional[str] = None     # Auxiliary task types to query before action prediction
-
+    aux_context_freq: int = 1
     # fmt: on
+
+
+END_TEXT = "<|im_end|>"
+
+
+def draw_bbox_on_image(img, bbox_dict, color_map):
+    """Draw bounding boxes on image with consistent colors per object.
+    
+    Args:
+        img: numpy array of shape (H,W,3) with values in [0,255]
+        bbox_dict: dict of object_name: [x1,y1,x2,y2] in normalized coordinates
+        color_map: dict mapping object names to RGB colors
+    """
+    img_with_bbox = img.copy()
+    h, w = img.shape[:2]
+    
+    for obj_name, bbox in bbox_dict.items():
+        if obj_name not in color_map:
+            # Generate random RGB color if not already assigned
+            color_map[obj_name] = tuple(random.random() for _ in range(3))
+        
+        color = color_map[obj_name]
+        x1, y1, x2, y2 = bbox
+        
+        # Convert normalized coords to pixel coords
+        x1, x2 = int(x1 * w), int(x2 * w)
+        y1, y2 = int(y1 * h), int(y2 * h)
+        
+        # Draw rectangle
+        cv2.rectangle(img_with_bbox, (x1, y1), (x2, y2), 
+                     tuple(int(c * 255) for c in color), 2)
+        
+        # Add label
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(img_with_bbox, obj_name, (x1, y1-5), font, 0.5, 
+                    tuple(int(c * 255) for c in color), 1)
+    
+    return img_with_bbox
+
+
+def draw_trajectory_on_image(img, trajectory_points):
+    """Draw end-effector trajectory on image.
+    
+    Args:
+        img: numpy array of shape (H,W,3) with values in [0,255]
+        trajectory_points: list of (x,y) tuples in normalized coordinates
+    """
+    img_with_traj = img.copy()
+    h, w = img.shape[:2]
+    
+    # Convert normalized coordinates to pixel coordinates
+    pixel_points = [(int(x * w), int(y * h)) for x, y in trajectory_points]
+    
+    # Draw lines connecting consecutive points
+    for i in range(len(pixel_points)-1):
+        cv2.line(img_with_traj, pixel_points[i], pixel_points[i+1], 
+                (0, 255, 0), 2)  # Green color for trajectory
+        
+    # Draw points
+    for point in pixel_points:
+        cv2.circle(img_with_traj, point, 3, (255, 0, 0), -1)  # Red dots for waypoints
+        
+    return img_with_traj
+
+
+def draw_motion_text_on_image(img, motion_text):
+    """Draw motion text as subtitles on the image with black background and white text.
+    
+    Args:
+        img: numpy array of shape (H,W,3) with values in [0,255]
+        motion_text: string describing the motion
+    """
+    img_with_text = img.copy()
+    h, w = img.shape[:2]
+    
+    # Remove end token if present
+    motion_text = motion_text.replace('<|im_end|>', '').strip()
+    
+    # Font settings
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.5  # Reduced from 0.7
+    font_thickness = 1
+    text_color = (255, 255, 255)  # White text
+    bg_color = (0, 0, 0)  # Black background
+    
+    # Split text into lines if too long (wrap at ~40 chars)
+    words = motion_text.split()
+    lines = []
+    current_line = []
+    current_length = 0
+    
+    for word in words:
+        if current_length + len(word) + 1 <= 40:  # +1 for space
+            current_line.append(word)
+            current_length += len(word) + 1
+        else:
+            lines.append(' '.join(current_line))
+            current_line = [word]
+            current_length = len(word)
+    if current_line:
+        lines.append(' '.join(current_line))
+    
+    # Calculate text sizes and positions
+    padding = 8  # Slightly reduced padding to match smaller text
+    line_spacing = 4  # Slightly reduced spacing to match smaller text
+    total_height = 0
+    
+    # Get size of each line
+    line_sizes = []
+    for line in lines:
+        (text_width, text_height), _ = cv2.getTextSize(line, font, font_scale, font_thickness)
+        line_sizes.append((text_width, text_height))
+        total_height += text_height + line_spacing
+    
+    # Calculate starting y position (near bottom of image)
+    y_pos = h - total_height - padding
+    
+    # Draw background and text for each line
+    for line, (text_width, text_height) in zip(lines, line_sizes):
+        # Calculate text position
+        x_pos = (w - text_width) // 2  # Center text
+        
+        # Draw background rectangle
+        bg_pts = np.array([[x_pos - padding, y_pos - padding],
+                          [x_pos + text_width + padding, y_pos + text_height + padding]])
+        cv2.rectangle(img_with_text, bg_pts[0], bg_pts[1], bg_color, -1)
+        
+        # Draw text
+        cv2.putText(img_with_text, line, (x_pos, y_pos + text_height), 
+                    font, font_scale, text_color, font_thickness)
+        
+        y_pos += text_height + line_spacing
+    
+    return img_with_text
 
 
 @draccus.wrap()
@@ -154,33 +291,43 @@ def eval_libero(cfg: GenerateConfig) -> None:
     if cfg.aux_task_types is not None:
         cfg.aux_task_types = cfg.aux_task_types.split("->")
 
-    # Start evaluation
+    # Initialize tracking for all tasks
+    task_episodes = [0] * num_tasks_in_suite
+    task_successes = [0] * num_tasks_in_suite
     total_episodes, total_successes = 0, 0
-    for task_id in tqdm.tqdm(range(num_tasks_in_suite)):
-        # Get task
-        task = task_suite.get_task(task_id)
 
-        # Get default LIBERO initial states
-        initial_states = task_suite.get_task_init_states(task_id)
+    # Run trials in an interleaved pattern
+    for trial_idx in range(cfg.num_trials_per_task):
+        # Iterate through each task for this trial
+        for task_id in tqdm.tqdm(range(5, num_tasks_in_suite)): #num_tasks_in_suite
+            # Get task
+            task = task_suite.get_task(task_id)
+            task_name = task.language
 
-        # Initialize LIBERO environment and task description
-        env, task_description = get_libero_env(task, cfg.model_family, resolution=256)
+            # Get default LIBERO initial states
+            initial_states = task_suite.get_task_init_states(task_id)
 
-        # Start episodes
-        task_episodes, task_successes = 0, 0
-        for episode_idx in tqdm.tqdm(range(cfg.num_trials_per_task)):
-            print(f"\nTask: {task_description}")
-            log_file.write(f"\nTask: {task_description}\n")
+            # Initialize LIBERO environment and task description
+            env, task_description = get_libero_env(task, cfg.model_family, resolution=256)
+
+            print(f"\nTask {task_id}: {task_name} (Trial {trial_idx + 1}/{cfg.num_trials_per_task})")
+            log_file.write(f"\nTask {task_id}: {task_name} (Trial {trial_idx + 1}/{cfg.num_trials_per_task})\n")
 
             # Reset environment
             env.reset()
 
             # Set initial states
-            obs = env.set_init_state(initial_states[episode_idx])
+            obs = env.set_init_state(initial_states[trial_idx])
 
             # Setup
             t = 0
             replay_images = []
+            replay_images_with_bbox = []  # Separate list for bbox images
+            bbox_color_map = {}  # Reset color map for each new video
+            has_bbox_predictions = False  # Flag to track if we've seen any bbox predictions
+            has_ee_pose_predictions = False  # Flag to track if we've seen any ee_pose predictions
+            has_motion_predictions = False  # Flag to track if we've seen any motion predictions
+            
             if cfg.task_suite_name == "libero_spatial":
                 max_steps = 220  # longest training demo has 193 steps
             elif cfg.task_suite_name == "libero_object":
@@ -190,10 +337,12 @@ def eval_libero(cfg: GenerateConfig) -> None:
             elif cfg.task_suite_name == "libero_10":
                 max_steps = 520  # longest training demo has 505 steps
             elif cfg.task_suite_name == "libero_90":
-                max_steps = 400  # longest training demo has 373 steps
+                max_steps = 400 # 400  # longest training demo has 373 steps
 
-            print(f"Starting episode {task_episodes+1}...")
-            log_file.write(f"Starting episode {task_episodes+1}...\n")
+            print(f"Starting episode {task_episodes[task_id]+1}...")
+            log_file.write(f"Starting episode {task_episodes[task_id]+1}...\n")
+            # Create progress bar for steps
+            pbar = tqdm.tqdm(total=max_steps + cfg.num_steps_wait, desc='Environment steps')
             while t < max_steps + cfg.num_steps_wait:
                 try:
                     # IMPORTANT: Do nothing for the first few timesteps because the simulator drops objects
@@ -201,6 +350,7 @@ def eval_libero(cfg: GenerateConfig) -> None:
                     if t < cfg.num_steps_wait:
                         obs, reward, done, info = env.step(get_libero_dummy_action(cfg.model_family))
                         t += 1
+                        pbar.update(1)
                         continue
 
                     # Get preprocessed image
@@ -219,13 +369,38 @@ def eval_libero(cfg: GenerateConfig) -> None:
                     }
 
                     # Query model to get action
-                    action = get_action(
+                    output = get_action(
                         cfg,
                         model,
                         observation,
                         task_description,
                         processor=processor,
                     )
+
+                    action = output['action']
+                    
+                    # Save original image
+                    replay_images.append(img)
+                    
+                    # Process image with visualizations
+                    current_img = img.copy()
+                    
+                    # Draw bounding boxes if available
+                    if 'bbox' in output:
+                        has_bbox_predictions = True
+                        current_img = draw_bbox_on_image(current_img, output['bbox'], bbox_color_map)
+                    
+                    # Draw trajectory if available
+                    if 'ee_pose_2D' in output:
+                        has_ee_pose_predictions = True
+                        current_img = draw_trajectory_on_image(current_img, output['ee_pose_2D'])
+                    
+                    # Draw motion text if available
+                    if 'low_level_motion' in output:
+                        has_motion_predictions = True
+                        current_img = draw_motion_text_on_image(current_img, output['low_level_motion'])
+                    
+                    replay_images_with_bbox.append(current_img)  # Now includes bbox, trajectory, and motion text
 
                     # Normalize gripper action [0,1] -> [-1,+1] because the environment expects the latter
                     action = normalize_gripper_action(action, binarize=True)
@@ -238,66 +413,86 @@ def eval_libero(cfg: GenerateConfig) -> None:
                     # Execute action in environment
                     obs, reward, done, info = env.step(action.tolist())
                     if done:
-                        task_successes += 1
-                        total_successes += 1
-                        break
+                        break    # Just break the loop, we'll count success after
                     t += 1
+                    pbar.update(1)
 
                 except Exception as e:
                     print(f"Caught exception: {e}")
                     log_file.write(f"Caught exception: {e}\n")
                     break
+            pbar.close()
 
-            task_episodes += 1
+            task_episodes[task_id] += 1
             total_episodes += 1
+            if done:
+                # Count success only once, here
+                task_successes[task_id] += 1
+                total_successes += 1
 
             # Save a replay video of the episode
             save_rollout_video(
                 replay_images, total_episodes, success=done, task_description=task_description, log_file=log_file
             )
-
-            # Save the videos to wandb
-            if cfg.use_wandb and (task_successes < 10 or task_episodes - task_successes < 10):
-                group = "success" if done else "failure"
-                idx = task_successes if done else task_episodes - task_successes
-                wandb.log(
-                    {f"{task_description}/{group}/{idx}": wandb.Video(np.array(replay_images).transpose(0, 3, 1, 2))}
+            
+            # Save visualization video if we had any predictions
+            if has_bbox_predictions or has_ee_pose_predictions or has_motion_predictions:
+                viz_suffix = "_with_" + "_".join(
+                    x for x in ["bbox", "ee_pose", "motion"] 
+                    if (x == "bbox" and has_bbox_predictions) or 
+                       (x == "ee_pose" and has_ee_pose_predictions) or
+                       (x == "motion" and has_motion_predictions)
+                )
+                save_rollout_video(
+                    replay_images_with_bbox, total_episodes, success=done,
+                    task_description=f"{task_description}{viz_suffix}", log_file=log_file
                 )
 
-            # Log current results
-            print(f"Success: {done}")
-            print(f"# episodes completed so far: {total_episodes}")
-            print(f"# successes: {total_successes} ({total_successes / total_episodes * 100:.1f}%)")
-            log_file.write(f"Success: {done}\n")
-            log_file.write(f"# episodes completed so far: {total_episodes}\n")
-            log_file.write(f"# successes: {total_successes} ({total_successes / total_episodes * 100:.1f}%)\n")
-            log_file.flush()
-
-        # Log final results
-        print(f"Current task success rate: {float(task_successes) / float(task_episodes)}")
-        print(f"Current total success rate: {float(total_successes) / float(total_episodes)}")
-        log_file.write(f"Current task success rate: {float(task_successes) / float(task_episodes)}\n")
-        log_file.write(f"Current total success rate: {float(total_successes) / float(total_episodes)}\n")
-        log_file.flush()
-        if cfg.use_wandb:
-            wandb.log(
-                {
-                    f"success_rate/{task_description}": float(task_successes) / float(task_episodes),
-                    f"num_episodes/{task_description}": task_episodes,
+            # If using wandb, log videos
+            if cfg.use_wandb and (task_successes[task_id] < 10 or task_episodes[task_id] - task_successes[task_id] < 10):
+                group = "success" if done else "failure"
+                idx = task_successes[task_id] if done else task_episodes[task_id] - task_successes[task_id]
+                log_dict = {
+                    f"{task_description}/{group}/{idx}": wandb.Video(np.array(replay_images).transpose(0, 3, 1, 2))
                 }
-            )
+                if has_bbox_predictions or has_ee_pose_predictions or has_motion_predictions:
+                    viz_suffix = "_with_" + "_".join(
+                        x for x in ["bbox", "ee_pose", "motion"] 
+                        if (x == "bbox" and has_bbox_predictions) or 
+                           (x == "ee_pose" and has_ee_pose_predictions) or
+                           (x == "motion" and has_motion_predictions)
+                    )
+                    log_dict[f"{task_description}{viz_suffix}/{group}/{idx}"] = wandb.Video(
+                        np.array(replay_images_with_bbox).transpose(0, 3, 1, 2)
+                    )
+                wandb.log(log_dict)
+
+            # Log current results for this task and overall progress
+            task_success_rate = float(task_successes[task_id]) / float(task_episodes[task_id]) * 100
+            total_success_rate = float(total_successes) / float(total_episodes) * 100
+            
+            print(f"Task {task_id} success rate: {task_success_rate:.1f}%")
+            print(f"Overall success rate: {total_success_rate:.1f}%")
+            log_file.write(f"Task {task_id} success rate: {task_success_rate:.1f}%\n")
+            log_file.write(f"Overall success rate: {total_success_rate:.1f}%\n")
+
+            # Log to wandb after each episode
+            if cfg.use_wandb:
+                wandb.log({
+                    f"success_rate/{task_description}": task_success_rate / 100,
+                    "success_rate/total": total_success_rate / 100,
+                    f"num_episodes/{task_description}": task_episodes[task_id],
+                    "num_episodes/total": total_episodes,
+                })
+
+        # Remove the per-trial summary since we're already logging after each episode
+        log_file.flush()
 
     # Save local log file
     log_file.close()
 
-    # Push total metrics and local log file to wandb
+    # Final wandb logging not needed since we're logging throughout
     if cfg.use_wandb:
-        wandb.log(
-            {
-                "success_rate/total": float(total_successes) / float(total_episodes),
-                "num_episodes/total": total_episodes,
-            }
-        )
         wandb.save(local_log_filepath)
 
 

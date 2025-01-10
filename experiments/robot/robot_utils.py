@@ -72,7 +72,10 @@ def get_action(cfg, model, obs, task_label, processor=None):
         action = get_prismatic_vla_action(
             model, processor, cfg.pretrained_checkpoint, obs, task_label, cfg.unnorm_key, aux_task_types=cfg.aux_task_types, center_crop=cfg.center_crop
         )
-        assert action.shape == (ACTION_DIM,)
+        if isinstance(action, dict):
+            assert action['action'].shape == (ACTION_DIM,)
+        else:
+            assert action.shape == (ACTION_DIM,)
     elif cfg.model_family == "openvla":
         action = get_vla_action(
             model, processor, cfg.pretrained_checkpoint, obs, task_label, cfg.unnorm_key, center_crop=cfg.center_crop

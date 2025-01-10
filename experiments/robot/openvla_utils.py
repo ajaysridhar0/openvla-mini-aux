@@ -43,6 +43,7 @@ def get_prismatic_vla(cfg):
         cfg.pretrained_checkpoint,
         hf_token=hf_token,
         load_for_training=False,
+        aux_context_freq=cfg.aux_context_freq,
     )
     for param in vla.parameters():
         assert param.dtype == torch.float32, f"Loaded VLM parameter not in full precision: {param}"
@@ -213,7 +214,7 @@ def get_vla_action(vla, processor, base_vla_name, obs, task_label, unnorm_key, c
     inputs = processor(prompt, image).to(DEVICE, dtype=torch.bfloat16)
 
     # Get action.
-    action = vla.predict_action(**inputs, unnorm_key=unnorm_key, do_sample=False)
+    action = vla.predict_action(**inputs, unnorm_key=unnorm_key, do_sample=False)['action']
     return action
 
 
@@ -236,5 +237,5 @@ def get_prismatic_vla_action(vla, processor, base_vla_name, obs, task_label, unn
         temp_image = temp_image.resize(image.size, Image.Resampling.BILINEAR)  # IMPORTANT: dlimp uses BILINEAR resize
         image = temp_image
 
-    action = vla.predict_action(image, task_label, unnorm_key=unnorm_key, aux_task_types=aux_task_types, **kwargs)
-    return action
+    action_dict = vla.predict_action(image, task_label, unnorm_key=unnorm_key, aux_task_types=aux_task_types, **kwargs)
+    return action_dict

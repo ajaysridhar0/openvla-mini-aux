@@ -5,7 +5,7 @@ PyTorch Module defining OpenVLA as a lightweight wrapper around a PrismaticVLM; 
 discretizing actions with the ActionTokenizer.
 """
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Tuple
 
 import numpy as np
 import time
@@ -29,11 +29,16 @@ class OpenVLA(PrismaticVLM):
         *args,
         norm_stats: Dict[str, Dict[str, Dict[str, Dict[str, List[float]]]]],
         action_tokenizer: ActionTokenizer,
+        aux_context_freq: int = 1,
         **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.norm_stats = norm_stats
         self.action_tokenizer = action_tokenizer
+        self.aux_context_freq = aux_context_freq
+        self._aux_cache = {}
+        self._aux_cache_counter = 0
+        self._last_instruction = None
 
     @torch.inference_mode()
     def predict_action(
@@ -72,31 +77,55 @@ class OpenVLA(PrismaticVLM):
 
         # Calculate total max tokens: for each aux Q&A pair, set a reasonable max (e.g., 50 tokens), plus action tokens
 
+        output = {}
+
         if aux_task_types:
-            max_tokens_per_aux = 250  # Adjust as needed
-            aux_answers = {}
-            for aux_type in aux_task_types:
-                aux_prompt = AUX_QUESTIONS_PROMPT[aux_type] + f" {instruction.lower()}?"
-                prompt_builder.add_turn(role="human", message=aux_prompt)
-                
-                # get response from model
-                prompt_text = prompt_builder.get_prompt()
-                input_ids = self.process_prompt_text(tokenizer, prompt_text)
-                
-                # Use autocast to ensure consistent dtype
-                autocast_dtype = self.llm_backbone.half_precision_dtype
-                with torch.autocast("cuda", dtype=autocast_dtype, enabled=self.enable_mixed_precision_training):
-                    generated_ids = super(PrismaticVLM, self).generate(
-                        input_ids=input_ids,                            # Shape: [1, seq]
-                        pixel_values=pixel_values,                      # Shape: [1, (opt T,) 3, res, res] or Dict[str, ...]
-                        max_new_tokens=max_tokens_per_aux,
-                        eos_token_id=151645,
-                        **kwargs
-                    )
-                generated_text = tokenizer.decode(generated_ids[0, input_ids.shape[1] :])
-                aux_answers[aux_type] = generated_text
-                prompt_builder.add_turn(role="gpt", message=generated_text)
-                
+            # Check if we need to refresh the cache
+            should_refresh = (
+                self._aux_cache_counter % self.aux_context_freq == 0
+                or instruction != self._last_instruction
+                or not self._aux_cache
+            )
+
+            if should_refresh:
+                # Original aux Q&A logic
+                aux_answers = {}
+                for aux_type in aux_task_types:
+                    aux_prompt = AUX_QUESTIONS_PROMPT[aux_type] + f" {instruction.lower()}?"
+                    prompt_builder.add_turn(role="human", message=aux_prompt)
+                    
+                    # get response from model
+                    prompt_text = prompt_builder.get_prompt()
+                    input_ids = self.process_prompt_text(tokenizer, prompt_text)
+
+                    # Use autocast to ensure consistent dtype
+                    autocast_dtype = self.llm_backbone.half_precision_dtype
+                    with torch.autocast("cuda", dtype=autocast_dtype, enabled=self.enable_mixed_precision_training):
+                        generated_ids = super(PrismaticVLM, self).generate(
+                            input_ids=input_ids,                            # Shape: [1, seq]
+                            pixel_values=pixel_values,                      # Shape: [1, (opt T,) 3, res, res] or Dict[str, ...]
+                            max_new_tokens=250,
+                            eos_token_id=151645,
+                            **kwargs
+                        )
+                    generated_text = tokenizer.decode(generated_ids[0, input_ids.shape[1] :])
+                    aux_answers[aux_type] = generated_text
+                    prompt_builder.add_turn(role="gpt", message=generated_text)
+                    
+                # Update cache
+                self._aux_cache = aux_answers
+                self._last_instruction = instruction
+            else:
+                # Use cached answers
+                aux_answers = self._aux_cache
+                for aux_type, answer in aux_answers.items():
+                    prompt_builder.add_turn(role="human", message=AUX_QUESTIONS_PROMPT[aux_type] + f" {instruction.lower()}?")
+                    prompt_builder.add_turn(role="gpt", message=answer)
+
+            self._aux_cache_counter += 1
+            output.update(aux_answers)
+        
+
         # Add Final Action Prompt
         prompt_builder.add_turn(role="human", message=f"What action should the robot take to {instruction.lower()}?")
 
@@ -135,10 +164,23 @@ class OpenVLA(PrismaticVLM):
         )
 
         elapsed_time = time.time() - start_time
-        overwatch.info(f"predict_action took {elapsed_time:.3f} seconds")
+        # overwatch.info(f"predict_action took {elapsed_time:.3f} seconds")
 
-        return actions
-    
+        output['action'] = actions
+        if "bbox" in aux_task_types:
+            try:
+                output['bbox'] = self.parse_bbox_string(output['bbox'])
+            except Exception as e:
+                overwatch.error(f"Error parsing bbox string: {e}")
+                output['bbox'] = {}
+        if "ee_pose_2D" in aux_task_types:
+            try:
+                output['ee_pose_2D'] = self.parse_ee_pose_2d_string(output['ee_pose_2D'])
+            except Exception as e:
+                overwatch.error(f"Error parsing ee_pose_2D string: {e}")
+                output['ee_pose_2D'] = []
+        
+        return output
 
     def process_prompt_text(self, tokenizer, prompt_text: str):
         # Prepare Inputs
@@ -217,3 +259,49 @@ class OpenVLA(PrismaticVLM):
         unnorm_key = self._check_unnorm_key(self.norm_stats, unnorm_key)
 
         return self.norm_stats[unnorm_key]["action"]
+
+    def parse_bbox_string(self, bbox_str: str) -> Dict[str, List[float]]:
+        """
+        Parse bbox string from model output into a dictionary mapping object names to their bounding boxes.
+        
+        @param bbox_str: String containing bbox predictions in format "name: [x1, y1, x2, y2], ..."
+        @return Dictionary mapping object names to bbox coordinates [x1, y1, x2, y2]
+        """
+        # Remove the <|im_end|> token if present
+        bbox_str = bbox_str.replace('<|im_end|>', '').strip()
+        
+        # Split into individual bbox predictions
+        bbox_entries = bbox_str.split('], ')
+        
+        bbox_dict = {}
+        for entry in bbox_entries:
+            # Split name and coordinates
+            name, coords = entry.split(': [')
+            
+            # Clean up coordinates and convert to float list
+            coords = coords.rstrip(']').split(', ')
+            bbox_dict[name] = [float(coord) for coord in coords]
+            
+        return bbox_dict
+
+    def parse_ee_pose_2d_string(self, pose_str: str) -> List[Tuple[float, float]]:
+        """
+        Parse ee_pose_2D string from model output into a list of 2D coordinates.
+        
+        @param pose_str: String containing pose predictions in format "[(x1, y1), (x2, y2), ...]"
+        @return List of tuples containing (x, y) coordinates
+        """
+        # Remove the <|im_end|> token if present
+        pose_str = pose_str.replace('<|im_end|>', '').strip()
+        
+        # Remove outer brackets and split into coordinate pairs
+        pose_str = pose_str.strip('[]')
+        coord_pairs = pose_str.split('), (')
+        
+        poses = []
+        for pair in coord_pairs:
+            # Clean up coordinates and convert to float tuple
+            pair = pair.strip('()').split(', ')
+            poses.append((float(pair[0]), float(pair[1])))
+            
+        return poses
