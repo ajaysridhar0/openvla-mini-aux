@@ -75,8 +75,8 @@ def find_qa_segments(labels):
         batch_segments.append(segments)
     
     # If input was 1D, return just the segments without batch dimension
-    if labels.shape[0] == 1:
-        return batch_segments[0]
+    # if labels.shape[0] == 1:
+    #     return batch_segments[0]
         
     return batch_segments
 
@@ -411,7 +411,7 @@ class TrainingStrategy(ABC):
                                 for batch_idx in range(len(qa_segments)):
                                     start, end = qa_segments[batch_idx][pred_idx]
                                     current_mask[batch_idx, start:end] = True
-
+                                    
                                 
                                 # Compute accuracy for current prediction type
                                 correct_preds = (action_preds == action_gt) & current_mask
@@ -429,7 +429,12 @@ class TrainingStrategy(ABC):
                                     if len(datasets) > 1:
                                         for ds in datasets:
                                             ds_mask = torch.tensor([elem == ds for elem in batch["dataset_names"]])
-                                            ds_correct_preds = correct_preds[ds_mask]
+                                            ds_mask = ds_mask[transform_type_mask.cpu()]
+                                            try:
+                                                ds_correct_preds = correct_preds[ds_mask]
+                                            except:
+                                                breakpoint()
+                                            
                                             ds_current_mask = current_mask[ds_mask]
                                             ds_accuracy = ds_correct_preds.sum().float() / ds_current_mask.sum().float()
                                             metrics.commit_for_dataset(
@@ -460,6 +465,7 @@ class TrainingStrategy(ABC):
                                     if len(datasets) > 1:
                                         for ds in datasets:
                                             ds_mask = torch.tensor([elem == ds for elem in batch["dataset_names"]])
+                                            ds_mask = ds_mask[transform_type_mask.cpu()]
                                             ds_action_mask = action_mask[ds_mask]
                                             ds_preds = action_preds[ds_mask][ds_action_mask]
                                             ds_gt = action_gt[ds_mask][ds_action_mask]
@@ -503,6 +509,7 @@ class TrainingStrategy(ABC):
                                         # Create dataset mask and expand to match tensor dimensions
                                         ds_mask = torch.tensor([elem == ds for elem in batch["dataset_names"]], 
                                                              device=action_preds.device)
+                                        ds_mask = ds_mask[transform_type_mask.cpu()]
                                         ds_mask = ds_mask.unsqueeze(1).expand(-1, action_preds.size(1))
                                         
                                         # Apply both dataset mask and action mask
