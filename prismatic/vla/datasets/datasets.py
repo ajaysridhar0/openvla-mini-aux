@@ -56,12 +56,15 @@ def _get_obj_pose_answer(rlds_batch: Dict[str, Any], lang: str) -> Tuple[str, st
     obj_bbox_names = rlds_batch['obj_bbox_names'].decode().split('|')
     dyn_obj_names = rlds_batch['dynamic_objects'].decode().split('|')
     obj_pose_answer = ""
-    for i, obj_name in enumerate(obj_bbox_names):
-        if obj_name in dyn_obj_names:
-            obj_pose_answer += f"{obj_name}: "
-            obj_pose_answer += str([(round(x, 3), round(y, 3)) for x, y in rlds_batch['obj_poses'][:, i]])
-            obj_pose_answer += ", "
-    obj_pose_answer = obj_pose_answer[:-2]
+    if dyn_obj_names[0] != "":
+        for i, obj_name in enumerate(obj_bbox_names):
+            if obj_name in dyn_obj_names:
+                obj_pose_answer += f"{obj_name}: "
+                obj_pose_answer += str([(round(x, 3), round(y, 3)) for x, y in rlds_batch['obj_poses'][:, i]])
+                obj_pose_answer += ", "
+        obj_pose_answer = obj_pose_answer[:-2]
+    else:
+        obj_pose_answer = "N/A"
     return (f"{AUX_QUESTIONS_PROMPT['obj_pose']} {lang}?", obj_pose_answer)
 
 
