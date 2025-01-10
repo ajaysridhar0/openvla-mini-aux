@@ -253,7 +253,9 @@ class VLAMetrics:
         }
 
         # Created metrics buffers for individual tracked datasets
-        self.dataset_trackers = defaultdict(lambda: VLAMetrics([], "", "", {}))
+        self.dataset_trackers = defaultdict(
+            lambda: defaultdict(lambda: deque(maxlen=window_size))
+        )
 
     def log(self, global_step: int, metrics: Dict[str, Union[int, float]]) -> None:
         for tracker in self.trackers:
@@ -305,27 +307,39 @@ class VLAMetrics:
                 self.state[key].append(value.detach())
 
     def commit_for_dataset(self, dataset_name: str, **kwargs) -> None:
-        self.dataset_trackers[dataset_name].commit(**kwargs)
+        """Commit metrics for a specific dataset."""
+        for key, value in kwargs.items():
+            if isinstance(value, torch.Tensor):
+                value = value.detach().cpu().item()  # Convert tensor to a scalar
+            self.dataset_trackers[dataset_name][key].append(value)
 
     @overwatch.rank_zero_only
     def push(self) -> str:
         # Note :: Raw Loss is an Average over Gradient Accumulation Steps --> No Smoothing!
         loss_raw = torch.stack(list(self.state["loss_raw"])).mean().item()
         loss = torch.stack(list(self.state["loss"])).mean().item()
-        l1_loss = torch.stack(list(self.state["l1_loss"])).mean().item()
-        action_accuracy = torch.stack(list(self.state["action_accuracy"])).mean().item()
         step_time, lr = np.mean(list(self.state["step_time"])), self.state["lr"][-1]
         status = self.get_status(loss)
+        l1_loss = torch.stack(list(self.state["l1_loss"])).mean().item()
+        action_accuracy = torch.stack(list(self.state["action_accuracy"])).mean().item()
 
-        # Get metrics per dataset
+        # Get metrics per dataset and prediction type
         dataset_metrics = {}
-        for ds, tracker in self.dataset_trackers.items():
-            dataset_metrics.update(
-                {
-                    f"{ds}/L1 Loss": torch.stack(list(tracker.state["l1_loss"])).mean().item(),
-                    f"{ds}/Action Token Accuracy": torch.stack(list(tracker.state["action_accuracy"])).mean().item(),
-                }
-            )
+        for ds, metrics_dict in self.dataset_trackers.items():
+            for metric_name, values in metrics_dict.items():
+                if len(values) > 0:
+                    if isinstance(values[0], torch.Tensor):
+                        metric_value = torch.stack(list(values)).mean().item()
+                    else:
+                        metric_value = np.mean(list(values))
+                    
+                    # If this is a dataset-specific metric (contains '/')
+                    dataset_metrics[f"{ds}/{metric_name}"] = metric_value
+                    # if '/' in ds:
+                    #     dataset_metrics[f"Dataset Specific/{ds}/{metric_name}"] = metric_value
+                    # else:
+                    #     # This is an aggregate metric for an aux type
+                    #     dataset_metrics[f"Aggregate/{ds}/{metric_name}"] = metric_value
 
         # Fire to Trackers
         prefix = "VLA Train"
@@ -340,7 +354,7 @@ class VLAMetrics:
                 f"{prefix}/Loss (Raw)": loss_raw,
                 f"{prefix}/Learning Rate": lr,
                 f"{prefix}/Step Time": step_time,
-                **dataset_metrics,
+                **dataset_metrics,  # This will include both aggregate and dataset-specific metrics
             },
         )
         return status
