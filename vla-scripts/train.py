@@ -81,7 +81,8 @@ class TrainConfig:
     # TODO (ajaysri): debug wandb
     wandb_project: str = "prismatic"                                # Name of W&B project to log to (use default!)
     wandb_entity: str = "ajaysridhar"                               # Name of entity to log under
-    
+
+    random_llm_weights: bool = False
 
     def __post_init__(self) -> None:
         """Lift optimization parameters from `self.vla` for ease of use =>> validate on `expected_world_size`"""
@@ -160,11 +161,12 @@ def train(cfg: TrainConfig) -> None:
             hf_token=hf_token,
             load_for_training=True,
             image_sequence_len=cfg.image_sequence_len,
+            random_llm_weights=cfg.random_llm_weights,
         )
 
     else:
         vlm = load(
-            cfg.vla.base_vlm, hf_token=hf_token, load_for_training=True, image_sequence_len=cfg.image_sequence_len
+            cfg.vla.base_vlm, hf_token=hf_token, load_for_training=True, image_sequence_len=cfg.image_sequence_len, random_llm_weights=cfg.random_llm_weights,
         )
 
     # [Validate] Model should be in Full Precision!

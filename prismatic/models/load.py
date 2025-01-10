@@ -55,8 +55,15 @@ def load(
     cache_dir: Optional[Union[str, Path]] = None,
     load_for_training: bool = False,
     image_sequence_len: Optional[int] = None,
+    random_llm_weights: bool = False,
 ) -> PrismaticVLM:
-    """Loads a pretrained PrismaticVLM from either local disk or the HuggingFace Hub."""
+    """
+    Loads a pretrained PrismaticVLM from either local disk or the HuggingFace Hub.
+    
+    Args:
+        ...
+        random_llm_weights: If True, initialize LLM weights randomly instead of loading pretrained weights
+    """
     if os.path.isdir(model_id_or_path):
         overwatch.info(f"Loading from local path `{(run_dir := Path(model_id_or_path))}`")
 
@@ -104,12 +111,16 @@ def load(
     )
 
     # Load LLM Backbone --> note `inference_mode = True` by default when calling `load()`
-    overwatch.info(f"Loading Pretrained LLM [bold]{model_cfg['llm_backbone_id']}[/] via HF Transformers")
+    overwatch.info(
+        f"{'Randomly initializing' if random_llm_weights else 'Loading Pretrained'} "
+        f"LLM [bold]{model_cfg['llm_backbone_id']}[/] via HF Transformers"
+    )
     llm_backbone, tokenizer = get_llm_backbone_and_tokenizer(
         model_cfg["llm_backbone_id"],
         llm_max_length=model_cfg.get("llm_max_length", 2048),
         hf_token=hf_token,
         inference_mode=not load_for_training,
+        pretrained=not random_llm_weights,
     )
 
     # Load VLM using `from_pretrained` (clobbers HF syntax... eventually should reconcile)
@@ -125,7 +136,6 @@ def load(
 
     return vlm
 
-
 # === Load Pretrained VLA Model ===
 def load_vla(
     model_id_or_path: Union[str, Path],
@@ -135,8 +145,16 @@ def load_vla(
     step_to_load: Optional[int] = None,
     model_type: str = "pretrained",
     image_sequence_len: Optional[int] = None,
+    random_llm_weights: bool = False,  # Add this new parameter
+    aux_context_freq: int = 1,
 ) -> OpenVLA:
-    """Loads a pretrained OpenVLA from either local disk or the HuggingFace Hub."""
+    """
+    Loads a pretrained OpenVLA from either local disk or the HuggingFace Hub.
+    
+    Args:
+        ...
+        random_llm_weights: If True, initialize LLM weights randomly instead of loading pretrained weights
+    """
 
     # TODO (siddk, moojink) :: Unify semantics with `load()` above; right now, `load_vla()` assumes path points to
     #   checkpoint `.pt` file, rather than the top-level run directory!
@@ -215,12 +233,16 @@ def load_vla(
     )
 
     # Load LLM Backbone --> note `inference_mode = True` by default when calling `load()`
-    overwatch.info(f"Loading Pretrained LLM [bold]{model_cfg.llm_backbone_id}[/] via HF Transformers")
+    overwatch.info(
+        f"{'Randomly initializing' if random_llm_weights else 'Loading Pretrained'} "
+        f"LLM [bold]{model_cfg.llm_backbone_id}[/] via HF Transformers"
+    )
     llm_backbone, tokenizer = get_llm_backbone_and_tokenizer(
         model_cfg.llm_backbone_id,
         llm_max_length=model_cfg.llm_max_length,
         hf_token=hf_token,
         inference_mode=not load_for_training,
+        pretrained=not random_llm_weights,  # Add this parameter to control weight initialization
     )
 
     # Create Action Tokenizer
@@ -238,6 +260,7 @@ def load_vla(
         freeze_weights=not load_for_training,
         norm_stats=norm_stats,
         action_tokenizer=action_tokenizer,
+        aux_context_freq=aux_context_freq,
     )
 
     return vla

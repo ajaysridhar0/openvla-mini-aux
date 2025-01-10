@@ -109,6 +109,7 @@ class HFCausalLLMBackbone(LLMBackbone, ABC):
         hf_token: Optional[str] = None,
         inference_mode: bool = False,
         use_flash_attention_2: bool = False,
+        pretrained: bool = True,
     ) -> None:
         super().__init__(llm_backbone_id)
         self.llm_family = llm_family
@@ -118,16 +119,21 @@ class HFCausalLLMBackbone(LLMBackbone, ABC):
         # Initialize LLM (downloading from HF Hub if necessary) --> `llm_cls` is the actual {Model}ForCausalLM class!
         #   => Note: We're eschewing use of the AutoModel API so that we can be more explicit about LLM-specific details
         if not self.inference_mode:
-            overwatch.info(f"Loading [bold]{llm_family}[/] LLM from [underline]`{hf_hub_path}`[/]", ctx_level=1)
-            self.llm = llm_cls.from_pretrained(
-                hf_hub_path,
-                token=hf_token,
-                use_flash_attention_2=use_flash_attention_2 if not self.inference_mode else False,
-                # The following parameters are set to prevent `UserWarnings` from HF; we want greedy decoding!
-                do_sample=False,
-                temperature=1.0,
-                top_p=1.0,
-            )
+            if pretrained:
+                overwatch.info(f"Loading [bold]{llm_family}[/] LLM from [underline]`{hf_hub_path}`[/]", ctx_level=1)
+                self.llm = llm_cls.from_pretrained(
+                    hf_hub_path,
+                    token=hf_token,
+                    use_flash_attention_2=use_flash_attention_2 if not self.inference_mode else False,
+                    # The following parameters are set to prevent `UserWarnings` from HF; we want greedy decoding!
+                    do_sample=False,
+                    temperature=1.0,
+                    top_p=1.0,
+                )
+            else:
+                overwatch.info(f"Initializing [bold]{llm_family}[/] LLM with random weights from config in [underline]`{hf_hub_path}`[/]", ctx_level=1)
+                config = AutoConfig.from_pretrained(hf_hub_path, token=hf_token)
+                self.llm = llm_cls.from_config(config)
 
         # [Contract] `inference_mode` means we're loading from a pretrained checkpoint; no need to load base weights!
         else:
