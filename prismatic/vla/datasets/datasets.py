@@ -44,11 +44,15 @@ def _get_bbox_qa(rlds_batch: Dict[str, Any], lang: str) -> Tuple[str, str]:
         bbox_answer += f"{obj_bbox_names[i]}: {bbox_coord_tokenized}"
         if i < len(obj_bbox_names) - 1:
             bbox_answer += ", "
+    if len(bbox_answer) == 0:
+        bbox_answer = "N/A"
     return (f"{AUX_QUESTIONS_PROMPT['bbox']} {lang}?", bbox_answer)
 
 
 def _get_low_level_motion_qa(rlds_batch: Dict[str, Any], lang: str) -> Tuple[str, str]:
     low_level_motion = rlds_batch['language_motions_future'].decode().split('|')[0]
+    if len(low_level_motion) == 0:
+        low_level_motion = "N/A"
     return (f"{AUX_QUESTIONS_PROMPT['low_level_motion']} {lang}?", low_level_motion)
 
 
@@ -70,6 +74,8 @@ def _get_obj_pose_answer(rlds_batch: Dict[str, Any], lang: str) -> Tuple[str, st
 
 def _get_ee_pose_2D_answer(rlds_batch: Dict[str, Any], lang: str) -> Tuple[str, str]:
     ee_pose_2D_answer = str([(round(x, 3), round(y, 3)) for x, y in rlds_batch['ee_pose_2D']])
+    if len(ee_pose_2D_answer) == 0:
+        ee_pose_2D_answer = "N/A"
     return (f"{AUX_QUESTIONS_PROMPT['ee_pose_2D']} {lang}?", ee_pose_2D_answer)
 
 
