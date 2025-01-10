@@ -368,6 +368,7 @@ def eval_libero(cfg: GenerateConfig) -> None:
                         ),
                     }
 
+
                     # Query model to get action
                     output = get_action(
                         cfg,

@@ -411,6 +411,7 @@ class TrainingStrategy(ABC):
                                 for batch_idx in range(len(qa_segments)):
                                     start, end = qa_segments[batch_idx][pred_idx]
                                     current_mask[batch_idx, start:end] = True
+
                                 
                                 # Compute accuracy for current prediction type
                                 correct_preds = (action_preds == action_gt) & current_mask

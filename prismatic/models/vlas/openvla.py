@@ -167,19 +167,20 @@ class OpenVLA(PrismaticVLM):
         # overwatch.info(f"predict_action took {elapsed_time:.3f} seconds")
 
         output['action'] = actions
-        if "bbox" in aux_task_types:
-            try:
-                output['bbox'] = self.parse_bbox_string(output['bbox'])
-            except Exception as e:
-                overwatch.error(f"Error parsing bbox string: {e}")
-                output['bbox'] = {}
-        if "ee_pose_2D" in aux_task_types:
-            try:
-                output['ee_pose_2D'] = self.parse_ee_pose_2d_string(output['ee_pose_2D'])
-            except Exception as e:
-                overwatch.error(f"Error parsing ee_pose_2D string: {e}")
-                output['ee_pose_2D'] = []
-        
+        if aux_task_types:
+            if "bbox" in aux_task_types:
+                try:
+                    output['bbox'] = self.parse_bbox_string(output['bbox'])
+                except Exception as e:
+                    overwatch.error(f"Error parsing bbox string: {e}")
+                    output['bbox'] = {}
+            if "ee_pose_2D" in aux_task_types:
+                try:
+                    output['ee_pose_2D'] = self.parse_ee_pose_2d_string(output['ee_pose_2D'])
+                except Exception as e:
+                    overwatch.error(f"Error parsing ee_pose_2D string: {e}")
+                    output['ee_pose_2D'] = []
+            
         return output
 
     def process_prompt_text(self, tokenizer, prompt_text: str):
