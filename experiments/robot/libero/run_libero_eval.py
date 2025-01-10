@@ -299,7 +299,7 @@ def eval_libero(cfg: GenerateConfig) -> None:
     # Run trials in an interleaved pattern
     for trial_idx in range(cfg.num_trials_per_task):
         # Iterate through each task for this trial
-        for task_id in tqdm.tqdm(range(5, num_tasks_in_suite)): #num_tasks_in_suite
+        for task_id in tqdm.tqdm(range(num_tasks_in_suite)): #num_tasks_in_suite
             # Get task
             task = task_suite.get_task(task_id)
             task_name = task.language
@@ -367,7 +367,6 @@ def eval_libero(cfg: GenerateConfig) -> None:
                             (obs["robot0_eef_pos"], quat2axisangle(obs["robot0_eef_quat"]), obs["robot0_gripper_qpos"])
                         ),
                     }
-
 
                     # Query model to get action
                     output = get_action(
