@@ -37,7 +37,6 @@ tf.config.set_visible_devices([], "GPU")
 
 # ruff: noqa: B006
 # @tf.function(experimental_relax_shapes=True)
-@tf.autograph.experimental.do_not_convert
 def make_dataset_from_rlds(
     name: str,
     data_dir: str,
@@ -188,7 +187,7 @@ def make_dataset_from_rlds(
             "obj_bbox_names": traj["obj_bbox_names"],
             "obj_bboxes": tf.cast(traj["obj_bboxes"], tf.float32),
             "language_motions_future": traj["language_motions_future"],
-            "dynamic_objects": traj["dynamic_objects"],
+            "dynamic_objects": traj.get("dynamic_objects", traj["obj_bbox_names"]),
             "ee_pose_2D": tf.cast(traj["ee_pose_2D"], tf.float32),
         }
 
