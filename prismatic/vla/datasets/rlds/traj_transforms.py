@@ -10,7 +10,6 @@ from typing import Dict
 
 import tensorflow as tf
 
-@tf.autograph.experimental.do_not_convert
 def chunk_act_obs(
     traj: Dict, 
     window_size: int, 
