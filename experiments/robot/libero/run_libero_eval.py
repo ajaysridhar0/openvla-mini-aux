@@ -68,6 +68,7 @@ class GenerateConfig:
     load_in_4bit: bool = False                       # (For OpenVLA only) Load with 4-bit quantization
 
     center_crop: bool = True                         # Center crop? (if trained w/ random crop image aug)
+    obs_history: int = 1                             # Number of images to pass in from history
 
     #################################################################################################################
     # LIBERO environment-specific parameters
@@ -359,10 +360,15 @@ def eval_libero(cfg: GenerateConfig) -> None:
                     # Save preprocessed image for replay video
                     replay_images.append(img)
 
+                    # buffering #obs_history images, optionally
+                    image_history = replay_images[-cfg.obs_history :]
+                    if len(image_history) < cfg.obs_history:
+                        image_history.extend([replay_images[-1]] * (cfg.obs_history - len(image_history)))
+
                     # Prepare observations dict
                     # Note: OpenVLA does not take proprio state as input
                     observation = {
-                        "full_image": img,
+                        "full_image": image_history,
                         "state": np.concatenate(
                             (obs["robot0_eef_pos"], quat2axisangle(obs["robot0_eef_quat"]), obs["robot0_gripper_qpos"])
                         ),

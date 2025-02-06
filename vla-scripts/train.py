@@ -103,6 +103,7 @@ class TrainConfig:
         self.action_tokenizer = self.vla.action_tokenizer
 
         self.image_sequence_len = self.vla.image_sequence_len
+        self.use_wrist_image = self.vla.use_wrist_image
 
         # [Validate] Assert on `expected_world_size`
         assert (
@@ -221,6 +222,9 @@ def train(cfg: TrainConfig) -> None:
         future_2D_trace_window_size=cfg.vla.future_2D_trace_window_size,
         obj_pose_stride=cfg.vla.obj_pose_stride,
         ee_pose_2D_stride=cfg.vla.ee_pose_2D_stride,
+        # if using wrist images, we assume we passed in a 2x image sequence len
+        image_window_size=cfg.image_sequence_len // 2 if cfg.use_wrist_image else cfg.image_sequence_len,
+        use_wrist_image=cfg.use_wrist_image,  # will double the sequence length
     )
 
     # Save dataset statistics for de-normalization at inference time

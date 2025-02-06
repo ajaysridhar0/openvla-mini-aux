@@ -220,22 +220,39 @@ def get_vla_action(vla, processor, base_vla_name, obs, task_label, unnorm_key, c
 
 def get_prismatic_vla_action(vla, processor, base_vla_name, obs, task_label, unnorm_key, aux_task_types=None, center_crop=False, **kwargs):
     """Generates an action with the VLA policy."""
-    image = Image.fromarray(obs["full_image"])
-    image = image.convert("RGB")
 
-    # (If trained with image augmentations) Center crop image and then resize back up to original size.
-    # IMPORTANT: Let's say crop scale == 0.9. To get the new height and width (post-crop), we must multiply
-    #            the original height and width by sqrt(0.9) -- not 0.9!
-    if center_crop:
-        temp_image = np.array(image)  # (H, W, C)
-        crop_scale = 0.9
-        sqrt_crop_scale = math.sqrt(crop_scale)
-        temp_image_cropped = apply_center_crop(
-            temp_image, t_h=int(sqrt_crop_scale * temp_image.shape[0]), t_w=int(sqrt_crop_scale * temp_image.shape[1])
-        )
-        temp_image = Image.fromarray(temp_image_cropped)
-        temp_image = temp_image.resize(image.size, Image.Resampling.BILINEAR)  # IMPORTANT: dlimp uses BILINEAR resize
-        image = temp_image
+    if not isinstance(obs["full_image"], list):
+        obs["full_image"] = [obs["full_image"]]
 
-    action_dict = vla.predict_action(image, task_label, unnorm_key=unnorm_key, aux_task_types=aux_task_types, **kwargs)
-    return action_dict
+    processed_images = []
+
+    for img in obs["full_image"]:
+        image = Image.fromarray(img)
+        image = image.convert("RGB")
+
+        # (If trained with image augmentations) Center crop image and then resize back up to original size.
+        # IMPORTANT: Let's say crop scale == 0.9. To get the new height and width (post-crop), we must multiply
+        #            the original height and width by sqrt(0.9) -- not 0.9!
+        if center_crop:
+            temp_image = np.array(image)  # (H, W, C)
+            crop_scale = 0.9
+            sqrt_crop_scale = math.sqrt(crop_scale)
+            temp_image_cropped = apply_center_crop(
+                temp_image,
+                t_h=int(sqrt_crop_scale * temp_image.shape[0]),
+                t_w=int(sqrt_crop_scale * temp_image.shape[1]),
+            )
+            temp_image = Image.fromarray(temp_image_cropped)
+            temp_image = temp_image.resize(
+                image.size, Image.Resampling.BILINEAR
+            )  # IMPORTANT: dlimp uses BILINEAR resize
+            image = temp_image
+
+        processed_images.append(image)
+
+    # extract for single image
+    if len(processed_images) == 1:
+        processed_images = processed_images[0]
+
+    action = vla.predict_action(processed_images, task_label, unnorm_key=unnorm_key, **kwargs)
+    return action

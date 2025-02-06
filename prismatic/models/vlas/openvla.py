@@ -59,7 +59,7 @@ class OpenVLA(PrismaticVLM):
         @param aux_questions: Optional list of auxiliary questions to ask before the final action question
         @return Dictionary containing auxiliary answers and the unnormalized (continuous) action vector
         """
-        start_time = time.time()
+        image_transform, tokenizer = self.vision_backbone.get_image_transform(), self.llm_backbone.tokenizer
 
         image_transform, tokenizer = self.vision_backbone.get_image_transform(), self.llm_backbone.tokenizer
 
@@ -162,9 +162,6 @@ class OpenVLA(PrismaticVLM):
             0.5 * (normalized_actions + 1) * (action_high - action_low) + action_low,
             normalized_actions,
         )
-
-        elapsed_time = time.time() - start_time
-        # overwatch.info(f"predict_action took {elapsed_time:.3f} seconds")
 
         output['action'] = actions
         if aux_task_types:

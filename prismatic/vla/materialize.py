@@ -46,6 +46,7 @@ def get_vla_dataset_and_collator(
     image_window_size: int = 1,
     transform_types: str = "action",
     transform_weights: str = None,
+    use_wrist_image: bool = False,
 ) -> Tuple[Dataset, ActionTokenizer, PaddedCollatorForActionPrediction]:
     """Initialize RLDS Dataset (wraps TFDS), ActionTokenizer, and initialize transform/collation functions."""
 
@@ -54,9 +55,16 @@ def get_vla_dataset_and_collator(
     # get the future action window needed from the tokenizer
     future_action_window_size = max(action_tokenizer.required_future_horizon, future_action_window_size)
 
+    load_camera_views = ("primary", "wrist") if use_wrist_image else ("primary",)
+
     # get the observation history from the image_transform (only needed if its a WrapSequence transform)
     if isinstance(image_transform, WrapSequenceImageTransform):
-        image_window_size = max(image_transform.sequence_len, image_window_size)
+        if use_wrist_image:
+            # expects groupings of two in image sequence len
+            assert image_transform.sequence_len % 2 == 0, "With wrist images, image transform must expect 2N images!"
+            image_window_size = max(image_transform.sequence_len // 2, image_window_size)
+        else:
+            image_window_size = max(image_transform.sequence_len, image_window_size)
 
     transform_base_args = {
         "tokenizer": tokenizer,
@@ -93,6 +101,15 @@ def get_vla_dataset_and_collator(
             rlds_transform = RLDSAuxTransform(**transform_base_args, aux_task_type=transform_type)
         batch_transforms.append((rlds_transform, weight))
 
+    batch_transform = RLDSBatchTransform(
+        action_tokenizer,
+        tokenizer,
+        image_transform,
+        prompt_builder_fn,
+        predict_stop_token=predict_stop_token,
+        image_window_size=image_window_size,
+        use_wrist_image=use_wrist_image,
+    )
     collator = PaddedCollatorForActionPrediction(
         tokenizer.model_max_length, tokenizer.pad_token_id, padding_side=padding_side
     )
@@ -113,6 +130,7 @@ def get_vla_dataset_and_collator(
         obj_pose_stride=obj_pose_stride,
         ee_pose_2D_stride=ee_pose_2D_stride,
         image_window_size=image_window_size,
+        load_camera_views=load_camera_views,
     )
 
     return dataset, action_tokenizer, collator

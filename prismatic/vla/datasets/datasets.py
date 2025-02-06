@@ -193,6 +193,9 @@ class BaseRLDSTransform:
 class RLDSBatchTransform(BaseRLDSTransform):
     # New required parameter
     action_tokenizer: ActionTokenizer
+    predict_stop_token: bool = True
+    image_window_size: int = 1
+    use_wrist_image: bool = False
 
     def __call__(self, rlds_batch: Dict[str, Any]) -> Dict[str, Any]:
         """Converts a RLDS batch to the format expected by the OpenVLA collator/models."""
@@ -203,6 +206,32 @@ class RLDSBatchTransform(BaseRLDSTransform):
         if self.action_tokenizer.required_future_horizon == 0:
             action = action[-1]
         else:
+            # get the last FH + 1 actions (current action + future ones) if required
+            action = action[-self.action_tokenizer.required_future_horizon - 1 :]
+
+        # either a single or multi image, depending on image_window_size
+        if self.image_window_size == 1:
+            img = Image.fromarray(rlds_batch["observation"]["image_primary"][0])
+            if self.use_wrist_image:
+                img = [img, Image.fromarray(rlds_batch["observation"]["image_wrist"][0])]
+        else:
+            img = [Image.fromarray(rlds_batch["observation"]["image_primary"][t]) for t in range(self.image_window_size)]
+            if self.use_wrist_image:
+                # wrist images are interleaved
+                wrist_img = [
+                    Image.fromarray(rlds_batch["observation"]["image_wrist"][t]) for t in range(self.image_window_size)
+                ]
+                img = [val for tup in zip(img, wrist_img) for val in tup]
+
+        
+        conversation = []
+
+        # if there is no action horizon, remove it here.
+        
+        if self.action_tokenizer.required_future_horizon == 0:
+            action = action[-1]
+        else:
+            # get the last FH + 1 actions (current action + future ones) if required
             action = action[-self.action_tokenizer.required_future_horizon - 1:]
 
         tokenized_action = self.action_tokenizer(action)
@@ -260,6 +289,22 @@ class ChainedTransform(BaseRLDSTransform):
         dataset_name = rlds_batch["dataset_name"]
         lang = rlds_batch["task"]["language_instruction"].decode().lower()
         img = self._process_image(rlds_batch)
+        conversation.extend([
+            {"from": "human", "value": f"What action should the robot take to {lang}?"},
+            {"from": "gpt", "value": tokenized_action}, 
+        ])
+
+        # Construct Chat-based Prompt
+        prompt_builder = self.prompt_builder_fn("openvla")
+        for turn in conversation:
+            prompt_builder.add_turn(turn["from"], turn["value"])
+
+        # Tokenize (w/ `base_tokenizer`)
+        input_ids = self.base_tokenizer(prompt_builder.get_prompt(), add_special_tokens=True).input_ids
+        labels = list(input_ids)
+
+        # Tensorize =>> Run Image Transform to get `pixel_values` =>> Return
+        input_ids, labels = torch.tensor(input_ids), torch.tensor(labels)
         pixel_values = self.image_transform(img)
 
         # First get bbox answer
@@ -310,6 +355,7 @@ class RLDSDataset(IterableDataset):
         obj_pose_stride: int = 1,
         ee_pose_2D_stride: int = 1,
         image_window_size: int = 1,
+        load_camera_views: tuple = ("primary",),
     ) -> None:
         """Lightweight wrapper around RLDS TFDS Pipeline for use with PyTorch/OpenVLA Data Loaders."""
         self.data_root_dir, self.data_mix, self.batch_transforms = data_root_dir, data_mix, batch_transforms
@@ -330,7 +376,7 @@ class RLDSDataset(IterableDataset):
         per_dataset_kwargs, weights = get_oxe_dataset_kwargs_and_weights(
             self.data_root_dir,
             mixture_spec,
-            load_camera_views=("primary",),
+            load_camera_views=load_camera_views,
             load_depth=False,
             load_proprio=False,
             load_language=True,
