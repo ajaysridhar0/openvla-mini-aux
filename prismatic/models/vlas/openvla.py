@@ -129,7 +129,6 @@ class OpenVLA(PrismaticVLM):
         # Add Final Action Prompt
         prompt_builder.add_turn(role="human", message=f"What action should the robot take to {instruction.lower()}?")
 
-        # breakpoint()
         prompt_text = prompt_builder.get_prompt()
 
         input_ids = self.process_prompt_text(tokenizer, prompt_text)
@@ -139,7 +138,6 @@ class OpenVLA(PrismaticVLM):
         autocast_dtype = self.llm_backbone.half_precision_dtype
         with torch.autocast("cuda", dtype=autocast_dtype, enabled=self.enable_mixed_precision_training):
             # fmt: off
-            # breakpoint()
             generated_ids = super(PrismaticVLM, self).generate(
                 input_ids=input_ids,                            # Shape: [1, seq]
                 pixel_values=pixel_values,                      # Shape: [1, (opt T,) 3, res, res] or Dict[str, ...]

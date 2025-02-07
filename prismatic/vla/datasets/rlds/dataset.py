@@ -36,7 +36,6 @@ tf.config.set_visible_devices([], "GPU")
 
 
 # ruff: noqa: B006
-# @tf.function(experimental_relax_shapes=True)
 def make_dataset_from_rlds(
     name: str,
     data_dir: str,

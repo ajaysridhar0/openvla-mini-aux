@@ -176,25 +176,23 @@ class Exp_Qwen25_DinoSigLIP_224px_0_5B_LIBERO_90_AUX(Exp_Qwen25_DinoSigLIP_224px
 @dataclass
 class Exp_Qwen25_DinoSigLIP_224px_0_5B_XEMBOD_ROBOCASA_FULL(Exp_Qwen25_DinoSigLIP_224px_0_5B_OXE_Magic_Soup):
     vla_id: str = "prism-qwen25-dinosiglip-224px+0_5b+mx-xembod-robocasa-full"
-
     data_mix: str = "xembod_robocasa_full"
-
     expected_world_size: int = 8
     global_batch_size: int = 256
     per_device_batch_size: int = 32
     use_wrist_image: bool = True
+    image_sequence_len: int = 2
 
 
 @dataclass
 class Exp_Qwen25_DinoSigLIP_224px_0_5B_XEMBOD_ROBOCASA_HELD_OUT(Exp_Qwen25_DinoSigLIP_224px_0_5B_OXE_Magic_Soup):
     vla_id: str = "prism-qwen25-dinosiglip-224px+0_5b+mx-xembod-robocasa-held-out"
-
     data_mix: str = "xembod_robocasa_held_out"
-
     expected_world_size: int = 8
     global_batch_size: int = 256
     per_device_batch_size: int = 32
     use_wrist_image: bool = True
+    image_sequence_len: int = 2
 
 @dataclass
 class Exp_Qwen25_DinoSigLIP_224px_T2_0_5B_LIBERO_90(Exp_Qwen25_DinoSigLIP_224px_0_5B_LIBERO_90):

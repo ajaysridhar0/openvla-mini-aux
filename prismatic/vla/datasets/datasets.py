@@ -19,7 +19,7 @@ from transformers.models.qwen2.tokenization_qwen2_fast import Qwen2TokenizerFast
 from prismatic.models.backbones.llm.prompting import PromptBuilder
 from prismatic.models.backbones.vision import ImageTransform
 from prismatic.util.data_utils import tree_map
-from prismatic.vla.action_tokenizer import ActionTokenizer
+from prismatic.vla import ActionTokenizer
 from prismatic.vla.datasets.rlds import make_interleaved_dataset, make_single_dataset
 from prismatic.vla.datasets.rlds.oxe import OXE_NAMED_MIXTURES, get_oxe_dataset_kwargs_and_weights
 from prismatic.vla.datasets.rlds.utils.data_utils import NormalizationType
@@ -93,14 +93,30 @@ class BaseRLDSTransform:
     image_transform: ImageTransform
     prompt_builder_fn: Type[PromptBuilder]
     # Optional parameters with default values 
-    image_window_size: int
-    predict_stop_token: bool
+    image_window_size: int = 1
+    predict_stop_token: bool = True
+    use_wrist_image: bool = False
+    aux_task_type: str = None
+    aux_task_types: List[str] = None
+    action_tokenizer: ActionTokenizer = None
+
 
     def _process_image(self, rlds_batch: Dict[str, Any]) -> Image.Image:
         """Process image(s) from RLDS batch based on window size."""
         if self.image_window_size == 1:
-            return Image.fromarray(rlds_batch["observation"]["image_primary"][0])
-        return [Image.fromarray(rlds_batch["observation"]["image_primary"][t]) for t in range(self.image_window_size)]
+            img = Image.fromarray(rlds_batch["observation"]["image_primary"][0])
+            if self.use_wrist_image:
+                img = [img, Image.fromarray(rlds_batch["observation"]["image_wrist"][0])]
+            return img
+        else:
+            img = [Image.fromarray(rlds_batch["observation"]["image_primary"][t]) for t in range(self.image_window_size)]
+            if self.use_wrist_image:
+                # wrist images are interleaved
+                wrist_img = [
+                    Image.fromarray(rlds_batch["observation"]["image_wrist"][t]) for t in range(self.image_window_size)
+                ]
+                img = [val for tup in zip(img, wrist_img) for val in tup]
+            return img
 
     def _create_conversation(self, qa_pairs: List[Tuple[str, str]]) -> Tuple[List[Dict[str, str]], List[int]]:
         """Create conversation turns from question and answer pairs.
@@ -191,11 +207,9 @@ class BaseRLDSTransform:
 
 @dataclass
 class RLDSBatchTransform(BaseRLDSTransform):
-    # New required parameter
-    action_tokenizer: ActionTokenizer
-    predict_stop_token: bool = True
-    image_window_size: int = 1
-    use_wrist_image: bool = False
+
+    def __post_init__(self):
+        assert self.action_tokenizer is not None, "Action tokenizer must be provided!"
 
     def __call__(self, rlds_batch: Dict[str, Any]) -> Dict[str, Any]:
         """Converts a RLDS batch to the format expected by the OpenVLA collator/models."""
@@ -206,32 +220,6 @@ class RLDSBatchTransform(BaseRLDSTransform):
         if self.action_tokenizer.required_future_horizon == 0:
             action = action[-1]
         else:
-            # get the last FH + 1 actions (current action + future ones) if required
-            action = action[-self.action_tokenizer.required_future_horizon - 1 :]
-
-        # either a single or multi image, depending on image_window_size
-        if self.image_window_size == 1:
-            img = Image.fromarray(rlds_batch["observation"]["image_primary"][0])
-            if self.use_wrist_image:
-                img = [img, Image.fromarray(rlds_batch["observation"]["image_wrist"][0])]
-        else:
-            img = [Image.fromarray(rlds_batch["observation"]["image_primary"][t]) for t in range(self.image_window_size)]
-            if self.use_wrist_image:
-                # wrist images are interleaved
-                wrist_img = [
-                    Image.fromarray(rlds_batch["observation"]["image_wrist"][t]) for t in range(self.image_window_size)
-                ]
-                img = [val for tup in zip(img, wrist_img) for val in tup]
-
-        
-        conversation = []
-
-        # if there is no action horizon, remove it here.
-        
-        if self.action_tokenizer.required_future_horizon == 0:
-            action = action[-1]
-        else:
-            # get the last FH + 1 actions (current action + future ones) if required
             action = action[-self.action_tokenizer.required_future_horizon - 1:]
 
         tokenized_action = self.action_tokenizer(action)
@@ -248,11 +236,9 @@ class RLDSBatchTransform(BaseRLDSTransform):
 
 @dataclass
 class RLDSAuxTransform(BaseRLDSTransform):
-    image_window_size: int
-    predict_stop_token: bool
-    aux_task_type: str
 
     def __post_init__(self):
+        assert self.aux_task_type is not None, "Aux task type must be provided!"
         assert self.aux_task_type in AUX_TASK_QA_FUNCTIONS, f"Invalid aux task type: {self.aux_task_type}!"
 
     def __call__(self, rlds_batch: Dict[str, Any]) -> Dict[str, Any]:
@@ -275,10 +261,9 @@ class RLDSAuxTransform(BaseRLDSTransform):
 
 @dataclass
 class ChainedTransform(BaseRLDSTransform):
-    action_tokenizer: ActionTokenizer
-    aux_task_types: List[Tuple[str, str]]
 
     def __post_init__(self):
+        assert self.aux_task_types is not None, "Aux task types must be provided!"
         assert len(self.aux_task_types) > 0, "Must specify at least one aux task type!"
         assert len(self.aux_task_types) <= len(AUX_TASK_QA_FUNCTIONS), "Cannot specify more aux task types than available!"
         for aux_task_type in self.aux_task_types:
@@ -289,22 +274,6 @@ class ChainedTransform(BaseRLDSTransform):
         dataset_name = rlds_batch["dataset_name"]
         lang = rlds_batch["task"]["language_instruction"].decode().lower()
         img = self._process_image(rlds_batch)
-        conversation.extend([
-            {"from": "human", "value": f"What action should the robot take to {lang}?"},
-            {"from": "gpt", "value": tokenized_action}, 
-        ])
-
-        # Construct Chat-based Prompt
-        prompt_builder = self.prompt_builder_fn("openvla")
-        for turn in conversation:
-            prompt_builder.add_turn(turn["from"], turn["value"])
-
-        # Tokenize (w/ `base_tokenizer`)
-        input_ids = self.base_tokenizer(prompt_builder.get_prompt(), add_special_tokens=True).input_ids
-        labels = list(input_ids)
-
-        # Tensorize =>> Run Image Transform to get `pixel_values` =>> Return
-        input_ids, labels = torch.tensor(input_ids), torch.tensor(labels)
         pixel_values = self.image_transform(img)
 
         # First get bbox answer

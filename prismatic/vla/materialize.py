@@ -15,7 +15,7 @@ from prismatic.models.backbones.llm.prompting import PromptBuilder
 from prismatic.models.backbones.vision import ImageTransform
 from prismatic.models.backbones.vision.base_vision import WrapSequenceImageTransform
 from prismatic.util.data_utils import PaddedCollatorForActionPrediction
-from prismatic.vla.action_tokenizer import ACTION_TOKENIZERS, ActionTokenizer
+from prismatic.vla import ActionTokenizer, ACTION_TOKENIZERS
 from prismatic.vla.datasets import EpisodicRLDSDataset, RLDSDataset
 from prismatic.vla.datasets.datasets import (
     RLDSBatchTransform, 
@@ -72,6 +72,7 @@ def get_vla_dataset_and_collator(
         "prompt_builder_fn": prompt_builder_fn,
         "predict_stop_token": predict_stop_token,
         "image_window_size": image_window_size,
+        "use_wrist_image": use_wrist_image
     }
 
     batch_transforms = []
@@ -96,20 +97,17 @@ def get_vla_dataset_and_collator(
                 aux_task_types=chained_transforms,
             )
         elif transform_type == "action":
-            rlds_transform = RLDSBatchTransform(**transform_base_args, action_tokenizer=action_tokenizer)
+            rlds_transform = RLDSBatchTransform(
+                **transform_base_args, 
+                action_tokenizer=action_tokenizer, 
+            )
         else:
-            rlds_transform = RLDSAuxTransform(**transform_base_args, aux_task_type=transform_type)
+            rlds_transform = RLDSAuxTransform(
+                **transform_base_args, 
+                aux_task_type=transform_type, 
+            )
         batch_transforms.append((rlds_transform, weight))
 
-    batch_transform = RLDSBatchTransform(
-        action_tokenizer,
-        tokenizer,
-        image_transform,
-        prompt_builder_fn,
-        predict_stop_token=predict_stop_token,
-        image_window_size=image_window_size,
-        use_wrist_image=use_wrist_image,
-    )
     collator = PaddedCollatorForActionPrediction(
         tokenizer.model_max_length, tokenizer.pad_token_id, padding_side=padding_side
     )
