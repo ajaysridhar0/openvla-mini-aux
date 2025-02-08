@@ -456,7 +456,10 @@ class TrainingStrategy(ABC):
                                 continuous_actions_gt = torch.tensor(
                                     action_tokenizer.decode_token_ids_to_actions(action_gt[action_mask].cpu().numpy())
                                 )
-                                action_l1_loss = torch.nn.functional.l1_loss(continuous_actions_pred, continuous_actions_gt)
+                                try:
+                                    action_l1_loss = torch.nn.functional.l1_loss(continuous_actions_pred, continuous_actions_gt)
+                                except:
+                                    breakpoint()
                                 metrics.commit_for_dataset(dataset_name=transform_type_str, l1_loss=action_l1_loss)
 
                                 # Per-dataset L1 loss

@@ -270,13 +270,13 @@ class ChainedTransform(BaseRLDSTransform):
             assert aux_task_type in AUX_TASK_QA_FUNCTIONS, f"Invalid aux task type: {aux_task_type}!"
 
     def __call__(self, rlds_batch: Dict[str, Any]) -> Dict[str, Any]:
-        """Chains bbox and action prediction in a CoT way with separate supervision."""
+        """Chains aux and action prediction in a CoT way with separate supervision."""
         dataset_name = rlds_batch["dataset_name"]
         lang = rlds_batch["task"]["language_instruction"].decode().lower()
         img = self._process_image(rlds_batch)
         pixel_values = self.image_transform(img)
 
-        # First get bbox answer
+        # First get aux answers
         qa_pairs = []
         transform_types = np.ones(len(AUX_TASK_QA_FUNCTIONS) + 1, dtype=np.int32) * -1
         for i, aux_task_type in enumerate(self.aux_task_types):
@@ -293,7 +293,7 @@ class ChainedTransform(BaseRLDSTransform):
             action = action[-self.action_tokenizer.required_future_horizon - 1:]
         tokenized_action = self.action_tokenizer(action)
 
-        # Create conversation with bbox and action
+        # Create conversation with aux and action
         conversation, answer_token_lengths = self._create_conversation(qa_pairs + [
             (f"Given this information, what action should the robot take?", tokenized_action)
         ])

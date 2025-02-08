@@ -20,6 +20,9 @@ overwatch = initialize_overwatch(__name__)
 
 
 class ActionTokenizer:
+    # Universal EOS token ID used across the codebase
+    EOS_TOKEN_ID = 151645
+    
     def __init__(
         self,
         tokenizer: PreTrainedTokenizerBase,
@@ -186,6 +189,133 @@ class VQActionTokenizer(ActionTokenizer):
         return self.vq_vae.input_dim_h - 1
 
 
+class FastActionTokenizer(ActionTokenizer):
+    """Action tokenizer that uses the physical-intelligence/fast tokenizer from Hugging Face."""
+    
+    def __init__(
+        self,
+        tokenizer: PreTrainedTokenizerBase,
+        use_extra: bool = False,
+    ) -> None:
+        """Initialize the FastActionTokenizer.
+        
+        Args:
+            tokenizer: Base LLM/VLM tokenizer to extend.
+            use_extra: Use the extra tokens (not just the last ones), only implemented for Qwen2
+        """
+        from transformers import AutoProcessor
+        self.tokenizer = tokenizer
+        self.fast_tokenizer = AutoProcessor.from_pretrained("physical-intelligence/fast", trust_remote_code=True)
+        
+        # The UniversalActionProcessor uses a vocab size of 1024
+        self.n_bins = 1024
+        
+        # Set up token ranges in VLA vocabulary - handle extra tokens like base ActionTokenizer
+        self.tokenizer_len = self.tokenizer.vocab_size
+        if isinstance(tokenizer, Qwen2TokenizerFast) and use_extra:
+            self.tokenizer_len = len(self.tokenizer)
+        elif use_extra:
+            raise NotImplementedError("Cannot use extra tokens for this tokenizer!")
+            
+        # [Contract] Set "action_token_begin_idx" based on `self.tokenizer.vocab_size - (self.n_bins + 1)`
+        #   =>> Assumes we're always overwriting the final `n_bins` tokens of the vocabulary!
+        self.action_token_begin_idx = int(self.tokenizer_len - (self.n_bins + 1))
+        self.action_token_end_idx = int(self.tokenizer_len)
+        
+        # Use the universal EOS token
+        self.stop_token = self.EOS_TOKEN_ID
+
+        self.action_horizon = 8
+        self.action_dim = 7
+        
+    def __call__(self, action: np.ndarray) -> Union[str, List[str]]:
+        """Tokenize continuous robot actions using the fast tokenizer.
+        
+        Args:
+            action: Continuous action array to tokenize.
+            
+        Returns:
+            Decoded string representation of the action tokens.
+        """
+        if len(action.shape) == 2:
+            action = action[None]
+
+        # The UniversalActionProcessor returns a list of token lists
+        fast_tokens = self.fast_tokenizer(action)
+        
+        # Map tokens to VLA vocabulary space and append EOS token
+        if isinstance(fast_tokens[0], list):
+            # For batches, convert each sequence to token IDs in VLA vocab space
+            token_lists = [
+                [t + self.action_token_begin_idx for t in token_list] + [self.stop_token]
+                for token_list in fast_tokens
+            ]
+            # Take first sequence and decode to string
+            return self.tokenizer.decode(token_lists[0])
+            
+        # For single sequences, convert to token IDs in VLA vocab space
+        mapped_tokens = [t + self.action_token_begin_idx for t in fast_tokens] + [self.stop_token]
+        return self.tokenizer.decode(mapped_tokens)
+        
+    def decode_token_ids_to_actions(self, action_token_ids: np.ndarray) -> np.ndarray:
+        """Decode tokenized actions back to continuous values.
+        
+        Args:
+            action_token_ids: Array of token IDs in VLA vocabulary space.
+            
+        Returns:
+            Continuous action array. Returns zero array of dim 7 if there is an error.
+        """
+        try:
+            # Handle both batched and unbatched inputs
+            is_batched = len(np.array(action_token_ids).shape) > 1
+            batch_size = action_token_ids.shape[0] if is_batched else 1
+            
+            # Convert string of space-separated tokens back to array if needed
+            if isinstance(action_token_ids, str):
+                action_token_ids = np.array([int(x) for x in action_token_ids.split()])
+                
+            # Remove EOS tokens and map back from VLA space to fast tokenizer space
+            if isinstance(action_token_ids, (list, np.ndarray)):
+                # Find where the sequence ends (at EOS token or end of sequence)
+                if self.stop_token in action_token_ids:
+                    end_idx = np.where(action_token_ids == self.stop_token)[0][0]
+                    action_token_ids = action_token_ids[:end_idx]
+                # Only convert tokens in our action token range
+                mask = (action_token_ids > self.action_token_begin_idx) & (action_token_ids < self.action_token_end_idx)
+                if not np.any(mask):
+                    return np.zeros((batch_size, self.action_horizon, self.action_dim))
+                fast_tokens = action_token_ids[mask] - self.action_token_begin_idx
+            else:
+                if action_token_ids == self.stop_token or not (self.action_token_begin_idx < action_token_ids < self.action_token_end_idx):
+                    return np.zeros((batch_size, self.action_horizon, self.action_dim))
+                fast_tokens = [action_token_ids - self.action_token_begin_idx]
+                
+            # Suppress error messages from the fast tokenizer
+            import contextlib
+            import io
+            with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
+                decoded_action = self.fast_tokenizer.decode(fast_tokens)
+            
+            # Check if the decoded action has the expected dimension
+            if decoded_action.shape[-1] != self.action_dim:
+                return np.zeros((batch_size, self.action_horizon, self.action_dim))
+            
+            # Remove batch dimension if input was unbatched
+            if not is_batched:
+                decoded_action = decoded_action[0]
+            return decoded_action
+        except:
+            zeros = np.zeros((batch_size, self.action_horizon, self.action_dim))
+            return zeros[0] if not is_batched else zeros
+
+    @property
+    def required_future_horizon(self) -> int:
+        # The UniversalActionProcessor uses DCT over a time horizon
+        # This will be determined by the input action shape
+        return self.action_horizon - 1
+
+
 ACTION_TOKENIZERS = {
     "action_tokenizer": ActionTokenizer,
     "extra_action_tokenizer": partial(ActionTokenizer, use_extra=True),
@@ -198,4 +328,6 @@ ACTION_TOKENIZERS = {
     "libero_vq_h0_extra_action_tokenizer": partial(
         VQActionTokenizer, vq_vae_path="/iliad/u/belkhale/openvla-mini/vq/pretrain_vq+mx-libero_90+fach-0+ng-7+nemb-128+nlatent-512", use_extra=True
     ),
+    "fast_action_tokenizer": FastActionTokenizer,
+    "fast_extra_action_tokenizer": partial(FastActionTokenizer, use_extra=True),
 }
