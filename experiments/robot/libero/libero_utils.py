@@ -47,9 +47,10 @@ def pad_action_robocasa(action: list, robot_type: str):
         action = action + [0] * 4 + [-1]
         assert len(action) == 12
     else:
-        action = action[:6] + [0] * 4 + [-1] + action[6:] + [-1]
+        action = action[:6] + [0] * 4 + action[6:]
         assert len(action) == 11
     return action
+
 
 def resize_image(img, resize_size):
     """
