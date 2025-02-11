@@ -241,6 +241,9 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("sawyer__pn_p_counter_to_cab_aux", 1.0),
         ("ur5e__pn_p_counter_to_cab_aux", 1.0),
         ("ur5e__pn_p_counter_to_sink_aux", 1.0)
+    ],
+    "all_robocasa_xembod": [
+       ("all_robocasa_xembod", 1.0)
     ]
     # TODO (ajaysri): add partial held-out mixture
 }

@@ -935,4 +935,5 @@ OXE_STANDARDIZATION_TRANSFORMS = {
     "sawyer__pn_p_counter_to_cab_aux": libero_dataset_transform,
     "ur5e__pn_p_counter_to_cab_aux": libero_dataset_transform,
     "ur5e__pn_p_counter_to_sink_aux": libero_dataset_transform,
+    "all_robocasa_xembod": libero_dataset_transform,
 }

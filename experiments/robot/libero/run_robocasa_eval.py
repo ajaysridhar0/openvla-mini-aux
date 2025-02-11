@@ -153,10 +153,24 @@ class GenerateConfig:
     # ROBOCASA environment-specific parameters
     #################################################################################################################
     robot_task_names: List[str] = field(default_factory=lambda: [
-        "panda__pn_p_counter_to_cab_aux", 
-        "kinova3__pn_p_counter_to_sink_aux",
-        "sawyer__pn_p_sink_to_counter_aux"
+        "panda__pn_p_counter_to_cab_aux",
+        "sawyer__pn_p_counter_to_sink_aux", 
+        "ur5e__pn_p_sink_to_counter_aux",
+        "kinova3__pn_p_counter_to_cab_aux",
+        "panda__pn_p_counter_to_sink_aux",
+        "sawyer__pn_p_sink_to_counter_aux",
+        "kinova3__pn_p_counter_to_sink_aux", 
+        "panda__pn_p_sink_to_counter_aux",
+        "ur5e__pn_p_counter_to_cab_aux",
+        "kinova3__pn_p_sink_to_counter_aux",
+        "sawyer__pn_p_counter_to_cab_aux",
+        "ur5e__pn_p_counter_to_sink_aux"
     ])
+    # robot_task_names: List[str] = field(default_factory=lambda: [
+    #     "ur5e__pn_p_sink_to_counter_aux",
+    #     "sawyer__pn_p_sink_to_counter_aux",
+    #     "kinova3__pn_p_sink_to_counter_aux",
+    # ])
     #                                       Options: libero_spatial, libero_object, libero_goal, libero_10, libero_90
     num_steps_wait: int = 10                         # Number of steps to wait for objects to stabilize in sim
     num_trials_per_task: int = 50                    # Number of rollouts per task
@@ -367,10 +381,6 @@ def eval_single_task(cfg: GenerateConfig, model, robot_task_name: str, log_file)
 
     # Get expected image dimensions
     resize_size = get_image_resize_size(cfg)
-
-    # Split aux_task_types by "->"
-    if cfg.aux_task_types is not None:
-        cfg.aux_task_types = cfg.aux_task_types.split("->")
 
     # Initialize tracking for single task
     total_episodes = 0
@@ -594,6 +604,10 @@ def eval_robocasa(cfg: GenerateConfig) -> None:
         'scale': 'low_dim', 
         'logits': 'low_dim'
     }
+
+     # Split aux_task_types by "->"
+    if cfg.aux_task_types is not None:
+        cfg.aux_task_types = cfg.aux_task_types.split("->")
 
     # Load model
     model = get_model(cfg)

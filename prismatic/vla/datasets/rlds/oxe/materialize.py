@@ -13,6 +13,7 @@ from prismatic.overwatch import initialize_overwatch
 from prismatic.vla.datasets.rlds.oxe.configs import OXE_DATASET_CONFIGS, ActionEncoding
 from prismatic.vla.datasets.rlds.oxe.transforms import OXE_STANDARDIZATION_TRANSFORMS
 from prismatic.vla.datasets.rlds.utils.data_utils import NormalizationType
+from prismatic.vla.datasets.rlds.oxe.transforms import libero_dataset_transform
 
 # Initialize Overwatch =>> Wraps `logging.Logger`
 overwatch = initialize_overwatch(__name__)
@@ -67,7 +68,7 @@ def make_oxe_dataset_kwargs(
         dataset_kwargs["language_key"] = "language_instruction"
 
     # Specify Standardization Transform
-    dataset_kwargs["standardize_fn"] = OXE_STANDARDIZATION_TRANSFORMS[dataset_name]
+    dataset_kwargs["standardize_fn"] = OXE_STANDARDIZATION_TRANSFORMS.get(dataset_name, libero_dataset_transform)
 
     # Add any aux arguments
     if "aux_kwargs" in dataset_kwargs:

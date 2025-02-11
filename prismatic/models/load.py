@@ -218,7 +218,8 @@ def load_vla(
         model_cfg = ModelConfig.get_choice_class(Path(vla_cfg["base_vlm"]).name)()
 
     # Load Dataset Statistics for Action Denormalization
-    with open(dataset_statistics_json, "r") as f:
+    # TODO (ajaysri) :: Make this dynamic
+    with open("/work/hdd/bcwv/ajaysri/datasets/jensen/xembod_robocasa/base_robocasa_xembod--full/dataset_statistics.json", "r") as f:
         norm_stats = json.load(f)
 
     # = Load Individual Components necessary for Instantiating a VLA (via base VLM components) =

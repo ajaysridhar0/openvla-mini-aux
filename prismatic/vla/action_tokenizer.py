@@ -337,4 +337,9 @@ ACTION_TOKENIZERS = {
         vq_vae_path="vq/pretrain_modvq+mx-bridge_dataset+fach-7+ng-7+nemb-256+nlatent-512",
         use_extra=True,
     ),
+    "robocasa_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/pretrain_vq+mx-all_robocasa_xembod+fach-7+ng-7+nemb-256+nlatent-512",
+        use_extra=True,
+    ),
 }
