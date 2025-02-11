@@ -147,7 +147,7 @@ class GenerateConfig:
 
     center_crop: bool = True                         # Center crop? (if trained w/ random crop image aug)
     obs_history: int = 1                             # Number of images to pass in from history
-    use_wrist_image: bool = False                    # Use wrist images (doubles the number of input images)
+    use_wrist_image: bool = True                    # Use wrist images (doubles the number of input images)
 
     #################################################################################################################
     # ROBOCASA environment-specific parameters
