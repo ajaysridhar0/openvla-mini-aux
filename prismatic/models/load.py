@@ -212,7 +212,10 @@ def load_vla(
             base_vlm = base_cfg["model_id"]
 
     overwatch.info(f"Base vlm: {base_vlm}")
-    model_cfg = ModelConfig.get_choice_class(base_vlm)()
+    try:
+        model_cfg = ModelConfig.get_choice_class(base_vlm)()
+    except KeyError:
+        model_cfg = ModelConfig.get_choice_class(Path(vla_cfg["base_vlm"]).name)()
 
     # Load Dataset Statistics for Action Denormalization
     with open(dataset_statistics_json, "r") as f:

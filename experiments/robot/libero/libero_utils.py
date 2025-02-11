@@ -7,9 +7,12 @@ import imageio
 import numpy as np
 import tensorflow as tf
 from libero.libero import get_libero_path
-from libero.libero.envs import OffScreenRenderEnv
-from PIL import Image
+try:
+    from libero.libero.envs import OffScreenRenderEnv
+except ImportError:
+    print("could not import libero.libero.envs.OffScreenRenderEnv since you are probably using robosuite version != 1.4.1")
 
+from PIL import Image
 from experiments.robot.robot_utils import (
     DATE,
     DATE_TIME,
@@ -31,6 +34,23 @@ def get_libero_dummy_action(model_family: str):
     return [0, 0, 0, 0, 0, 0, -1]
 
 
+def get_robocasa_dummy_action(robot_name: str):
+    """Get dummy/no-op action, used to roll out the simulation while the robot does nothing."""
+    if robot_name == "panda":
+        return [0] * 6 + [-1] + [0] * 4 + [-1]
+    else:
+        return [0] * 10 + [-1]
+    
+
+def pad_action_robocasa(action: list, robot_type: str):
+    if robot_type == "panda":
+        action = action + [0] * 4 + [-1]
+        assert len(action) == 12
+    else:
+        action = action[:6] + [0] * 4 + [-1] + action[6:] + [-1]
+        assert len(action) == 11
+    return action
+
 def resize_image(img, resize_size):
     """
     Takes numpy array corresponding to a single image and returns resized image as numpy array.
@@ -48,18 +68,29 @@ def resize_image(img, resize_size):
     return img
 
 
-def get_libero_image(obs, resize_size, key="agentview_image"):
+def get_libero_image(obs, resize_size, key="agentview_image", flip_image=True, is_robocasa=False):
     """Extracts image from observations and preprocesses it."""
     assert isinstance(resize_size, int) or isinstance(resize_size, tuple)
     if isinstance(resize_size, int):
         resize_size = (resize_size, resize_size)
     img = obs[key]
-    img = np.flipud(img)
+    if flip_image:
+        img = np.flipud(img)
     # img = img[::-1, ::-1]  # IMPORTANT: rotate 180 degrees to match train preprocessing
+    if is_robocasa:
+        img = np.transpose(img, (1, 2, 0))
+        img = (255*img).astype(np.uint8)
     img = Image.fromarray(img)
     img = img.resize(resize_size, Image.Resampling.LANCZOS)  # resize to size seen at train time
     img = img.convert("RGB")
     return np.array(img)
+
+
+def patch_model_for_generation(model):
+    """Add required attributes for newer transformers compatibility."""
+    if not hasattr(model, '_supports_cache_class'):
+        model._supports_cache_class = False
+    return model
 
 
 def save_rollout_video(rollout_images, idx, success, task_description, log_file=None):
