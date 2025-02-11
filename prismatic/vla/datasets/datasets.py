@@ -103,6 +103,7 @@ class BaseRLDSTransform:
 
     def _process_image(self, rlds_batch: Dict[str, Any]) -> Image.Image:
         """Process image(s) from RLDS batch based on window size."""
+        # either a single or multi image, depending on image_window_size
         if self.image_window_size == 1:
             img = Image.fromarray(rlds_batch["observation"]["image_primary"][0])
             if self.use_wrist_image:
@@ -216,6 +217,9 @@ class RLDSBatchTransform(BaseRLDSTransform):
         dataset_name, action = rlds_batch["dataset_name"], rlds_batch["action"]
         lang = rlds_batch["task"]["language_instruction"].decode().lower()
         img = self._process_image(rlds_batch)
+        conversation = []
+
+        # if there is no action horizon, remove it here.
 
         if self.action_tokenizer.required_future_horizon == 0:
             action = action[-1]

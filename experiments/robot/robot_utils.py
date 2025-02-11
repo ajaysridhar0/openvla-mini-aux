@@ -1,5 +1,6 @@
 """Utils for evaluating robot policies in various environments."""
 
+import math
 import os
 import random
 import time
@@ -26,6 +27,17 @@ OPENVLA_V01_SYSTEM_PROMPT = (
     "A chat between a curious user and an artificial intelligence assistant. "
     "The assistant gives helpful, detailed, and polite answers to the user's questions."
 )
+
+
+def round_to_n(x, n=1):
+    # round scalar to n significant figure(s)
+    return round(x, -int(math.floor(math.log10(abs(x))) + (n - 1)))
+
+
+def hr_name(float_arg, fp=None):
+    if fp is not None:
+        float_arg = round_to_n(float_arg, n=fp)
+    return str(float_arg).replace(".", "_")
 
 
 def set_seed_everywhere(seed: int):

@@ -174,6 +174,11 @@ def apply_center_crop(im, t_h, t_w):
 
 def get_vla_action(vla, processor, base_vla_name, obs, task_label, unnorm_key, center_crop=False):
     """Generates an action with the VLA policy."""
+
+    # only supports 1 image
+    if isinstance(obs["full_image"], list):
+        obs["full_image"] = obs["full_image"][0]
+
     image = Image.fromarray(obs["full_image"])
     image = image.convert("RGB")
 

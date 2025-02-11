@@ -142,9 +142,10 @@ class Exp_SigLIP_224px_OXE_Magic_Soup(Exp_SigLIP_224px_Bridge):
 @dataclass
 class Exp_Qwen25_DinoSigLIP_224px_0_5B_OXE_Magic_Soup(Exp_SigLIP_224px_Bridge):
     vla_id: str = "prism-qwen25-dinosiglip-224px+0_5b+mx-oxe-magic-soup"
-    base_vlm: Union[str, Path] = "prism-qwen25-dinosiglip-224px+0_5b"
+    base_vlm: Union[str, Path] = "prism-qwen25-extra-dinosiglip-224px+0_5b"
 
     data_mix: str = "oxe_magic_soup"
+    action_tokenizer: str = "extra_action_tokenizer"
 
     expected_world_size: int = 8
     global_batch_size: int = 256
@@ -213,9 +214,10 @@ class Exp_Qwen25_DinoSigLIP_224px_wrist_0_5B_LIBERO_90(Exp_Qwen25_DinoSigLIP_224
 @dataclass
 class Exp_Qwen25_DinoSigLIP_224px_0_5B_Bridge(Exp_SigLIP_224px_Bridge):
     vla_id: str = "prism-qwen25-dinosiglip-224px+0_5b+mx-bridge"
-    base_vlm: Union[str, Path] = "prism-qwen25-dinosiglip-224px+0_5b"
+    base_vlm: Union[str, Path] = "prism-qwen25-extra-dinosiglip-224px+0_5b"
 
     data_mix: str = "bridge_dataset"  # direct dataset
+    action_tokenizer: str = "extra_action_tokenizer"
 
     expected_world_size: int = 8
     global_batch_size: int = 256

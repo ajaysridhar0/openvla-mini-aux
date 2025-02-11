@@ -69,6 +69,7 @@ class GenerateConfig:
 
     center_crop: bool = True                         # Center crop? (if trained w/ random crop image aug)
     obs_history: int = 1                             # Number of images to pass in from history
+    use_wrist_image: bool = False                    # Use wrist images (doubles the number of input images)
 
     #################################################################################################################
     # LIBERO environment-specific parameters
@@ -305,11 +306,10 @@ def eval_libero(cfg: GenerateConfig) -> None:
             task = task_suite.get_task(task_id)
             task_name = task.language
 
-            # Get default LIBERO initial states
             initial_states = task_suite.get_task_init_states(task_id)
 
             # Initialize LIBERO environment and task description
-            env, task_description = get_libero_env(task, cfg.model_family, resolution=256)
+            env, task_description = get_libero_env(task, cfg.model_family, resolution=resize_size)
 
             print(f"\nTask {task_id}: {task_name} (Trial {trial_idx + 1}/{cfg.num_trials_per_task})")
             log_file.write(f"\nTask {task_id}: {task_name} (Trial {trial_idx + 1}/{cfg.num_trials_per_task})\n")
@@ -329,6 +329,7 @@ def eval_libero(cfg: GenerateConfig) -> None:
             has_ee_pose_predictions = False  # Flag to track if we've seen any ee_pose predictions
             has_motion_predictions = False  # Flag to track if we've seen any motion predictions
             
+            replay_wrist_images = []
             if cfg.task_suite_name == "libero_spatial":
                 max_steps = 220  # longest training demo has 193 steps
             elif cfg.task_suite_name == "libero_object":
@@ -360,10 +361,25 @@ def eval_libero(cfg: GenerateConfig) -> None:
                     # Save preprocessed image for replay video
                     replay_images.append(img)
 
+                    # use_wrist_image
+                    if cfg.use_wrist_image:
+                        wrist_img = get_libero_image(obs, resize_size, key="robot0_eye_in_hand_image")
+                        replay_wrist_images.append(wrist_img)
+
                     # buffering #obs_history images, optionally
                     image_history = replay_images[-cfg.obs_history :]
                     if len(image_history) < cfg.obs_history:
                         image_history.extend([replay_images[-1]] * (cfg.obs_history - len(image_history)))
+
+                    # same but for optional wrist images
+                    if cfg.use_wrist_image:
+                        wrist_image_history = replay_wrist_images[-cfg.obs_history :]
+                        if len(wrist_image_history) < cfg.obs_history:
+                            wrist_image_history.extend(
+                                [replay_wrist_images[-1]] * (cfg.obs_history - len(wrist_image_history))
+                            )
+                        # interleaved images [... image_t, wrist_t ...]
+                        image_history = [val for tup in zip(image_history, wrist_image_history) for val in tup]
 
                     # Prepare observations dict
                     # Note: OpenVLA does not take proprio state as input

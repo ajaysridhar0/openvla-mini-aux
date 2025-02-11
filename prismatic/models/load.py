@@ -202,7 +202,17 @@ def load_vla(
     # Load VLA Config (and corresponding base VLM `ModelConfig`) from `config.json`
     with open(config_json, "r") as f:
         vla_cfg = json.load(f)["vla"]
-        model_cfg = ModelConfig.get_choice_class(Path(vla_cfg["base_vlm"]).name)()
+        base_vlm = vla_cfg["base_vlm"]
+
+    # if base vlm is a folder, load its config.json (only works for native format!)
+    # this might happen if you start a run who's base vlm is from a folder instead of from hf
+    if os.path.isdir(base_vlm):
+        with open(Path(base_vlm) / "config.json", "r") as f:
+            base_cfg = json.load(f)["model"]
+            base_vlm = base_cfg["model_id"]
+
+    overwatch.info(f"Base vlm: {base_vlm}")
+    model_cfg = ModelConfig.get_choice_class(base_vlm)()
 
     # Load Dataset Statistics for Action Denormalization
     with open(dataset_statistics_json, "r") as f:

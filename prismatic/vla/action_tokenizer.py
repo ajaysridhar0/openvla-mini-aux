@@ -66,7 +66,7 @@ class ActionTokenizer:
         discretized_action = np.digitize(action, self.bins)
 
         # Handle single element vs. batch
-        if len(discretized_action.shape) == 1:
+        if len(discretized_action.shape) <= 1:
             return self.tokenizer.decode(list(self.tokenizer_len - discretized_action))
         else:
             return self.tokenizer.batch_decode((self.tokenizer_len - discretized_action).tolist())
@@ -319,6 +319,7 @@ class FastActionTokenizer(ActionTokenizer):
 ACTION_TOKENIZERS = {
     "action_tokenizer": ActionTokenizer,
     "extra_action_tokenizer": partial(ActionTokenizer, use_extra=True),
+    # libero
     "libero_vq_action_tokenizer": partial(
         VQActionTokenizer, vq_vae_path="/iliad/u/belkhale/openvla-mini/vq/pretrain_vq+mx-libero_90+fach-7+ng-7+nemb-128+nlatent-512"
     ),
@@ -330,4 +331,10 @@ ACTION_TOKENIZERS = {
     ),
     "fast_action_tokenizer": FastActionTokenizer,
     "fast_extra_action_tokenizer": partial(FastActionTokenizer, use_extra=True),
+    # bridge
+    "bridge_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/pretrain_modvq+mx-bridge_dataset+fach-7+ng-7+nemb-256+nlatent-512",
+        use_extra=True,
+    ),
 }

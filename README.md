@@ -1,5 +1,7 @@
 # OpenVLA: An Open-Source Vision-Language-Action Model
 
+**Note: For MiniVLA, see the links in Latest Updates below!**
+
 [![arXiv](https://img.shields.io/badge/arXiv-2406.09246-df2a2a.svg?style=for-the-badge)](https://arxiv.org/abs/2406.09246)
 [![HF Models](https://img.shields.io/badge/%F0%9F%A4%97-Models-yellow?style=for-the-badge)](https://huggingface.co/openvla/openvla-7b)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.2.0-EE4C2C.svg?style=for-the-badge&logo=pytorch)](https://pytorch.org/get-started/locally/)
@@ -7,12 +9,20 @@
 [![License](https://img.shields.io/github/license/TRI-ML/prismatic-vlms?style=for-the-badge)](LICENSE)
 
 [**Getting Started**](#getting-started) | [**Pretrained VLAs**](#pretrained-vlas) | [**Installation**](#installation) | [**Fine-Tuning OpenVLA via LoRA**](#fine-tuning-openvla-via-lora) | [**Fully Fine-Tuning OpenVLA**](#fully-fine-tuning-openvla) |
-[**Training VLAs from Scratch**](#training-vlas-from-scratch) | [**Evaluating OpenVLA**](#evaluating-openvla) | [**Project Website**](https://openvla.github.io/)
+[**Training VLAs from Scratch**](#training-vlas-from-scratch) | [**Evaluating OpenVLA**](#evaluating-openvla) | [**MiniVLA Details**](#minivla) | [**Action Chunking**](#action-chunking) | [**Multi-Image**](#multi-image) | [**Project Website**](https://openvla.github.io/)
 
 
 <hr style="border: 2px solid gray;"></hr>
 
 ## Latest Updates
+
+### MINI VLA Updates
+- [2024-12-09] Added [MiniVLA](#minivla) configs with Qwen2.5 0.5B backbone support.
+- [2024-12-09] Added [Multi-Image](#multi-image) support for wrist images and/or image histories.
+- [2024-12-09] Added [Residual VQ Action chunking](#action-chunking)
+- [2024-12-09] Added option for simpler eval that is similar to libero (see `experiments/robot/simpler/run_simpler_eval.py`)
+
+### Original Updates
 - [2024-10-15] Added a [VLA Performance Troubleshooting](#vla-performance-troubleshooting) section to the README with best practices for debugging poor VLA performance after fine-tuning.
 - [2024-09-04] Added LIBERO simulation benchmark fine-tuning experiments to paper (see v2 on [arXiv](https://arxiv.org/abs/2406.09246));
   added instructions for reproducing OpenVLA results in [LIBERO Simulation Benchmark Evaluations](#libero-simulation-benchmark-evaluations) section
@@ -426,6 +436,105 @@ AttributeError: 'DLataset' object has no attribute 'traj_map'. Did you mean: 'fl
 ```
 - **Fix**: Upgrade `dlimp` to the newest version. You may have to `--force-reinstall` like so:
 `pip install --no-deps --force-reinstall git+https://github.com/moojink/dlimp_openvla`
+
+---
+
+## MiniVLA
+
+
+### Base Prismatic VLM for Qwen2.5
+
+We have included a variant Prismatic VLM trained one the [Qwen2.5 0.5B backbone here](TODO).
+The configurations for training the Prismatic VLM can be found under `prismatic/conf/models.py` with `Qwen2.5` in the name.
+
+The recommended Base VLM config to use for pretraining is `--model.type prism-qwen25-extra-dinosiglip-224px+0_5b`.
+Here, "extra" corresponds to adding an extra 256 tokens to the Qwen Vocabulary `<extra_i> ... ` to deconflict later action prediction in MiniVLA.
+
+Here's an example of how to train, following the prismatic guidelines with 8 GPUs:
+
+```bash
+# Run from the root of the repository
+torchrun --standalone --nnodes 1 --nproc-per-node 8 scripts/pretrain.py \
+  --model.type "prism-qwen25-extra-dinosiglip-224px+0_5b" \
+```
+
+### Training MiniVLA on your dataset
+
+Training configs for MiniVLA using the above base VLM can be found under `prismatic/conf/vla.py` with `Qwen2.5` in the name.
+
+IMPORTANT: All Qwen2.5 backbone VLAs should use `vla.action_tokenizer = extra_action_tokenizer`, which is the default in all the configs now.
+This uses the newly added 256 extra tokens for VLA action binning, instead of the last 256 tokens in the vocabulary (`action_tokenizer` uses this).
+
+Here's an example of how to train MiniVLA on Libero-90:
+
+```bash
+torchrun --standalone --nnodes 1 --nproc-per-node 8 vla-scripts/train.py \
+  --vla.type "prism-qwen25-dinosiglip-224px+0_5b+mx-libero-90" \
+  --data_root_dir <PATH TO LIBERO DATA ROOT> \
+  --run_root_dir <PATH TO LOG/CHECKPOINT ROOT> \
+  --wandb_project "<PROJECT>" \
+  --wandb_entity "<ENTITY>"
+```
+
+We have [LIBERO pretrained models](TODO) and [Bridge pretrained models](TODO).
+
+---
+
+## Action Chunking
+
+To implement action chunking, we use the VQ-Bet implementation of Residual VQ. Follow the [installation instructions here](https://github.com/jayLEE0301/vq_bet_official).
+
+### How does it work?
+
+Rather than naively predict action chunks by adding more output tokens, we *compress* the continuous action chunks of shape `(H x A)` using Residual VQ into a set `T` of "code words", each of which is an N dimensional latent vector. We use the unique integer index of each code work as the `bins` for action prediction. Thus we compress `(H x A)` continuous values into a set of `T` discrete bins for the model to predict. Residual VQ is especially useful because it is "autoregressively" encoded, which matches the autoregressive decoding that we do with action prediction in VLAs.
+
+### Pretraining VQ for your dataset
+
+To use VQ style chunking, first you should train a Residual VQ network. We provide the `vla-scripts/pretrain_vq.py` script as a wrapper around the VQ-Bet Residual VQ implementation for training from arbitrary tfds datasets and any mixtures defined in this codebase.
+
+For example, here's how to pretrain the VQ on bridge (`data_mix=bridge_dataset`) with an action horizon of 8 (`future_action_horizon=7`), input action dimension of 7 (`action_dim=7`) and the number of codewords (i.e. the number of discrete bins for each output action) as 256 (`vqvae_n_embed=256`):
+
+```bash
+# from root dir
+python vla-scripts/pretrain_vq.py --data_dir <WHERE IS BRIDGE DATA> \\
+        --data_mix bridge_dataset --action_dim 7 --future_action_horizon 7 --vqvae_n_embed 256
+```
+
+By default, this will create a directory under the root called `vq/` for each of the pretrained checkpoint.
+
+We have several existing VQs that you can use, [LIBERO VQ](TODO) and [Bridge VQ](TODO). Download them into this vq/ folder before running VLA training or inference.
+
+### Training and Inference with VQ
+
+Once you've downloaded an existing VQ or pretrained your own, you can train a VQ enabled model just by:
+1. Specify the new action tokenizer in `ACTION_TOKENIZERS` in `prismatic/vla/action_tokenizer.py` similarly to the VQ `libero_vq_action_tokenizer`, for example if we wanted to add a new one for vq path `vq/my_vq_model` that uses the same action bins as the base `action_tokenizer`, just append:
+
+```python
+  'my_action_tokenizer_name': partial(
+      VQActionTokenizer, vq_vae_path="vq/my_vq_model"
+  ),
+  ...
+```
+
+**NOTE**: For MiniVLA and Qwen LLM backbones, you should use the `use_extra=True` when defining tokenizers to use the extra tokens as our action bins instead of the last 256 like other models use.
+
+2. Pass in `--vla.action_tokenizer my_action_tokenizer_name` to the train or finetune script to use this action tokenizer instead.
+
+---
+
+## Multi Image
+
+We have added native support for multi images into the code base. Some examples on libero in `prismatic/conf/vla.py`:
+1. `prism-qwen25-dinosiglip-224px-t2+0_5b+mx-libero-90`: History of 2
+2. `prism-qwen25-dinosiglip-224px-wrist+0_5b+mx-libero-90`: Uses wrist images
+
+Both of these can be used at launch by updating the `--vla.type ...` argument.
+
+The implementation just uses the same visual encoder, but runs it on multiple images, then concatenates those token sequences to pass into the LLM backbone, similarly to single images.
+
+**NOTE** Images are expected to be passed in at inference in the exact same order & number as training, since there are no "prefix" tags denoting which image is which in the token sequence that gets passed into the image, its just one big concatenated sequence of `<img1_tokens> <img2_tokens> ...` before the prompt.
+
+**NOTE**: If you want to add your own config with multi-image, make sure to specify `image_sequence_len` to match the number of *raw images* expected (e.g., 2 for both history=2 and wrist example above). If you use wrist images, specify `vla.use_wrist_image=True` in the config, which is already done in the above config.
 
 ---
 
