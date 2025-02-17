@@ -242,6 +242,44 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("ur5e__pn_p_counter_to_cab_aux", 1.0),
         ("ur5e__pn_p_counter_to_sink_aux", 1.0)
     ],
+    "sawyer_robocasa": [
+        ("sawyer__pn_p_counter_to_sink_aux", 1.0),
+        ("sawyer__pn_p_sink_to_counter_aux", 1.0),
+        ("sawyer__pn_p_counter_to_cab_aux", 1.0),
+    ],
+    "panda_robocasa": [
+        ("panda__pn_p_counter_to_sink_aux", 1.0),
+        ("panda__pn_p_sink_to_counter_aux", 1.0),
+        ("panda__pn_p_counter_to_cab_aux", 1.0),
+    ],
+    "ur5e_robocasa": [
+        ("ur5e__pn_p_counter_to_sink_aux", 1.0),
+        ("ur5e__pn_p_sink_to_counter_aux", 1.0),
+        ("ur5e__pn_p_counter_to_cab_aux", 1.0),
+    ],
+    "kinova3_robocasa": [
+        ("kinova3__pn_p_counter_to_sink_aux", 1.0),
+        ("kinova3__pn_p_sink_to_counter_aux", 1.0),
+        ("kinova3__pn_p_counter_to_cab_aux", 1.0),
+    ],
+    "counter_to_cab_robocasa": [
+        ("panda__pn_p_counter_to_cab_aux", 1.0),
+        ("sawyer__pn_p_counter_to_cab_aux", 1.0),
+        ("ur5e__pn_p_counter_to_cab_aux", 1.0),
+        ("kinova3__pn_p_counter_to_cab_aux", 1.0),
+    ],
+    "sink_to_counter_robocasa": [
+        ("panda__pn_p_sink_to_counter_aux", 1.0),
+        ("sawyer__pn_p_sink_to_counter_aux", 1.0),
+        ("ur5e__pn_p_sink_to_counter_aux", 1.0),
+        ("kinova3__pn_p_sink_to_counter_aux", 1.0),
+    ],
+    "counter_to_sink_robocasa": [
+        ("panda__pn_p_counter_to_sink_aux", 1.0),
+        ("sawyer__pn_p_counter_to_sink_aux", 1.0),
+        ("ur5e__pn_p_counter_to_sink_aux", 1.0),
+        ("kinova3__pn_p_counter_to_sink_aux", 1.0),
+    ],
     "all_robocasa_xembod": [
        ("all_robocasa_xembod", 1.0)
     ]
