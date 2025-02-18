@@ -166,6 +166,7 @@ class GenerateConfig:
         "sawyer__pn_p_counter_to_cab_aux",
         "ur5e__pn_p_counter_to_sink_aux"
     ])
+    robot: str = None
     # robot_task_names: List[str] = field(default_factory=lambda: [
     #     "ur5e__pn_p_sink_to_counter_aux",
     #     "sawyer__pn_p_sink_to_counter_aux",
@@ -405,13 +406,13 @@ def eval_single_task(cfg: GenerateConfig, model, robot_task_name: str, log_file)
         has_motion_predictions = False
 
         if "pn_p_sink_to_counter" in cfg.task_suite_name:
-            max_steps = 420
+            max_steps = 450
         elif "pn_p_counter_to_cab" in cfg.task_suite_name:
-            max_steps = 360
+            max_steps = 450
         elif "pn_p_counter_to_sink" in cfg.task_suite_name:
-            max_steps = 350
+            max_steps = 450
         else:
-            max_steps = 400
+            max_steps = 450
 
         print(f"Starting episode {total_episodes+1}...")
         log_file.write(f"Starting episode {total_episodes+1}...\n")
@@ -480,17 +481,29 @@ def eval_single_task(cfg: GenerateConfig, model, robot_task_name: str, log_file)
             # Draw bounding boxes if available
             if 'bbox' in output:
                 has_bbox_predictions = True
-                current_img = draw_bbox_on_image(current_img, output['bbox'], bbox_color_map)
+                try:
+                    current_img = draw_bbox_on_image(current_img, output['bbox'], bbox_color_map)
+                except Exception as e:
+                    print(f"Error drawing bounding boxes: {e}")
+                    print(f"Output: {output['bbox']}")
             
             # Draw trajectory if available
             if 'ee_pose_2D' in output:
                 has_ee_pose_predictions = True
-                current_img = draw_trajectory_on_image(current_img, output['ee_pose_2D'])
+                try:
+                    current_img = draw_trajectory_on_image(current_img, output['ee_pose_2D'])
+                except Exception as e:
+                    print(f"Error drawing trajectory: {e}")
+                    print(f"Output: {output['ee_pose_2D']}")
             
             # Draw motion text if available
             if 'low_level_motion' in output:
                 has_motion_predictions = True
-                current_img = draw_motion_text_on_image(current_img, output['low_level_motion'])
+                try:
+                    current_img = draw_motion_text_on_image(current_img, output['low_level_motion'])
+                except Exception as e:
+                    print(f"Error drawing motion text: {e}")
+                    print(f"Output: {output['low_level_motion']}")
             
             replay_images_with_bbox.append(current_img)
 
@@ -590,6 +603,13 @@ def eval_robocasa(cfg: GenerateConfig) -> None:
     if "image_aug" in cfg.pretrained_checkpoint:
         assert cfg.center_crop, "Expecting `center_crop==True` because model was trained with image augmentations!"
     assert not (cfg.load_in_8bit and cfg.load_in_4bit), "Cannot use both 8-bit and 4-bit quantization!"
+
+    if cfg.robot is not None:
+        cfg.robot_task_names = [f"{cfg.robot}__pn_p_counter_to_cab_aux",
+                                f"{cfg.robot}__pn_p_counter_to_sink_aux",
+                                f"{cfg.robot}__pn_p_sink_to_counter_aux"]
+        
+    print(f"Evaluating {cfg.robot_task_names} for {cfg.robot}...")
 
     # Set random seed
     set_seed_everywhere(cfg.seed)
