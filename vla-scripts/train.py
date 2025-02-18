@@ -34,7 +34,7 @@ from prismatic.training import VLAMetrics, get_train_strategy
 from prismatic.util import set_global_seed
 from prismatic.vla import get_vla_dataset_and_collator
 from prismatic.vla.datasets.rlds.utils.data_utils import save_dataset_statistics
-
+from prismatic.vla.action_tokenizer import FastActionTokenizer
 # Sane Defaults
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -84,6 +84,8 @@ class TrainConfig:
 
     random_llm_weights: bool = False
 
+    normalize_data: bool = True
+
     def __post_init__(self) -> None:
         """Lift optimization parameters from `self.vla` for ease of use =>> validate on `expected_world_size`"""
         self.epochs = self.vla.epochs
@@ -104,6 +106,8 @@ class TrainConfig:
 
         self.image_sequence_len = self.vla.image_sequence_len
         self.use_wrist_image = self.vla.use_wrist_image
+
+        self.normalize_data = self.vla.normalize_data
 
         # [Validate] Assert on `expected_world_size`
         assert (
@@ -222,9 +226,9 @@ def train(cfg: TrainConfig) -> None:
         future_2D_trace_window_size=cfg.vla.future_2D_trace_window_size,
         obj_pose_stride=cfg.vla.obj_pose_stride,
         ee_pose_2D_stride=cfg.vla.ee_pose_2D_stride,
-        # if using wrist images, we assume we passed in a 2x image sequence len
         image_window_size=cfg.image_sequence_len // 2 if cfg.use_wrist_image else cfg.image_sequence_len,
         use_wrist_image=cfg.use_wrist_image,  # will double the sequence length
+        normalize_data=cfg.normalize_data,
     )
 
     # Save dataset statistics for de-normalization at inference time
@@ -276,6 +280,7 @@ def train(cfg: TrainConfig) -> None:
         action_tokenizer,
         metrics,
         save_interval=cfg.save_interval,
+        sequence_level_decoding=isinstance(action_tokenizer, FastActionTokenizer),
     )
 
     # Finalize

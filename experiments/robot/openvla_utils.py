@@ -259,5 +259,5 @@ def get_prismatic_vla_action(vla, processor, base_vla_name, obs, task_label, unn
     if len(processed_images) == 1:
         processed_images = processed_images[0]
 
-    action = vla.predict_action(processed_images, task_label, unnorm_key=unnorm_key, **kwargs)
+    action = vla.predict_action(processed_images, task_label, unnorm_key=unnorm_key, aux_task_types=aux_task_types, **kwargs)
     return action

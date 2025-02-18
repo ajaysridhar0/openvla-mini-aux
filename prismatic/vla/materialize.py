@@ -47,6 +47,7 @@ def get_vla_dataset_and_collator(
     transform_types: str = "action",
     transform_weights: str = None,
     use_wrist_image: bool = False,
+    normalize_data: bool = True,
 ) -> Tuple[Dataset, ActionTokenizer, PaddedCollatorForActionPrediction]:
     """Initialize RLDS Dataset (wraps TFDS), ActionTokenizer, and initialize transform/collation functions."""
 
@@ -129,6 +130,7 @@ def get_vla_dataset_and_collator(
         ee_pose_2D_stride=ee_pose_2D_stride,
         image_window_size=image_window_size,
         load_camera_views=load_camera_views,
+        normalize_data=normalize_data,
     )
 
     return dataset, action_tokenizer, collator

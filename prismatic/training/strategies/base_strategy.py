@@ -314,8 +314,15 @@ class TrainingStrategy(ABC):
         metrics: VLAMetrics,
         save_interval: int = 2500,
         save_full_model: bool = True,
+        sequence_level_decoding: bool = False,
     ) -> None:
-        """Run the VLA training loop for the given `dataset` and `collator`; log losses, action metrics to `metrics`."""
+        """
+        Run the VLA training loop for the given `dataset` and `collator`.
+        
+        Args:
+            sequence_level_decoding: If True, maintains sequence structure when decoding action tokens,
+                passing List[List[int]] to decode_token_ids_to_actions instead of flattening.
+        """
         assert isinstance(vla_dataset, IterableDataset), "VLA training expects an IterableDataset!"
         assert self.grad_accumulation_steps == 1, "VLA training does not support gradient accumulation!"
 
@@ -450,12 +457,30 @@ class TrainingStrategy(ABC):
                                     start, end = qa_segments[batch_idx][action_idx]
                                     action_mask[batch_idx, start:end-2] = True
 
-                                continuous_actions_pred = torch.tensor(
-                                    action_tokenizer.decode_token_ids_to_actions(action_preds[action_mask].cpu().numpy())
-                                )
-                                continuous_actions_gt = torch.tensor(
-                                    action_tokenizer.decode_token_ids_to_actions(action_gt[action_mask].cpu().numpy())
-                                )
+                                if sequence_level_decoding:
+                                    # Maintain sequence structure for each batch item
+                                    pred_sequences = []
+                                    gt_sequences = []
+                                    for b in range(action_preds.size(0)):
+                                        batch_mask = action_mask[b]
+                                        pred_sequences.append(action_preds[b][batch_mask].tolist())
+                                        gt_sequences.append(action_gt[b][batch_mask].tolist())
+                                    
+                                    continuous_actions_pred = torch.tensor(
+                                        action_tokenizer.decode_token_ids_to_actions(pred_sequences)
+                                    )
+                                    continuous_actions_gt = torch.tensor(
+                                        action_tokenizer.decode_token_ids_to_actions(gt_sequences)
+                                    )
+                                else:
+                                    # Original flattened behavior
+                                    continuous_actions_pred = torch.tensor(
+                                        action_tokenizer.decode_token_ids_to_actions(action_preds[action_mask].cpu().numpy())
+                                    )
+                                    continuous_actions_gt = torch.tensor(
+                                        action_tokenizer.decode_token_ids_to_actions(action_gt[action_mask].cpu().numpy())
+                                    )
+
                                 try:
                                     action_l1_loss = torch.nn.functional.l1_loss(continuous_actions_pred, continuous_actions_gt)
                                 except:
@@ -474,12 +499,28 @@ class TrainingStrategy(ABC):
                                             ds_gt = action_gt[ds_mask][ds_action_mask]
                                             
                                             if ds_preds.numel() > 0:
-                                                ds_continuous_pred = torch.tensor(
-                                                    action_tokenizer.decode_token_ids_to_actions(ds_preds.cpu().numpy())
-                                                )
-                                                ds_continuous_gt = torch.tensor(
-                                                    action_tokenizer.decode_token_ids_to_actions(ds_gt.cpu().numpy())
-                                                )
+                                                if sequence_level_decoding:
+                                                    # Maintain sequence structure for dataset-specific predictions
+                                                    ds_pred_sequences = []
+                                                    ds_gt_sequences = []
+                                                    for b in range(ds_preds.size(0)):
+                                                        ds_pred_sequences.append(ds_preds[b].tolist())
+                                                        ds_gt_sequences.append(ds_gt[b].tolist())
+                                                    
+                                                    ds_continuous_pred = torch.tensor(
+                                                        action_tokenizer.decode_token_ids_to_actions(ds_pred_sequences)
+                                                    )
+                                                    ds_continuous_gt = torch.tensor(
+                                                        action_tokenizer.decode_token_ids_to_actions(ds_gt_sequences)
+                                                    )
+                                                else:
+                                                    # Original flattened behavior
+                                                    ds_continuous_pred = torch.tensor(
+                                                        action_tokenizer.decode_token_ids_to_actions(ds_preds.cpu().numpy())
+                                                    )
+                                                    ds_continuous_gt = torch.tensor(
+                                                        action_tokenizer.decode_token_ids_to_actions(ds_gt.cpu().numpy())
+                                                    )
                                                 ds_l1_loss = torch.nn.functional.l1_loss(ds_continuous_pred, ds_continuous_gt)
                                                 metrics.commit_for_dataset(
                                                     dataset_name=f"{ds.decode()}/{transform_type_str}",
@@ -487,21 +528,49 @@ class TrainingStrategy(ABC):
                                                 )
                         
                         else:
-                            # For "all", keep the original action-only accuracy computation with dataset logging
-                            mask = (action_tokenizer.action_token_end_idx > action_gt) & (action_gt > action_tokenizer.action_token_begin_idx)
-                            correct_preds = (action_preds == action_gt) & mask
-                            action_accuracy = correct_preds.sum().float() / mask.sum().float()
+                            # For "all", use qa_segments to precisely identify action token locations
+                            qa_segments = find_qa_segments(action_gt)
+                            action_mask = torch.zeros_like(action_gt, dtype=torch.bool)
                             
-                            continuous_actions_pred = torch.tensor(
-                                action_tokenizer.decode_token_ids_to_actions(action_preds[mask].cpu().numpy()),
-                                device=action_preds.device
-                            ).clone().detach()
-                            continuous_actions_gt = torch.tensor(
-                                action_tokenizer.decode_token_ids_to_actions(action_gt[mask].cpu().numpy()),
-                                device=action_gt.device
-                            ).clone().detach()
+                            # For "all" we only care about the last segment contains actions (*always true)
+                            for batch_idx in range(len(qa_segments)):
+                                if qa_segments[batch_idx]:  # if there are any segments
+                                    start, end = qa_segments[batch_idx][-1]  # take last segment
+                                    # Exclude the last 2 tokens which are typically EOS/padding
+                                    action_mask[batch_idx, start:end-2] = True
+                            
+                            correct_preds = (action_preds == action_gt) & action_mask
+                            action_accuracy = correct_preds.sum().float() / action_mask.sum().float()
+                            
+                            if sequence_level_decoding:
+                                # Maintain sequence structure for each batch item
+                                pred_sequences = []
+                                gt_sequences = []
+                                for b in range(action_preds.size(0)):
+                                    batch_mask = action_mask[b]
+                                    pred_sequences.append(action_preds[b][batch_mask].tolist())
+                                    gt_sequences.append(action_gt[b][batch_mask].tolist())
+                                
+                                continuous_actions_pred = torch.tensor(
+                                    action_tokenizer.decode_token_ids_to_actions(pred_sequences),
+                                    device=action_preds.device
+                                ).clone().detach()
+                                continuous_actions_gt = torch.tensor(
+                                    action_tokenizer.decode_token_ids_to_actions(gt_sequences),
+                                    device=action_gt.device
+                                ).clone().detach()
+                            else:
+                                # Original flattened behavior
+                                continuous_actions_pred = torch.tensor(
+                                    action_tokenizer.decode_token_ids_to_actions(action_preds[action_mask].cpu().numpy()),
+                                    device=action_preds.device
+                                ).clone().detach()
+                                continuous_actions_gt = torch.tensor(
+                                    action_tokenizer.decode_token_ids_to_actions(action_gt[action_mask].cpu().numpy()),
+                                    device=action_gt.device
+                                ).clone().detach()
+                            
                             action_l1_loss = torch.nn.functional.l1_loss(continuous_actions_pred, continuous_actions_gt)
-                            
                             metrics.commit(action_accuracy=action_accuracy, l1_loss=action_l1_loss, update_step_time=True)
 
                             # Per-dataset metrics for "all" (only on rank zero)
@@ -516,20 +585,41 @@ class TrainingStrategy(ABC):
                                         ds_mask = ds_mask.unsqueeze(1).expand(-1, action_preds.size(1))
                                         
                                         # Apply both dataset mask and action mask
-                                        combined_mask = ds_mask & mask
+                                        combined_mask = ds_mask & action_mask
                                         
                                         if combined_mask.sum() > 0:
                                             ds_accuracy = correct_preds[combined_mask].sum().float() / combined_mask.sum().float()
-                                            ds_continuous_pred = torch.tensor(
-                                                action_tokenizer.decode_token_ids_to_actions(action_preds[combined_mask].cpu().numpy()),
-                                                device=action_preds.device
-                                            ).clone().detach()
-                                            ds_continuous_gt = torch.tensor(
-                                                action_tokenizer.decode_token_ids_to_actions(action_gt[combined_mask].cpu().numpy()),
-                                                device=action_gt.device
-                                            ).clone().detach()
-                                            ds_l1_loss = torch.nn.functional.l1_loss(ds_continuous_pred, ds_continuous_gt)
                                             
+                                            if sequence_level_decoding:
+                                                # Maintain sequence structure for "all" dataset-specific predictions
+                                                ds_pred_sequences = []
+                                                ds_gt_sequences = []
+                                                for b in range(action_preds.size(0)):
+                                                    batch_combined_mask = combined_mask[b]
+                                                    if batch_combined_mask.any():
+                                                        ds_pred_sequences.append(action_preds[b][batch_combined_mask].tolist())
+                                                        ds_gt_sequences.append(action_gt[b][batch_combined_mask].tolist())
+                                                
+                                                ds_continuous_pred = torch.tensor(
+                                                    action_tokenizer.decode_token_ids_to_actions(ds_pred_sequences),
+                                                    device=action_preds.device
+                                                ).clone().detach()
+                                                ds_continuous_gt = torch.tensor(
+                                                    action_tokenizer.decode_token_ids_to_actions(ds_gt_sequences),
+                                                    device=action_gt.device
+                                                ).clone().detach()
+                                            else:
+                                                # Original flattened behavior
+                                                ds_continuous_pred = torch.tensor(
+                                                    action_tokenizer.decode_token_ids_to_actions(action_preds[combined_mask].cpu().numpy()),
+                                                    device=action_preds.device
+                                                ).clone().detach()
+                                                ds_continuous_gt = torch.tensor(
+                                                    action_tokenizer.decode_token_ids_to_actions(action_gt[combined_mask].cpu().numpy()),
+                                                    device=action_gt.device
+                                                ).clone().detach()
+                                            
+                                            ds_l1_loss = torch.nn.functional.l1_loss(ds_continuous_pred, ds_continuous_gt)
                                             metrics.commit_for_dataset(
                                                 dataset_name=f"{ds.decode()}/all",
                                                 action_accuracy=ds_accuracy,

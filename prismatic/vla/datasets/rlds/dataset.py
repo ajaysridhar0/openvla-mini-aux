@@ -48,6 +48,7 @@ def make_dataset_from_rlds(
     state_obs_keys: List[Optional[str]] = (),
     language_key: Optional[str] = None,
     action_proprio_normalization_type: NormalizationType = NormalizationType.NORMAL,
+    normalize_data: bool = True,
     dataset_statistics: Optional[Union[dict, str]] = None,
     absolute_action_mask: Optional[List[bool]] = None,
     action_normalization_mask: Optional[List[bool]] = None,
@@ -96,6 +97,7 @@ def make_dataset_from_rlds(
             extracted from `traj[language_key]`.
         action_proprio_normalization_type (str, optional): The type of normalization to perform on the action,
             proprio, or both. Can be "normal" (mean 0, std 1) or "bounds" (normalized to [-1, 1]).
+        normalize_data (bool, optional): Whether to apply normalization to the dataset.
         dataset_statistics: (dict|str, optional): dict (or path to JSON file) that contains dataset statistics
             for normalization. If `action_proprio_normalization_type` is "normal", this should contain "mean" and
             "std" keys. If `action_proprio_normalization_type` is "bounds", this should contain "min" and "max"
@@ -243,14 +245,17 @@ def make_dataset_from_rlds(
     dataset = dl.DLataset.from_rlds(builder, split=split, shuffle=shuffle, num_parallel_reads=num_parallel_reads)
 
     dataset = dataset.traj_map(restructure, num_parallel_calls)
-    dataset = dataset.traj_map(
-        partial(
-            normalize_action_and_proprio,
-            metadata=dataset_statistics,
-            normalization_type=action_proprio_normalization_type,
-        ),
-        num_parallel_calls,
-    )
+    
+    # Only apply normalization if normalize_data is True
+    if normalize_data:
+        dataset = dataset.traj_map(
+            partial(
+                normalize_action_and_proprio,
+                metadata=dataset_statistics,
+                normalization_type=action_proprio_normalization_type,
+            ),
+            num_parallel_calls,
+        )
 
     return dataset, dataset_statistics
 
@@ -484,6 +489,7 @@ def make_interleaved_dataset(
     balance_weights: bool = False,
     traj_transform_threads: Optional[int] = None,
     traj_read_threads: Optional[int] = None,
+    normalize_data: bool = True,
 ) -> dl.DLataset:
     """
     Creates an interleaved dataset from list of dataset configs (kwargs). Returns a dataset of batched frames.
@@ -507,6 +513,7 @@ def make_interleaved_dataset(
             datasets according to their sampling weights. If None, defaults to AUTOTUNE for every dataset.
         traj_read_threads: total number of parallel read workers for trajectory transforms, distributed across
             datasets according to their sampling weights. If None, defaults to AUTOTUNE for every dataset.
+        normalize_data: whether to apply normalization to the dataset
     """
     # Default to uniform sampling (if `sample_weights` is not specified)
     if not sample_weights:
@@ -525,7 +532,7 @@ def make_interleaved_dataset(
         data_kwargs = copy.deepcopy(dataset_kwargs)
         if "dataset_frame_transform_kwargs" in data_kwargs:
             data_kwargs.pop("dataset_frame_transform_kwargs")
-        _, dataset_statistics = make_dataset_from_rlds(**data_kwargs, train=train)
+        _, dataset_statistics = make_dataset_from_rlds(**data_kwargs, train=train, normalize_data=normalize_data)
         dataset_sizes.append(dataset_statistics["num_transitions"])
         all_dataset_statistics[dataset_kwargs["name"]] = dataset_statistics
 
@@ -568,6 +575,7 @@ def make_interleaved_dataset(
             num_parallel_calls=threads,
             num_parallel_reads=reads,
             dataset_statistics=all_dataset_statistics[dataset_kwargs["name"]],
+            normalize_data=normalize_data,
         )
         dataset = apply_trajectory_transforms(
             dataset.repeat(),

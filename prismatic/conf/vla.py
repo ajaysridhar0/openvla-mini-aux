@@ -68,6 +68,8 @@ class VLAConfig(ChoiceRegistry):
     obj_pose_stride: int = 5                       # Object Pose Stride
     ee_pose_2D_stride: int = 5                      # End-Effector 2D Trace Stride
 
+    normalize_data: bool = True  # Add this field
+
 
 # === OpenVLA Training Configurations ===
 

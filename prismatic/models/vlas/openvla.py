@@ -61,8 +61,6 @@ class OpenVLA(PrismaticVLM):
         """
         image_transform, tokenizer = self.vision_backbone.get_image_transform(), self.llm_backbone.tokenizer
 
-        image_transform, tokenizer = self.vision_backbone.get_image_transform(), self.llm_backbone.tokenizer
-
         # Preprocess Image
         pixel_values = image_transform(image)
         if isinstance(pixel_values, torch.Tensor):

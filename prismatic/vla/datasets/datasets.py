@@ -329,6 +329,7 @@ class RLDSDataset(IterableDataset):
         ee_pose_2D_stride: int = 1,
         image_window_size: int = 1,
         load_camera_views: tuple = ("primary",),
+        normalize_data: bool = True,
     ) -> None:
         """Lightweight wrapper around RLDS TFDS Pipeline for use with PyTorch/OpenVLA Data Loaders."""
         self.data_root_dir, self.data_mix, self.batch_transforms = data_root_dir, data_mix, batch_transforms
@@ -377,6 +378,7 @@ class RLDSDataset(IterableDataset):
             traj_transform_threads=len(mixture_spec),
             traj_read_threads=len(mixture_spec),
             train=train,
+            normalize_data=normalize_data,
         )
 
         # If applicable, enable image augmentations
