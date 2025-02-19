@@ -13,6 +13,8 @@ import tensorflow as tf
 def chunk_act_obs(
     traj: Dict, 
     window_size: int, 
+    past_obj_pose_window_size: int = 0,
+    past_2D_trace_window_size: int = 0,
     future_action_window_size: int = 0, 
     future_obj_pose_window_size: int = 0,
     future_2D_trace_window_size: int = 0,
@@ -20,80 +22,83 @@ def chunk_act_obs(
     ee_pose_2D_stride: int = 1,
 ) -> Dict:
     """
-    Chunks actions and observations into the given window_size.
-
-    "observation" keys are given a new axis (at index 1) of size `window_size` containing `window_size - 1`
-    observations from the past and the current observation. "action" is given a new axis (at index 1) of size
-    `window_size + future_action_window_size` containing `window_size - 1` actions from the past, the current
-    action, and `future_action_window_size` actions from the future. "pad_mask" is added to "observation" and
-    indicates whether an observation should be considered padding (i.e. if it had come from a timestep
-    before the start of the trajectory).
-
-    Striding is applied to "obj_pose" and "ee_pose_2D" to control the step size between indices in the chunking
-    process. A stride of 1 means every index is included, while a stride of n means every nth index is included.
-    This allows for downsampling of the data in these specific chunks.
+    Chunks actions and observations into windows, with separate past/current/future for aux task data.
     """
     traj_len = tf.shape(traj["action"])[0]
     action_dim = traj["action"].shape[-1]
+    
+    # Create indices for the main observation window
     chunk_indices = tf.broadcast_to(tf.range(-window_size + 1, 1), [traj_len, window_size]) + tf.broadcast_to(
         tf.range(traj_len)[:, None], [traj_len, window_size]
     )
 
+    # Create indices for action chunks (current + future only)
     action_chunk_indices = tf.broadcast_to(
-        tf.range(-window_size + 1, 1 + future_action_window_size),
-        [traj_len, window_size + future_action_window_size],
+        tf.range(0, 1 + future_action_window_size),
+        [traj_len, 1 + future_action_window_size],
     ) + tf.broadcast_to(
         tf.range(traj_len)[:, None],
-        [traj_len, window_size + future_action_window_size],
+        [traj_len, 1 + future_action_window_size],
     )
 
-    # Calculate the number of chunks based on stride with ceiling division
-    obj_pose_chunks_size = (window_size + future_obj_pose_window_size + obj_pose_stride - 1) // obj_pose_stride
-    obj_pose_chunk_indices = tf.broadcast_to(
-        tf.range(-window_size + 1, 1 + future_obj_pose_window_size, obj_pose_stride),
-        [traj_len, obj_pose_chunks_size],
-    ) + tf.broadcast_to(
-        tf.range(traj_len)[:, None],
-        [traj_len, obj_pose_chunks_size],
-    )
+    # Handle past indices for aux tasks
+    past_obj_pose_indices = None
+    if past_obj_pose_window_size > 0:
+        past_obj_pose_indices = tf.broadcast_to(
+            tf.range(-past_obj_pose_window_size, 0, obj_pose_stride),
+            [traj_len, (past_obj_pose_window_size + obj_pose_stride - 1) // obj_pose_stride],
+        ) + tf.broadcast_to(
+            tf.range(traj_len)[:, None],
+            [traj_len, (past_obj_pose_window_size + obj_pose_stride - 1) // obj_pose_stride],
+        )
 
-    ee_pose_chunks_size = (window_size + future_2D_trace_window_size + ee_pose_2D_stride - 1) // ee_pose_2D_stride
-    ee_pose_chunk_indices = tf.broadcast_to(
-        tf.range(-window_size + 1, 1 + future_2D_trace_window_size, ee_pose_2D_stride),
-        [traj_len, ee_pose_chunks_size],
-    ) + tf.broadcast_to(
-        tf.range(traj_len)[:, None],
-        [traj_len, ee_pose_chunks_size],
-    )
+    past_ee_pose_indices = None
+    if past_2D_trace_window_size > 0:
+        past_ee_pose_indices = tf.broadcast_to(
+            tf.range(-past_2D_trace_window_size, 0, ee_pose_2D_stride),
+            [traj_len, (past_2D_trace_window_size + ee_pose_2D_stride - 1) // ee_pose_2D_stride],
+        ) + tf.broadcast_to(
+            tf.range(traj_len)[:, None],
+            [traj_len, (past_2D_trace_window_size + ee_pose_2D_stride - 1) // ee_pose_2D_stride],
+        )
 
-    floored_chunk_indices = tf.maximum(chunk_indices, 0)
+    # Handle future indices for aux tasks
+    future_obj_pose_indices = None
+    if future_obj_pose_window_size > 0:
+        future_obj_pose_indices = tf.broadcast_to(
+            tf.range(1, future_obj_pose_window_size + 1, obj_pose_stride),
+            [traj_len, (future_obj_pose_window_size + obj_pose_stride - 1) // obj_pose_stride],
+        ) + tf.broadcast_to(
+            tf.range(traj_len)[:, None],
+            [traj_len, (future_obj_pose_window_size + obj_pose_stride - 1) // obj_pose_stride],
+        )
 
+    future_ee_pose_indices = None
+    if future_2D_trace_window_size > 0:
+        future_ee_pose_indices = tf.broadcast_to(
+            tf.range(1, future_2D_trace_window_size + 1, ee_pose_2D_stride),
+            [traj_len, (future_2D_trace_window_size + ee_pose_2D_stride - 1) // ee_pose_2D_stride],
+        ) + tf.broadcast_to(
+            tf.range(traj_len)[:, None],
+            [traj_len, (future_2D_trace_window_size + ee_pose_2D_stride - 1) // ee_pose_2D_stride],
+        )
+
+    # Floor indices at 0 and ceiling at goal_timestep
     if "timestep" in traj["task"]:
         goal_timestep = traj["task"]["timestep"]
     else:
         goal_timestep = tf.fill([traj_len], traj_len - 1)
 
-    floored_action_chunk_indices = tf.minimum(tf.maximum(action_chunk_indices, 0), goal_timestep[:, None])
-    floored_obj_pose_chunk_indices = tf.minimum(tf.maximum(obj_pose_chunk_indices, 0), goal_timestep[:, None])
-    floored_ee_pose_chunk_indices = tf.minimum(tf.maximum(ee_pose_chunk_indices, 0), goal_timestep[:, None])
-
+    floored_chunk_indices = tf.maximum(chunk_indices, 0)
+    
+    # Gather data using computed indices
     traj["observation"] = tf.nest.map_structure(lambda x: tf.gather(x, floored_chunk_indices), traj["observation"])
-    traj["action"] = tf.gather(traj["action"], floored_action_chunk_indices)
     
-    # Convert bboxes to center poses and chunk
-    bboxes = tf.cast(traj["obj_bboxes"], tf.float32)
-    center_x = (bboxes[..., 0] + bboxes[..., 2]) / 2.0  # (min_x + max_x) / 2
-    center_y = (bboxes[..., 1] + bboxes[..., 3]) / 2.0  # (min_y + max_y) / 2
-    center_poses = tf.stack([center_x, center_y], axis=-1)
-    traj["obj_poses"] = tf.gather(center_poses, floored_obj_pose_chunk_indices)
+    # Handle actions (current + future only)
+    floored_action_indices = tf.minimum(tf.maximum(action_chunk_indices, 0), goal_timestep[:, None])
+    traj["action"] = tf.gather(traj["action"], floored_action_indices)
     
-    # Chunk ee_pose_2D
-    traj["ee_pose_2D"] = tf.gather(traj["ee_pose_2D"], floored_ee_pose_chunk_indices)
-
-    # indicates whether an entire observation is padding
-    traj["observation"]["pad_mask"] = chunk_indices >= 0
-
-    # if no absolute_action_mask was provided, assume all actions are relative
+    # Handle absolute vs relative actions
     if "absolute_action_mask" not in traj and future_action_window_size > 0:
         logging.warning(
             "future_action_window_size > 0 but no absolute_action_mask was provided. "
@@ -106,9 +111,32 @@ def chunk_act_obs(
         tf.zeros_like(traj["action"]),  # relative actions are zeroed
     )
 
-    # actions past the goal timestep become neutral
+    # Make actions neutral past the goal timestep
     action_past_goal = action_chunk_indices > goal_timestep[:, None]
     traj["action"] = tf.where(action_past_goal[:, :, None], neutral_actions, traj["action"])
+    
+    # Convert bboxes to center poses
+    bboxes = tf.cast(traj["obj_bboxes"], tf.float32)
+    center_x = (bboxes[..., 0] + bboxes[..., 2]) / 2.0
+    center_y = (bboxes[..., 1] + bboxes[..., 3]) / 2.0
+    center_poses = tf.stack([center_x, center_y], axis=-1)
+    
+    # Handle object poses
+    traj["obj_poses_current"] = tf.gather(center_poses, tf.maximum(chunk_indices, 0))
+    if past_obj_pose_indices is not None:
+        traj["obj_poses_past"] = tf.gather(center_poses, tf.maximum(past_obj_pose_indices, 0))
+    if future_obj_pose_indices is not None:
+        traj["obj_poses_future"] = tf.gather(center_poses, tf.minimum(future_obj_pose_indices, goal_timestep[:, None]))
+    
+    # Handle ee poses
+    traj["ee_pose_2D_current"] = tf.gather(traj["ee_pose_2D"], tf.maximum(chunk_indices, 0))
+    if past_ee_pose_indices is not None:
+        traj["ee_pose_2D_past"] = tf.gather(traj["ee_pose_2D"], tf.maximum(past_ee_pose_indices, 0))
+    if future_ee_pose_indices is not None:
+        traj["ee_pose_2D_future"] = tf.gather(traj["ee_pose_2D"], tf.minimum(future_ee_pose_indices, goal_timestep[:, None]))
+
+    # Add padding mask
+    traj["observation"]["pad_mask"] = chunk_indices >= 0
 
     return traj
 

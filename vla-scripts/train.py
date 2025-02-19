@@ -229,6 +229,8 @@ def train(cfg: TrainConfig) -> None:
         image_window_size=cfg.image_sequence_len // 2 if cfg.use_wrist_image else cfg.image_sequence_len,
         use_wrist_image=cfg.use_wrist_image,  # will double the sequence length
         normalize_data=cfg.normalize_data,
+        past_obj_pose_window_size=cfg.vla.past_obj_pose_window_size,
+        past_2D_trace_window_size=cfg.vla.past_2D_trace_window_size,
     )
 
     # Save dataset statistics for de-normalization at inference time

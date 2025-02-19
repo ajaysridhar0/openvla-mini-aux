@@ -30,8 +30,8 @@ IGNORE_INDEX = -100
 AUX_QUESTIONS_PROMPT = {
     "bbox": "What are the relevant objects and their bounding boxes to",
     "low_level_motion": "What motion should the robot do to",
-    "obj_pose": "What are the relevant objects, and what should their traces be to",
-    "ee_pose_2D": "What should the end-effector's 2D trace be to",
+    "obj_pose": "predict the future object positions to",
+    "ee_pose_2D": "predict the end-effector's future 2D trace to",
 }
 
 
@@ -56,27 +56,73 @@ def _get_low_level_motion_qa(rlds_batch: Dict[str, Any], lang: str) -> Tuple[str
     return (f"{AUX_QUESTIONS_PROMPT['low_level_motion']} {lang}?", low_level_motion)
 
 
-def _get_obj_pose_answer(rlds_batch: Dict[str, Any], lang: str) -> Tuple[str, str]:
+def _get_obj_pose_answer(
+    rlds_batch: Dict[str, Any], 
+    lang: str, 
+) -> Tuple[str, str]:
     obj_bbox_names = rlds_batch['obj_bbox_names'].decode().split('|')
     dyn_obj_names = rlds_batch['dynamic_objects'].decode().split('|')
+    
+    # Format current and future poses
     obj_pose_answer = ""
     if dyn_obj_names[0] != "":
-        for i, obj_name in enumerate(obj_bbox_names):
-            if obj_name in dyn_obj_names:
-                obj_pose_answer += f"{obj_name}: "
-                obj_pose_answer += str([(round(x, 3), round(y, 3)) for x, y in rlds_batch['obj_poses'][:, i]])
-                obj_pose_answer += ", "
-        obj_pose_answer = obj_pose_answer[:-2]
+        # Get past history if available
+        past_history = ""
+        if "obj_poses_past" in rlds_batch:
+            past_poses = rlds_batch['obj_poses_past']
+            if len(past_poses) > 0:
+                past_history = "Given the movement of the target object(s): "
+                for i, obj_name in enumerate(obj_bbox_names):
+                    if obj_name in dyn_obj_names:
+                        past_history += f"{obj_name}: {str([(round(x, 3), round(y, 3)) for x, y in past_poses[:, i]])}; "
+                past_history = past_history[:-2] + ", "
+
+        # Combine current and future poses
+        poses_list = []
+        if "obj_poses_current" in rlds_batch:
+            poses_list.append(rlds_batch['obj_poses_current'])
+        if "obj_poses_future" in rlds_batch:
+            poses_list.append(rlds_batch['obj_poses_future'])
+        
+        if poses_list:  # If we have any poses
+            poses = np.concatenate(poses_list, axis=0)
+            for i, obj_name in enumerate(obj_bbox_names):
+                if obj_name in dyn_obj_names:
+                    obj_pose_answer += f"{obj_name}: "
+                    obj_pose_answer += str([(round(x, 3), round(y, 3)) for x, y in poses[:, i]])
+                    obj_pose_answer += ", "
+            obj_pose_answer = obj_pose_answer[:-2]
     else:
         obj_pose_answer = "N/A"
-    return (f"{AUX_QUESTIONS_PROMPT['obj_pose']} {lang}?", obj_pose_answer)
+
+    return (f"{past_history}{AUX_QUESTIONS_PROMPT['obj_pose']} {lang}?", obj_pose_answer)
 
 
-def _get_ee_pose_2D_answer(rlds_batch: Dict[str, Any], lang: str) -> Tuple[str, str]:
-    ee_pose_2D_answer = str([(round(x, 3), round(y, 3)) for x, y in rlds_batch['ee_pose_2D']])
-    if len(ee_pose_2D_answer) == 0:
+def _get_ee_pose_2D_answer(
+    rlds_batch: Dict[str, Any], 
+    lang: str, 
+) -> Tuple[str, str]:
+    # Get past history if available
+    past_history = ""
+    if "ee_pose_2D_past" in rlds_batch:
+        past_poses = rlds_batch['ee_pose_2D_past']
+        if len(past_poses) > 0:
+            past_history = f"Given the end-effector's previous trace: {str([(round(x, 3), round(y, 3)) for x, y in past_poses])}, "
+
+    # Format current and future poses
+    poses_list = []
+    if "ee_pose_2D_current" in rlds_batch:
+        poses_list.append(rlds_batch['ee_pose_2D_current'])
+    if "ee_pose_2D_future" in rlds_batch:
+        poses_list.append(rlds_batch['ee_pose_2D_future'])
+        
+    if poses_list:  # If we have any poses
+        poses = np.concatenate(poses_list, axis=0)
+        ee_pose_2D_answer = str([(round(x, 3), round(y, 3)) for x, y in poses])
+    else:
         ee_pose_2D_answer = "N/A"
-    return (f"{AUX_QUESTIONS_PROMPT['ee_pose_2D']} {lang}?", ee_pose_2D_answer)
+
+    return (f"{past_history}{AUX_QUESTIONS_PROMPT['ee_pose_2D']} {lang}?", ee_pose_2D_answer)
 
 
 AUX_TASK_QA_FUNCTIONS = {
@@ -92,7 +138,6 @@ class BaseRLDSTransform:
     tokenizer: PreTrainedTokenizerBase
     image_transform: ImageTransform
     prompt_builder_fn: Type[PromptBuilder]
-    # Optional parameters with default values 
     image_window_size: int = 1
     predict_stop_token: bool = True
     use_wrist_image: bool = False
@@ -251,7 +296,10 @@ class RLDSAuxTransform(BaseRLDSTransform):
         lang = rlds_batch["task"]["language_instruction"].decode().lower()
         img = self._process_image(rlds_batch)
 
-        aux_question, aux_answer = AUX_TASK_QA_FUNCTIONS[self.aux_task_type](rlds_batch, lang)
+        aux_question, aux_answer = AUX_TASK_QA_FUNCTIONS[self.aux_task_type](
+            rlds_batch, 
+            lang,
+        )
         conversation, answer_token_lengths = self._create_conversation([
             (aux_question, aux_answer)
         ])
@@ -322,6 +370,8 @@ class RLDSDataset(IterableDataset):
         shuffle_buffer_size: int = 256_000,
         train: bool = True,
         image_aug: bool = False,
+        past_obj_pose_window_size: int = 0,
+        past_2D_trace_window_size: int = 0,
         future_action_window_size: int = 0,
         future_obj_pose_window_size: int = 0,
         future_2D_trace_window_size: int = 0,
@@ -358,14 +408,16 @@ class RLDSDataset(IterableDataset):
         )
         rlds_config = dict(
             traj_transform_kwargs=dict(
-                window_size=image_window_size,                        # If we wanted to feed / predict more than one step
-                future_action_window_size=future_action_window_size,  # For action chunking
+                window_size=image_window_size,
+                past_obj_pose_window_size=past_obj_pose_window_size,
+                past_2D_trace_window_size=past_2D_trace_window_size,
+                future_action_window_size=future_action_window_size,
                 future_obj_pose_window_size=future_obj_pose_window_size,
                 future_2D_trace_window_size=future_2D_trace_window_size,
                 obj_pose_stride=obj_pose_stride,
                 ee_pose_2D_stride=ee_pose_2D_stride,
-                skip_unlabeled=True,                                  # Skip trajectories without language labels
-                goal_relabeling_strategy="uniform",                   # Goals are currently unused
+                skip_unlabeled=True,
+                goal_relabeling_strategy="uniform",
             ),
             frame_transform_kwargs=dict(
                 resize_size=resize_resolution,

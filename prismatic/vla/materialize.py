@@ -48,6 +48,8 @@ def get_vla_dataset_and_collator(
     transform_weights: str = None,
     use_wrist_image: bool = False,
     normalize_data: bool = True,
+    past_obj_pose_window_size: int = 0,
+    past_2D_trace_window_size: int = 0,
 ) -> Tuple[Dataset, ActionTokenizer, PaddedCollatorForActionPrediction]:
     """Initialize RLDS Dataset (wraps TFDS), ActionTokenizer, and initialize transform/collation functions."""
 
@@ -73,7 +75,7 @@ def get_vla_dataset_and_collator(
         "prompt_builder_fn": prompt_builder_fn,
         "predict_stop_token": predict_stop_token,
         "image_window_size": image_window_size,
-        "use_wrist_image": use_wrist_image
+        "use_wrist_image": use_wrist_image,
     }
 
     batch_transforms = []
@@ -126,6 +128,8 @@ def get_vla_dataset_and_collator(
         future_action_window_size=future_action_window_size,
         future_obj_pose_window_size=future_obj_pose_window_size,
         future_2D_trace_window_size=future_2D_trace_window_size,
+        past_obj_pose_window_size=past_obj_pose_window_size,
+        past_2D_trace_window_size=past_2D_trace_window_size,
         obj_pose_stride=obj_pose_stride,
         ee_pose_2D_stride=ee_pose_2D_stride,
         image_window_size=image_window_size,

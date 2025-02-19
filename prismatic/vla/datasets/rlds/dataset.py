@@ -267,6 +267,8 @@ def apply_trajectory_transforms(
     goal_relabeling_strategy: Optional[str] = None,
     goal_relabeling_kwargs: dict = {},
     window_size: int = 1,
+    past_obj_pose_window_size: int = 0,
+    past_2D_trace_window_size: int = 0,
     future_action_window_size: int = 0,
     future_obj_pose_window_size: int = 0,
     future_2D_trace_window_size: int = 0,
@@ -296,6 +298,10 @@ def apply_trajectory_transforms(
             no goal relabeling. See `goal_relabeling.py`.
         goal_relabeling_kwargs (dict, optional): Additional keyword arguments to pass to the goal relabeling function.
         window_size (int, optional): The length of the snippets that trajectories are chunked into.
+        past_obj_pose_window_size (int, optional): The number of past object poses before window_size to include
+            in the chunked object poses.
+        past_2D_trace_window_size (int, optional): The number of past 2D traces before window_size to include
+            in the chunked 2D traces.
         future_action_window_size (int, optional): The number of future actions beyond window_size to include
             in the chunked actions.
         future_obj_pose_window_size (int, optional): The number of future object poses beyond window_size to include
@@ -356,6 +362,8 @@ def apply_trajectory_transforms(
         partial(
             traj_transforms.chunk_act_obs,
             window_size=window_size,
+            past_obj_pose_window_size=past_obj_pose_window_size,
+            past_2D_trace_window_size=past_2D_trace_window_size,
             future_action_window_size=future_action_window_size,
             future_obj_pose_window_size=future_obj_pose_window_size,
             future_2D_trace_window_size=future_2D_trace_window_size,
