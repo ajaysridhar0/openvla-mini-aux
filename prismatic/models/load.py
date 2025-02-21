@@ -173,7 +173,7 @@ def load_vla(
     # Otherwise =>> try looking for a match on `model_id_or_path` on the HF Hub (`VLA_HF_HUB_REPO`)
     else:
         # Search HF Hub Repo via fsspec API
-        overwatch.info(f"Checking HF for `{(hf_path := str(Path(VLA_HF_HUB_REPO) / model_type / model_id_or_path))}`")
+        overwatch.info(f"Checking HF for `{(hf_path := str(model_id_or_path))}`")
         if not (tmpfs := HfFileSystem()).exists(hf_path):
             raise ValueError(f"Couldn't find valid HF Hub Path `{hf_path = }`")
 
@@ -188,15 +188,16 @@ def load_vla(
 
         overwatch.info(f"Downloading Model `{model_id_or_path}` Config & Checkpoint `{target_ckpt}`")
         with overwatch.local_zero_first():
-            relpath = Path(model_type) / model_id_or_path
+            relpath = model_id_or_path
+            repo_id = relpath.as_posix()
             config_json = hf_hub_download(
-                repo_id=VLA_HF_HUB_REPO, filename=f"{(relpath / 'config.json')!s}", cache_dir=cache_dir
+                repo_id=repo_id, filename=f"{('config.json')!s}", cache_dir=cache_dir
             )
             dataset_statistics_json = hf_hub_download(
-                repo_id=VLA_HF_HUB_REPO, filename=f"{(relpath / 'dataset_statistics.json')!s}", cache_dir=cache_dir
+                repo_id=repo_id, filename=f"{('dataset_statistics.json')!s}", cache_dir=cache_dir
             )
             checkpoint_pt = hf_hub_download(
-                repo_id=VLA_HF_HUB_REPO, filename=f"{(relpath / 'checkpoints' / target_ckpt)!s}", cache_dir=cache_dir
+                repo_id=repo_id, filename=f"checkpoints/{target_ckpt}", cache_dir=cache_dir
             )
 
     # Load VLA Config (and corresponding base VLM `ModelConfig`) from `config.json`
@@ -219,7 +220,7 @@ def load_vla(
 
     # Load Dataset Statistics for Action Denormalization
     # TODO (ajaysri) :: Make this dynamic
-    with open("/work/hdd/bcwv/ajaysri/datasets/jensen/xembod_robocasa/base_robocasa_xembod--full/dataset_statistics.json", "r") as f:
+    with open(dataset_statistics_json, "r") as f:
         norm_stats = json.load(f)
 
     # = Load Individual Components necessary for Instantiating a VLA (via base VLM components) =
