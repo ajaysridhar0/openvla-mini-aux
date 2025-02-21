@@ -936,4 +936,12 @@ OXE_STANDARDIZATION_TRANSFORMS = {
     "ur5e__pn_p_counter_to_cab_aux": libero_dataset_transform,
     "ur5e__pn_p_counter_to_sink_aux": libero_dataset_transform,
     "all_robocasa_xembod": libero_dataset_transform,
+    "ghost__sawyer_mimicgen": libero_dataset_transform,
+    "ghost__panda_mimicgen": libero_dataset_transform,
+    "ghost__ur5e_mimicgen": libero_dataset_transform,
+    "ghost__kinova3_mimicgen": libero_dataset_transform,
+    "solid__sawyer_mimicgen": libero_dataset_transform,
+    "solid__panda_mimicgen": libero_dataset_transform,
+    "solid__ur5e_mimicgen": libero_dataset_transform,
+    "solid__kinova3_mimicgen": libero_dataset_transform,
 }
