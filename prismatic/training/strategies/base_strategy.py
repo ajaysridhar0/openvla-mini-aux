@@ -110,6 +110,7 @@ class TrainingStrategy(ABC):
         # Get relevant VLM instance parameters before they get (potentially) wrapped
         self.all_module_keys, self.trainable_module_keys = self.vlm.all_module_keys, self.vlm.trainable_module_keys
         self.llm_transformer_layer_cls = self.vlm.llm_backbone.transformer_layer_cls
+        self.vision_backbone = self.vlm.vision_backbone
 
         # Optimization Parameters
         self.epochs, self.max_steps = epochs, max_steps
@@ -398,7 +399,7 @@ class TrainingStrategy(ABC):
                         transform_type_mask = (transform_types == 0).any(dim=1)
                         transform_type_str = "all"
                         
-                    action_preds = output.logits[:, self.vlm.vision_backbone.num_patches : -1].argmax(dim=2)
+                    action_preds = output.logits[:, self.vision_backbone.num_patches : -1].argmax(dim=2)
                     action_preds = action_preds[transform_type_mask]
                     action_gt = batch["labels"][:, 1:].to(action_preds.device)
                     action_gt = action_gt[transform_type_mask]
