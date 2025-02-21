@@ -10,12 +10,15 @@ from typing import Callable, Optional
 import torch
 
 from prismatic.models.vlms import PrismaticVLM
-from prismatic.training.strategies import FSDPStrategy, TrainingStrategy
+from prismatic.training.strategies import FSDPStrategy, TrainingStrategy, LoraDDPStrategy
 
 # Registry =>> Maps ID --> {cls(), kwargs} :: supports FSDP for now, but DDP handler is also implemented!
 TRAIN_STRATEGIES = {
     "fsdp-shard-grad-op": {"cls": FSDPStrategy, "kwargs": {"sharding_strategy": "shard-grad-op"}},
     "fsdp-full-shard": {"cls": FSDPStrategy, "kwargs": {"sharding_strategy": "full-shard"}},
+    "ddp-lora": {"cls": LoraDDPStrategy, "kwargs": {"lora_rank": 32,
+                                                    "lora_alpha": 16,
+                                                    "lora_dropout": 0}},
 }
 
 
