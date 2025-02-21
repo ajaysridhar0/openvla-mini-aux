@@ -295,6 +295,19 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("solid__ur5e_mimicgen", 1.0),
         ("solid__kinova3_mimicgen", 1.0),
     ],
+    "half_sawyer_half_garbage": [
+        ("sawyer__pn_p_counter_to_cab_aux", 0.28849956172432545),
+        ("sawyer__pn_p_counter_to_sink_aux", 0.3604427773684267),
+        ("sawyer__pn_p_sink_to_counter_aux", 0.25923149024504605),
+        ("ghost__kinova3_mimicgen", 0.0114782713327753),
+        ("ghost__panda_mimicgen", 0.0114782713327753),
+        ("ghost__sawyer_mimicgen", 0.0114782713327753),
+        ("ghost__ur5e_mimicgen", 0.0114782713327753),
+        ("solid__kinova3_mimicgen", 0.0114782713327753),
+        ("solid__panda_mimicgen", 0.0114782713327753),
+        ("solid__sawyer_mimicgen", 0.0114782713327753),
+        ("solid__ur5e_mimicgen", 0.0114782713327753),
+    ],
     # TODO (ajaysri): add partial held-out mixture
 }
 # fmt: on
