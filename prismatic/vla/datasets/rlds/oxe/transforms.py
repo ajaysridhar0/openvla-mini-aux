@@ -944,4 +944,7 @@ OXE_STANDARDIZATION_TRANSFORMS = {
     "solid__panda_mimicgen": libero_dataset_transform,
     "solid__ur5e_mimicgen": libero_dataset_transform,
     "solid__kinova3_mimicgen": libero_dataset_transform,
+    "sawyer_pnpcountertocab_random_tex_cam": libero_dataset_transform,
+    "sawyer_pnpcountertosink_random_tex_cam": libero_dataset_transform,
+    "sawyer_pnpsinktocounter_random_tex_cam": libero_dataset_transform,
 }
