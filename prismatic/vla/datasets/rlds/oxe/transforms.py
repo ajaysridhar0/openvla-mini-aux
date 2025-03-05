@@ -947,4 +947,5 @@ OXE_STANDARDIZATION_TRANSFORMS = {
     "sawyer_pnpcountertocab_random_tex_cam": libero_dataset_transform,
     "sawyer_pnpcountertosink_random_tex_cam": libero_dataset_transform,
     "sawyer_pnpsinktocounter_random_tex_cam": libero_dataset_transform,
+    "solid_u_r5e_mimicgen": libero_dataset_transform,
 }

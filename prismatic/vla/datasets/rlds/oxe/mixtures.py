@@ -308,6 +308,20 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("solid__sawyer_mimicgen", 0.0114782713327753),
         ("solid__ur5e_mimicgen", 0.0114782713327753),
     ],
+     "good_saywer_garbage_everything": [
+        ("sawyer__pn_p_counter_to_cab_aux", 1),
+        ("sawyer__pn_p_counter_to_sink_aux", 1),
+        ("sawyer__pn_p_sink_to_counter_aux", 1),
+        # ("ghost__kinova3_mimicgen", 0.0114782713327753),
+        # ("ghost__panda_mimicgen", 0.0114782713327753),
+        # ("ghost__sawyer_mimicgen", 0.0114782713327753),
+        # ("ghost__ur5e_mimicgen", 0.0114782713327753),
+        ("solid__kinova3_mimicgen", 1),
+        ("solid__panda_mimicgen", 1),
+        ("solid__sawyer_mimicgen", 1),
+        ("solid__ur5e_mimicgen", 1),
+    ],
+
     "human_data_sawyer_random_cam_tex": [
         ("sawyer_pnpcountertosink_random_tex_cam", 1.0),
         ("sawyer_pnpcountertocab_random_tex_cam", 1.0),
@@ -316,6 +330,26 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("sawyer__pn_p_counter_to_cab_aux", 1.0),
         ("sawyer__pn_p_sink_to_counter_aux", 1.0),
     ],
+    "mega_robocasa_xembod": [
+        ("panda__pn_p_counter_to_cab_aux", 1.0),
+        ("sawyer__pn_p_counter_to_sink_aux", 1.0),
+        ("ur5e__pn_p_sink_to_counter_aux", 1.0),
+        ("kinova3__pn_p_counter_to_cab_aux", 1.0),
+        ("panda__pn_p_counter_to_sink_aux", 1.0),
+        ("sawyer__pn_p_sink_to_counter_aux", 1.0),
+        ("kinova3__pn_p_counter_to_sink_aux", 1.0),
+        ("panda__pn_p_sink_to_counter_aux", 1.0),
+        ("kinova3__pn_p_sink_to_counter_aux", 1.0),
+        ("sawyer__pn_p_counter_to_cab_aux", 1.0),
+        ("ur5e__pn_p_counter_to_cab_aux", 1.0),
+        ("ur5e__pn_p_counter_to_sink_aux", 1.0),
+        # solid
+        ("solid__sawyer_mimicgen", 1.0),
+        ("solid__panda_mimicgen", 1.0),
+        ("solid_u_r5e_mimicgen", 1.0),
+        ("solid__kinova3_mimicgen", 1.0),
+    ],
+
     
     # TODO (ajaysri): add partial held-out mixture
 }
