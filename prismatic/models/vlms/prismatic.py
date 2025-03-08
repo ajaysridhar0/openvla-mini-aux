@@ -110,25 +110,37 @@ class PrismaticVLM(VLM):
             "projector" in model_state_dict and "llm_backbone" in model_state_dict
         ), "PrismaticVLM `from_pretrained` expects checkpoint with keys for `projector` AND `llm_backbone`!"
 
-        # Check if we're using a ResNet backbone with a DINO+SigLIP checkpoint
+        # Check if we're using a ResNet backbone
         is_resnet = "resnet" in vision_backbone.identifier.lower()
         
-        # Only try to load projector weights if not using ResNet (or if dimensions match)
-        if not is_resnet:
+        # Check if the checkpoint was trained with ResNet
+        checkpoint_has_resnet = False
+        if "vision_backbone" in model_state_dict:
+            # Try to determine if the checkpoint was trained with ResNet
+            if hasattr(model_state_dict["vision_backbone"], "get") and model_state_dict["vision_backbone"].get("identifier", "").lower().startswith("resnet"):
+                checkpoint_has_resnet = True
+            # Check if the checkpoint contains ResNet-specific modules
+            elif any("featurizer.layer" in key for key in model_state_dict["vision_backbone"].keys()):
+                checkpoint_has_resnet = True
+        
+        # Only skip loading projector if we're using ResNet with a non-ResNet checkpoint
+        if is_resnet and not checkpoint_has_resnet:
+            overwatch.info(f"Using ResNet backbone with DINO+SigLIP checkpoint. Using randomly initialized projector.")
+        else:
             try:
                 vlm.projector.load_state_dict(model_state_dict["projector"])
+                overwatch.info(f"Successfully loaded projector weights from checkpoint.")
             except RuntimeError as e:
                 if "size mismatch" in str(e) and is_resnet:
-                    overwatch.warn(f"Projector dimension mismatch for ResNet backbone. Using randomly initialized projector instead.")
+                    overwatch.warn(f"Projector dimension mismatch. Using randomly initialized projector instead.")
                 else:
                     raise e
-        else:
-            overwatch.info(f"Using ResNet backbone with DINO+SigLIP checkpoint. Using randomly initialized projector.")
 
         vlm.llm_backbone.load_state_dict(model_state_dict["llm_backbone"])
-        if "vision_backbone" in model_state_dict.keys() and not is_resnet:
+        if "vision_backbone" in model_state_dict.keys():
             try:
                 vlm.vision_backbone.load_state_dict(model_state_dict["vision_backbone"])
+                overwatch.info(f"Successfully loaded vision backbone weights from checkpoint.")
             except RuntimeError as e:
                 if "size mismatch" in str(e) and is_resnet:
                     overwatch.warn(f"Vision backbone dimension mismatch. Using pretrained ResNet weights from timm instead.")
