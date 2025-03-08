@@ -96,6 +96,16 @@ def load(
         elif "resnet101" in vla_id.lower():
             overwatch.info(f"Detected ResNet VLA ID: {vla_id}. Overriding vision backbone to: resnet101-224px")
             model_cfg["vision_backbone_id"] = "resnet101-224px"
+    
+    # Also check if the checkpoint itself is from a ResNet model
+    checkpoint_path = str(checkpoint_pt)
+    if "resnet" in checkpoint_path.lower():
+        if "resnet50" in checkpoint_path.lower():
+            overwatch.info(f"Detected ResNet checkpoint. Using ResNet50 backbone.")
+            model_cfg["vision_backbone_id"] = "resnet50-224px"
+        elif "resnet101" in checkpoint_path.lower():
+            overwatch.info(f"Detected ResNet checkpoint. Using ResNet101 backbone.")
+            model_cfg["vision_backbone_id"] = "resnet101-224px"
 
     # = Load Individual Components necessary for Instantiating a VLM =
     #   =>> Print Minimal Config
@@ -219,12 +229,26 @@ def load_vla(
     # Override vision backbone for our ResNet config (based on the vla_id)
     # This ensures we use the ResNet backbone even when loading from a DINO+SigLIP checkpoint
     vla_id = vla_cfg.get("vla_id", "")
-    if "resnet50" in vla_id.lower():
+    checkpoint_path = str(checkpoint_pt)
+    
+    # Check if this is a ResNet checkpoint by looking at the path
+    is_resnet_checkpoint = "resnet" in checkpoint_path.lower()
+    
+    # Only override if it's a ResNet VLA ID but not a ResNet checkpoint
+    if "resnet50" in vla_id.lower() and not is_resnet_checkpoint:
         vla_cfg["vision_backbone_id"] = "resnet50-224px"
         overwatch.info(f"Detected ResNet VLA ID. Overriding vision backbone to: resnet50-224px")
-    elif "resnet101" in vla_id.lower():
+    elif "resnet101" in vla_id.lower() and not is_resnet_checkpoint:
         vla_cfg["vision_backbone_id"] = "resnet101-224px"
         overwatch.info(f"Detected ResNet VLA ID. Overriding vision backbone to: resnet101-224px")
+    elif is_resnet_checkpoint:
+        # If it's a ResNet checkpoint, make sure we use the ResNet backbone
+        if "resnet50" in checkpoint_path.lower():
+            vla_cfg["vision_backbone_id"] = "resnet50-224px"
+            overwatch.info(f"Detected ResNet checkpoint. Using ResNet50 backbone.")
+        elif "resnet101" in checkpoint_path.lower():
+            vla_cfg["vision_backbone_id"] = "resnet101-224px"
+            overwatch.info(f"Detected ResNet checkpoint. Using ResNet101 backbone.")
 
     # if base vlm is a folder, load its config.json (only works for native format!)
     # this might happen if you start a run who's base vlm is from a folder instead of from hf
