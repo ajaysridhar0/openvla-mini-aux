@@ -377,7 +377,7 @@ ACTION_TOKENIZERS = {
     ),
     "robocasa_vq_extra_action_tokenizer": partial(
         VQActionTokenizer,
-        vq_vae_path="/afs/.ir/users/a/j/ajaysri/openvla-mini-aux/vq/vq_noop_filter",
+        vq_vae_path="/iliad/u/ajaysri/general_action/vq_noop_filter",
         use_extra=True,
     ),
 }

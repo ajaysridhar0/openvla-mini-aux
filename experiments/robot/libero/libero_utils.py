@@ -6,8 +6,8 @@ import os
 import imageio
 import numpy as np
 import tensorflow as tf
-from libero.libero import get_libero_path
 try:
+    from libero.libero import get_libero_path
     from libero.libero.envs import OffScreenRenderEnv
 except ImportError:
     print("could not import libero.libero.envs.OffScreenRenderEnv since you are probably using robosuite version != 1.4.1")

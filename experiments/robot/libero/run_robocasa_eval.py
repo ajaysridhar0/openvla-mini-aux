@@ -26,7 +26,6 @@ from typing import List, Optional, Union, Tuple
 import draccus
 import numpy as np
 import tqdm
-from libero.libero import benchmark
 
 import wandb
 import cv2
@@ -116,19 +115,20 @@ def create_env(env_meta, env_name=None, render=False, render_offscreen=False, us
 
 
 # Map task names to their corresponding dataset paths
+BASE_DATA_PATH = "/iliad/u/ajaysri/general_action/mg_claude/final_human_collected_demos/"
 ROBOT_TASK_DATA_PATHS = {
-    "panda__pn_p_counter_to_cab_aux": "/work/hdd/bcwv/ajaysri/datasets/final_human_collected_demos/panda/PnPCounterToCab/demo_im224_libero_right.hdf5",
-    "sawyer__pn_p_counter_to_sink_aux": "/work/hdd/bcwv/ajaysri/datasets/final_human_collected_demos/sawyer/PnPCounterToSink/demo_im224_libero_right.hdf5",
-    "ur5e__pn_p_sink_to_counter_aux": "/work/hdd/bcwv/ajaysri/datasets/final_human_collected_demos/ur5e/PnPSinkToCounter/demo_im224_libero_right.hdf5",
-    "kinova3__pn_p_counter_to_cab_aux": "/work/hdd/bcwv/ajaysri/datasets/final_human_collected_demos/kinova3/PnPCounterToCab/demo_im224_libero_right.hdf5",
-    "panda__pn_p_counter_to_sink_aux": "/work/hdd/bcwv/ajaysri/datasets/final_human_collected_demos/panda/PnPCounterToSink/demo_im128_im224_libero_right.hdf5",
-    "sawyer__pn_p_sink_to_counter_aux": "/work/hdd/bcwv/ajaysri/datasets/final_human_collected_demos/sawyer/PnPSinkToCounter/demo_im128_im224_libero_right.hdf5",
-    "kinova3__pn_p_counter_to_sink_aux": "/work/hdd/bcwv/ajaysri/datasets/final_human_collected_demos/kinova3/PnPCounterToSink/demo_im224_libero_right.hdf5",
-    "panda__pn_p_sink_to_counter_aux": "/work/hdd/bcwv/ajaysri/datasets/final_human_collected_demos/panda/PnPSinkToCounter/demo_im224_libero_right.hdf5",
-    "ur5e__pn_p_counter_to_cab_aux": "/work/hdd/bcwv/ajaysri/datasets/final_human_collected_demos/ur5e/PnPCounterToCab/demo_im224_libero_right.hdf5",
-    "kinova3__pn_p_sink_to_counter_aux": "/work/hdd/bcwv/ajaysri/datasets/final_human_collected_demos/kinova3/PnPSinkToCounter/demo_im224_libero_right.hdf5",
-    "sawyer__pn_p_counter_to_cab_aux": "/work/hdd/bcwv/ajaysri/datasets/final_human_collected_demos/sawyer/PnPCounterToCab/demo_im128_im224_libero_right.hdf5",
-    "ur5e__pn_p_counter_to_sink_aux": "/work/hdd/bcwv/ajaysri/datasets/final_human_collected_demos/ur5e/PnPCounterToSink/demo_im224_libero_right.hdf5"
+    "panda__pn_p_counter_to_cab_aux": os.path.join(BASE_DATA_PATH, "panda/PnPCounterToCab/demo_im224_libero_right.hdf5"),
+    "sawyer__pn_p_counter_to_sink_aux": os.path.join(BASE_DATA_PATH, "sawyer/PnPCounterToSink/demo_im224_libero_right.hdf5"),
+    "ur5e__pn_p_sink_to_counter_aux": os.path.join(BASE_DATA_PATH, "ur5e/PnPSinkToCounter/demo_im224_libero_right.hdf5"),
+    "kinova3__pn_p_counter_to_cab_aux": os.path.join(BASE_DATA_PATH, "kinova3/PnPCounterToCab/demo_im224_libero_right.hdf5"),
+    "panda__pn_p_counter_to_sink_aux": os.path.join(BASE_DATA_PATH, "panda/PnPCounterToSink/demo_im224_libero_right.hdf5"),
+    "sawyer__pn_p_sink_to_counter_aux": os.path.join(BASE_DATA_PATH, "sawyer/PnPSinkToCounter/demo_im224_libero_right.hdf5"),
+    "kinova3__pn_p_counter_to_sink_aux": os.path.join(BASE_DATA_PATH, "kinova3/PnPCounterToSink/demo_im224_libero_right.hdf5"),
+    "panda__pn_p_sink_to_counter_aux": os.path.join(BASE_DATA_PATH, "panda/PnPSinkToCounter/demo_im224_libero_right.hdf5"),
+    "ur5e__pn_p_counter_to_cab_aux": os.path.join(BASE_DATA_PATH, "ur5e/PnPCounterToCab/demo_im224_libero_right.hdf5"),
+    "kinova3__pn_p_sink_to_counter_aux": os.path.join(BASE_DATA_PATH, "kinova3/PnPSinkToCounter/demo_im224_libero_right.hdf5"),
+    "sawyer__pn_p_counter_to_cab_aux": os.path.join(BASE_DATA_PATH, "sawyer/PnPCounterToCab/demo_im224_libero_right.hdf5"),
+    "ur5e__pn_p_counter_to_sink_aux": os.path.join(BASE_DATA_PATH, "ur5e/PnPCounterToSink/demo_im224_libero_right.hdf5")
 }
 
 
@@ -405,14 +405,15 @@ def eval_single_task(cfg: GenerateConfig, model, robot_task_name: str, log_file)
         has_ee_pose_predictions = False
         has_motion_predictions = False
 
-        if "pn_p_sink_to_counter" in cfg.task_suite_name:
-            max_steps = 450
-        elif "pn_p_counter_to_cab" in cfg.task_suite_name:
-            max_steps = 450
-        elif "pn_p_counter_to_sink" in cfg.task_suite_name:
-            max_steps = 450
-        else:
-            max_steps = 450
+        # if "pn_p_sink_to_counter" in cfg.task_suite_name:
+        #     max_steps = 450
+        # elif "pn_p_counter_to_cab" in cfg.task_suite_name:
+        #     max_steps = 450
+        # elif "pn_p_counter_to_sink" in cfg.task_suite_name:
+        #     max_steps = 450
+        # else:
+        #     max_steps = 450
+        max_steps = 450
 
         print(f"Starting episode {total_episodes+1}...")
         log_file.write(f"Starting episode {total_episodes+1}...\n")

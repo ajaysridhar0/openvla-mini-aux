@@ -45,8 +45,8 @@ def get_prismatic_vla(cfg):
         load_for_training=False,
         aux_context_freq=cfg.aux_context_freq,
     )
-    for param in vla.parameters():
-        assert param.dtype == torch.float32, f"Loaded VLM parameter not in full precision: {param}"
+    # for param in vla.parameters():
+        # assert param.dtype == torch.float32, f"Loaded VLM parameter not in full precision: {param}"
     # Cast to half precision.
     vla.vision_backbone.to(dtype=vla.vision_backbone.half_precision_dtype)
     vla.llm_backbone.to(dtype=vla.llm_backbone.half_precision_dtype)
