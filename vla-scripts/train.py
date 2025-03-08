@@ -171,7 +171,12 @@ def train(cfg: TrainConfig) -> None:
 
     else:
         vlm = load(
-            cfg.vla.base_vlm, hf_token=hf_token, load_for_training=True, image_sequence_len=cfg.image_sequence_len, random_llm_weights=cfg.random_llm_weights,
+            cfg.vla.base_vlm, 
+            hf_token=hf_token, 
+            load_for_training=True, 
+            image_sequence_len=cfg.image_sequence_len, 
+            random_llm_weights=cfg.random_llm_weights,
+            vla_id=cfg.vla.vla_id,  # Pass the VLA ID to check for special backbone overrides
         )
 
     # [Validate] Model should be in Full Precision!

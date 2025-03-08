@@ -56,6 +56,7 @@ def load(
     load_for_training: bool = False,
     image_sequence_len: Optional[int] = None,
     random_llm_weights: bool = False,
+    vla_id: Optional[str] = None,
 ) -> PrismaticVLM:
     """
     Loads a pretrained PrismaticVLM from either local disk or the HuggingFace Hub.
@@ -63,6 +64,7 @@ def load(
     Args:
         ...
         random_llm_weights: If True, initialize LLM weights randomly instead of loading pretrained weights
+        vla_id: Optional VLA ID to check for special backbone overrides
     """
     if os.path.isdir(model_id_or_path):
         overwatch.info(f"Loading from local path `{(run_dir := Path(model_id_or_path))}`")
@@ -85,6 +87,15 @@ def load(
     # Load Model Config from `config.json`
     with open(config_json, "r") as f:
         model_cfg = json.load(f)["model"]
+
+    # Check if we're loading for a ResNet-based VLA
+    if vla_id is not None and "resnet" in vla_id.lower():
+        if "resnet50" in vla_id.lower():
+            overwatch.info(f"Detected ResNet VLA ID: {vla_id}. Overriding vision backbone to: resnet50-224px")
+            model_cfg["vision_backbone_id"] = "resnet50-224px"
+        elif "resnet101" in vla_id.lower():
+            overwatch.info(f"Detected ResNet VLA ID: {vla_id}. Overriding vision backbone to: resnet101-224px")
+            model_cfg["vision_backbone_id"] = "resnet101-224px"
 
     # = Load Individual Components necessary for Instantiating a VLM =
     #   =>> Print Minimal Config
@@ -205,6 +216,16 @@ def load_vla(
         vla_cfg = json.load(f)["vla"]
         base_vlm = vla_cfg["base_vlm"]
 
+    # Override vision backbone for our ResNet config (based on the vla_id)
+    # This ensures we use the ResNet backbone even when loading from a DINO+SigLIP checkpoint
+    vla_id = vla_cfg.get("vla_id", "")
+    if "resnet50" in vla_id.lower():
+        vla_cfg["vision_backbone_id"] = "resnet50-224px"
+        overwatch.info(f"Detected ResNet VLA ID. Overriding vision backbone to: resnet50-224px")
+    elif "resnet101" in vla_id.lower():
+        vla_cfg["vision_backbone_id"] = "resnet101-224px"
+        overwatch.info(f"Detected ResNet VLA ID. Overriding vision backbone to: resnet101-224px")
+
     # if base vlm is a folder, load its config.json (only works for native format!)
     # this might happen if you start a run who's base vlm is from a folder instead of from hf
     if os.path.isdir(base_vlm):
@@ -240,9 +261,9 @@ def load_vla(
             image_sequence_len = 1
 
     # Load Vision Backbone
-    overwatch.info(f"Loading Vision Backbone [bold]{model_cfg.vision_backbone_id}[/]")
+    overwatch.info(f"Loading Vision Backbone [bold]{vla_cfg.get('vision_backbone_id', model_cfg.vision_backbone_id)}[/]")
     vision_backbone, image_transform = get_vision_backbone_and_transform(
-        model_cfg.vision_backbone_id,
+        vla_cfg.get('vision_backbone_id', model_cfg.vision_backbone_id),
         model_cfg.image_resize_strategy,
         image_sequence_len,
     )

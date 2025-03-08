@@ -316,6 +316,14 @@ class Exp_SigLIP_224px_Droid_Wipe(Exp_SigLIP_224px_Bridge):
     data_mix: str = "droid_wipe"
 
 
+@dataclass
+class Exp_Qwen25_ResNet50_224px_0_5B_XEMBOD_ROBOCASA_FULL(Exp_Qwen25_DinoSigLIP_224px_0_5B_XEMBOD_ROBOCASA_FULL):
+    vla_id: str = "prism-qwen25-resnet50-224px+0_5b+mx-xembod-robocasa-full"
+    base_vlm: Union[str, Path] = "prism-qwen25-dinosiglip-224px+0_5b+mx-xembod-robocasa-full"  # Use DINO+SigLIP checkpoint
+    vision_backbone_id: str = "resnet50-224px"  # Use ResNet-50 backbone
+    freeze_vision_backbone: bool = False  # Allow fine-tuning the ResNet backbone
+
+
 # === Define a VLA Registry Enum for Reference & Validation ===
 @unique
 class VLARegistry(Enum):
@@ -341,6 +349,7 @@ class VLARegistry(Enum):
     QWEN25_DINOSIGLIP_224PX_0_5B_XEMBOD_ROBOCASA_FULL = Exp_Qwen25_DinoSigLIP_224px_0_5B_XEMBOD_ROBOCASA_FULL
     QWEN25_DINOSIGLIP_224PX_0_5B_XEMBOD_ROBOCASA_HELD_OUT = Exp_Qwen25_DinoSigLIP_224px_0_5B_XEMBOD_ROBOCASA_HELD_OUT
     QWEN25_DINOSIGLIP_224PX_WRIST_0_5B_LIBERO_90 = Exp_Qwen25_DinoSigLIP_224px_wrist_0_5B_LIBERO_90
+    QWEN25_RESNET50_224PX_0_5B_XEMBOD_ROBOCASA_FULL = Exp_Qwen25_ResNet50_224px_0_5B_XEMBOD_ROBOCASA_FULL  # Add new model
 
     QWEN25_DINOSIGLIP_224PX_0_5B_BRIDGE = Exp_Qwen25_DinoSigLIP_224px_0_5B_Bridge
 

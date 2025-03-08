@@ -110,10 +110,30 @@ class PrismaticVLM(VLM):
             "projector" in model_state_dict and "llm_backbone" in model_state_dict
         ), "PrismaticVLM `from_pretrained` expects checkpoint with keys for `projector` AND `llm_backbone`!"
 
-        vlm.projector.load_state_dict(model_state_dict["projector"])
+        # Check if we're using a ResNet backbone with a DINO+SigLIP checkpoint
+        is_resnet = "resnet" in vision_backbone.identifier.lower()
+        
+        # Only try to load projector weights if not using ResNet (or if dimensions match)
+        if not is_resnet:
+            try:
+                vlm.projector.load_state_dict(model_state_dict["projector"])
+            except RuntimeError as e:
+                if "size mismatch" in str(e) and is_resnet:
+                    overwatch.warn(f"Projector dimension mismatch for ResNet backbone. Using randomly initialized projector instead.")
+                else:
+                    raise e
+        else:
+            overwatch.info(f"Using ResNet backbone with DINO+SigLIP checkpoint. Using randomly initialized projector.")
+
         vlm.llm_backbone.load_state_dict(model_state_dict["llm_backbone"])
-        if "vision_backbone" in model_state_dict.keys():
-            vlm.vision_backbone.load_state_dict(model_state_dict["vision_backbone"])
+        if "vision_backbone" in model_state_dict.keys() and not is_resnet:
+            try:
+                vlm.vision_backbone.load_state_dict(model_state_dict["vision_backbone"])
+            except RuntimeError as e:
+                if "size mismatch" in str(e) and is_resnet:
+                    overwatch.warn(f"Vision backbone dimension mismatch. Using pretrained ResNet weights from timm instead.")
+                else:
+                    raise e
 
         # Freeze Weights
         if freeze_weights:
