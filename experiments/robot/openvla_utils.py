@@ -39,11 +39,18 @@ def get_prismatic_vla(cfg):
     # set_seed(cfg.seed)
     # Load VLA checkpoint.
     print(f"Loading VLM from checkpoint: {cfg.pretrained_checkpoint}")
+    
+    # Check if we should randomly initialize LLM weights
+    random_llm_weights = getattr(cfg, 'random_llm_weights', False)
+    if random_llm_weights:
+        print(f"[*] Using randomly initialized LLM weights (for ablation study)")
+    
     vla = load_vla(
         cfg.pretrained_checkpoint,
         hf_token=hf_token,
         load_for_training=False,
         aux_context_freq=cfg.aux_context_freq,
+        random_llm_weights=random_llm_weights,
     )
     for param in vla.parameters():
         assert param.dtype == torch.float32, f"Loaded VLM parameter not in full precision: {param}"
