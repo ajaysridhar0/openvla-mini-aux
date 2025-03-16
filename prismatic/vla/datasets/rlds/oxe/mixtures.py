@@ -321,7 +321,16 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("solid__sawyer_mimicgen", 1),
         ("solid__ur5e_mimicgen", 1),
     ],
-
+    "good_saywer_500_mg_everything": [
+        ("sawyer__pn_p_counter_to_cab_aux", 1),
+        ("sawyer__pn_p_counter_to_sink_aux", 1),
+        ("sawyer__pn_p_sink_to_counter_aux", 1),
+        ("solid__sawyer_mimicgen", 1),
+        ("sawyer_500_pnpcabtocounter", 1),
+        ("sawyer_500_pnpcountertocab", 1),
+        ("sawyer_500_pnpcountertomicrowave", 1),
+        ("sawyer_500_pnpsinktocounter", 1),
+    ],
     "human_data_sawyer_random_cam_tex": [
         ("sawyer_pnpcountertosink_random_tex_cam", 1.0),
         ("sawyer_pnpcountertocab_random_tex_cam", 1.0),
