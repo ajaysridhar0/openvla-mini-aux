@@ -185,11 +185,11 @@ def make_dataset_from_rlds(
             "task": task,
             "action": tf.cast(traj["action"], tf.float32),
             "dataset_name": tf.repeat(name, traj_len),
-            "obj_bbox_names": traj["obj_bbox_names"],
-            "obj_bboxes": tf.cast(traj["obj_bboxes"], tf.float32),
-            "language_motions_future": traj["language_motions_future"],
-            "dynamic_objects": traj.get("dynamic_objects", traj["obj_bbox_names"]),
-            "ee_pose_2D": tf.cast(traj["ee_pose_2D"], tf.float32),
+            "obj_bbox_names": traj.get("obj_bbox_names", tf.repeat("", traj_len)),
+            "obj_bboxes": tf.cast(traj.get("obj_bboxes", tf.zeros((traj_len, 0, 4), dtype=tf.float32)), tf.float32),
+            "language_motions_future": traj.get("language_motions_future", tf.repeat("", traj_len)),
+            "dynamic_objects": traj.get("dynamic_objects", traj.get("obj_bbox_names", tf.repeat("", traj_len))),
+            "ee_pose_2D": tf.cast(traj.get("ee_pose_2D", tf.zeros((traj_len, 2), dtype=tf.float32)), tf.float32),
         }
 
         if absolute_action_mask is not None:
