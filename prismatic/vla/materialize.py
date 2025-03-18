@@ -6,7 +6,7 @@ exports individual functions for clear control flow.
 """
 
 from pathlib import Path
-from typing import Tuple, Type, List
+from typing import Tuple, Type, List, Optional, Dict
 
 from torch.utils.data import Dataset
 from transformers import PreTrainedTokenizerBase
@@ -50,6 +50,8 @@ def get_vla_dataset_and_collator(
     normalize_data: bool = True,
     past_obj_pose_window_size: int = 0,
     past_2D_trace_window_size: int = 0,
+    subset_percentages: Optional[Dict[str, float]] = None,
+    global_subset_fraction: Optional[float] = None,
 ) -> Tuple[Dataset, ActionTokenizer, PaddedCollatorForActionPrediction]:
     """Initialize RLDS Dataset (wraps TFDS), ActionTokenizer, and initialize transform/collation functions."""
 
@@ -135,6 +137,8 @@ def get_vla_dataset_and_collator(
         image_window_size=image_window_size,
         load_camera_views=load_camera_views,
         normalize_data=normalize_data,
+        subset_percentages=subset_percentages,
+        global_subset_fraction=global_subset_fraction,
     )
 
     return dataset, action_tokenizer, collator

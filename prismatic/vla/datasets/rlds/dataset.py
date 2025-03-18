@@ -255,7 +255,6 @@ def make_dataset_from_rlds(
             subset_size = int(total_size * subset_percentage)
             if subset_size > 0:
                 overwatch.info(f"Using {subset_percentage:.1%} of dataset '{name}' ({subset_size}/{total_size} trajectories)")
-                breakpoint()
                 dataset = dataset.take(subset_size)
             else:
                 overwatch.warning(f"Subset size too small: {subset_size} trajectories. Using entire dataset.")
