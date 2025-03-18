@@ -85,6 +85,14 @@ class TrainConfig:
     random_llm_weights: bool = False
 
     normalize_data: bool = True
+    
+    # Dataset subsetting - dictionary mapping dataset names to percentage to use
+    # Example: '{"bridge_orig": 0.25}' to use only 25% of bridge_orig dataset
+    subset_percentages: Optional[str] = None                        # JSON string with dataset subsetting percentages
+    
+    # Global subset fraction - applies the same fraction to all datasets in the mixture
+    # Example: 0.25 to use only 25% of all datasets in the mixture
+    global_subset_fraction: Optional[float] = None                  # Fraction (0.0-1.0) of each dataset to use
 
     def __post_init__(self) -> None:
         """Lift optimization parameters from `self.vla` for ease of use =>> validate on `expected_world_size`"""
@@ -215,6 +223,25 @@ def train(cfg: TrainConfig) -> None:
 
     # Get VLA Dataset & Collator
     overwatch.info(f"Creating VLA Open-X Dataset with Mixture `{cfg.vla.data_mix}`")
+    
+    # Parse subset_percentages from JSON string if provided
+    subset_percentages = None
+    if cfg.subset_percentages:
+        try:
+            subset_percentages = json.loads(cfg.subset_percentages)
+            overwatch.info(f"Using subset percentages: {subset_percentages}")
+        except json.JSONDecodeError:
+            overwatch.warning(f"Failed to parse subset_percentages JSON: {cfg.subset_percentages}")
+    # Apply global_subset_fraction if provided and no subset_percentages
+    elif cfg.global_subset_fraction is not None:
+        if 0.0 < cfg.global_subset_fraction < 1.0:
+            # We'll create the subset_percentages dictionary in get_vla_dataset_and_collator
+            # by applying the global fraction to all datasets in the mixture
+            overwatch.info(f"Using global subset fraction: {cfg.global_subset_fraction:.2f} for all datasets")
+        else:
+            overwatch.warning(f"Invalid global_subset_fraction: {cfg.global_subset_fraction}, must be between 0 and 1. Ignoring.")
+            cfg.global_subset_fraction = None
+    
     vla_dataset, action_tokenizer, collator = get_vla_dataset_and_collator(
         cfg.data_root_dir,
         cfg.vla.data_mix,
@@ -236,6 +263,8 @@ def train(cfg: TrainConfig) -> None:
         normalize_data=cfg.normalize_data,
         past_obj_pose_window_size=cfg.vla.past_obj_pose_window_size,
         past_2D_trace_window_size=cfg.vla.past_2D_trace_window_size,
+        subset_percentages=subset_percentages,
+        global_subset_fraction=cfg.global_subset_fraction,
     )
 
     # Save dataset statistics for de-normalization at inference time

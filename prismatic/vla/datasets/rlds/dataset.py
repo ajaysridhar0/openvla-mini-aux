@@ -54,6 +54,7 @@ def make_dataset_from_rlds(
     action_normalization_mask: Optional[List[bool]] = None,
     num_parallel_reads: int = tf.data.AUTOTUNE,
     num_parallel_calls: int = tf.data.AUTOTUNE,
+    subset_percentage: Optional[float] = None,
 ) -> Tuple[dl.DLataset, dict]:
     """
     This function is responsible for loading a specific RLDS dataset from storage and getting it into a standardized
@@ -114,6 +115,8 @@ def make_dataset_from_rlds(
             it's always exactly 0 or 1. By default, all action dimensions are normalized.
         num_parallel_reads (int): number of parallel read workers. Default to AUTOTUNE.
         num_parallel_calls (int): number of parallel calls for traj_map operations. Default to AUTOTUNE.
+        subset_percentage (float, optional): If provided, only use this percentage of the dataset (between 0 and 1).
+            For example, 0.25 would use only 25% of the dataset.
     Returns:
         Dataset of trajectories where each step has the following fields:
         - observation:
@@ -243,6 +246,21 @@ def make_dataset_from_rlds(
         split = "train" if train else "val"
 
     dataset = dl.DLataset.from_rlds(builder, split=split, shuffle=shuffle, num_parallel_reads=num_parallel_reads)
+    
+    # Apply subsetting if a percentage is specified
+    if subset_percentage is not None and 0.0 < subset_percentage < 1.0:
+        # Get the total size
+        total_size = dataset_statistics.get("num_trajectories", 0)
+        if total_size > 0:
+            subset_size = int(total_size * subset_percentage)
+            if subset_size > 0:
+                overwatch.info(f"Using {subset_percentage:.1%} of dataset '{name}' ({subset_size}/{total_size} trajectories)")
+                breakpoint()
+                dataset = dataset.take(subset_size)
+            else:
+                overwatch.warning(f"Subset size too small: {subset_size} trajectories. Using entire dataset.")
+        else:
+            overwatch.warning(f"Dataset statistics missing num_trajectories. Cannot subset dataset '{name}'.")
 
     dataset = dataset.traj_map(restructure, num_parallel_calls)
     
