@@ -7,7 +7,7 @@ clear control flow.
 
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Optional
 
 from prismatic.overwatch import initialize_overwatch
 from prismatic.vla.datasets.rlds.oxe.configs import OXE_DATASET_CONFIGS, ActionEncoding
@@ -85,6 +85,8 @@ def get_oxe_dataset_kwargs_and_weights(
     load_proprio: bool = True,
     load_language: bool = True,
     action_proprio_normalization_type: NormalizationType = NormalizationType.NORMAL,
+    subset_percentages: Optional[Dict[str, float]] = None,
+    global_subset_fraction: Optional[float] = None,
 ) -> Tuple[Dict[str, Any], List[float]]:
     """
     Generates dataset kwargs for a given dataset mix from the Open X-Embodiment dataset. The returned kwargs
@@ -97,6 +99,11 @@ def get_oxe_dataset_kwargs_and_weights(
     :param load_proprio: Load proprioceptive state.
     :param load_language: Load language instructions.
     :param action_proprio_normalization_type: Normalization scheme to use for proprioceptive actions.
+    :param subset_percentages: Optional dictionary mapping dataset names to percentage of data to use (0.0-1.0)
+                               Example: {"dataset_name": 0.25} to use 25% of dataset_name
+    :param global_subset_fraction: Optional float specifying a fraction to use for ALL datasets (0.0-1.0)
+                                   Example: 0.25 to use 25% of all datasets
+                                   Note: This is ignored if subset_percentages is provided
 
     return: Tuple of (per_dataset_kwargs, sampling_weights)
     """
@@ -111,19 +118,38 @@ def get_oxe_dataset_kwargs_and_weights(
 
     # Assemble Dataset Config (kwargs) and Weights
     per_dataset_kwargs, sampling_weights = [], []
+    
+    # If global_subset_fraction is provided and subset_percentages is not, apply it to all datasets
+    global_subset = None
+    if subset_percentages is None and global_subset_fraction is not None:
+        if 0.0 < global_subset_fraction < 1.0:
+            global_subset = global_subset_fraction
+            overwatch.info(f"Applying global subset fraction {global_subset:.1%} to all datasets")
+    
     for d_name, d_weight in filtered_mixture_spec:
         try:
-            per_dataset_kwargs.append(
-                make_oxe_dataset_kwargs(
-                    d_name,
-                    data_root_dir,
-                    load_camera_views,
-                    load_depth,
-                    load_proprio,
-                    load_language,
-                    action_proprio_normalization_type,
-                )
+            dataset_kwargs = make_oxe_dataset_kwargs(
+                d_name,
+                data_root_dir,
+                load_camera_views,
+                load_depth,
+                load_proprio,
+                load_language,
+                action_proprio_normalization_type,
             )
+            
+            # Apply subsetting if specified for this dataset
+            if subset_percentages and d_name in subset_percentages:
+                subset_pct = subset_percentages[d_name]
+                if 0.0 < subset_pct < 1.0:
+                    dataset_kwargs["subset_percentage"] = subset_pct
+                    overwatch.info(f"Using {subset_pct:.1%} of dataset '{d_name}'")
+            # Apply global subset if no specific subset is defined for this dataset
+            elif global_subset is not None:
+                dataset_kwargs["subset_percentage"] = global_subset
+                overwatch.info(f"Using {global_subset:.1%} of dataset '{d_name}' (global setting)")
+            
+            per_dataset_kwargs.append(dataset_kwargs)
             sampling_weights.append(d_weight)
 
         except ValueError as e:

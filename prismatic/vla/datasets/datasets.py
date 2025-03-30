@@ -7,7 +7,7 @@ format to OpenVLA, IterableDataset shim.
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Tuple, Type, List
+from typing import Any, Dict, Tuple, Type, List, Optional
 
 import numpy as np
 import torch
@@ -380,6 +380,8 @@ class RLDSDataset(IterableDataset):
         image_window_size: int = 1,
         load_camera_views: tuple = ("primary",),
         normalize_data: bool = True,
+        subset_percentages: Optional[Dict[str, float]] = None,
+        global_subset_fraction: Optional[float] = None,
     ) -> None:
         """Lightweight wrapper around RLDS TFDS Pipeline for use with PyTorch/OpenVLA Data Loaders."""
         self.data_root_dir, self.data_mix, self.batch_transforms = data_root_dir, data_mix, batch_transforms
@@ -405,6 +407,8 @@ class RLDSDataset(IterableDataset):
             load_proprio=False,
             load_language=True,
             action_proprio_normalization_type=NormalizationType.BOUNDS_Q99,
+            subset_percentages=subset_percentages,
+            global_subset_fraction=global_subset_fraction,
         )
         rlds_config = dict(
             traj_transform_kwargs=dict(

@@ -144,6 +144,7 @@ class GenerateConfig:
     pretrained_checkpoint: Union[str, Path] = ""     # Pretrained checkpoint path
     load_in_8bit: bool = False                       # (For OpenVLA only) Load with 8-bit quantization
     load_in_4bit: bool = False                       # (For OpenVLA only) Load with 4-bit quantization
+    random_llm_weights: bool = False                 # Randomly initialize LLM weights (for ablation studies)
 
     center_crop: bool = True                         # Center crop? (if trained w/ random crop image aug)
     obs_history: int = 1                             # Number of images to pass in from history
