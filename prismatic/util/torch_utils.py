@@ -24,6 +24,13 @@ from typing import Callable, Optional
 import numpy as np
 import torch
 
+from prismatic.overwatch import initialize_overwatch
+
+
+# Initialize Overwatch =>> Wraps `logging.Logger`
+overwatch = initialize_overwatch(__name__)
+
+
 # === Randomness ===
 
 
@@ -77,7 +84,18 @@ def worker_init_function(worker_id: int) -> None:
 # === BFloat16 Support ===
 
 
-def check_bloat16_supported() -> bool:
+def check_bfloat16_supported() -> bool:
+    # TPU Check (by design, all TPUs support BF16)
+    try:
+        # TODO (kpertsch) =>> Figure out how to reliably determine whether running on TPU!
+        import torch_xla.core.xla_model as xm
+
+        return bool(xm.xla_device())
+
+    except ImportError:
+        pass
+
+    # CUDA Check
     try:
         import packaging.version
         import torch.cuda.nccl as nccl

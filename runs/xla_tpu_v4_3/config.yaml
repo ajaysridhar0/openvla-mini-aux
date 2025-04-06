@@ -1,0 +1,61 @@
+data_root_dir: /iliad_nfs/ajaysri/datasets/xembod_data_human_rlds_final
+global_subset_fraction: null
+hf_token: .hf_token
+image_aug: false
+is_resume: true
+log_interval: 1
+normalize_data: true
+pretrained_checkpoint: null
+random_llm_weights: false
+resume_dir: null
+resume_epoch: null
+resume_step: null
+run_id: xla_tpu_v4_3
+run_id_note: null
+run_root_dir: runs
+save_interval: 2500
+seed: 7
+subset_percentages: null
+trackers:
+- jsonl
+- wandb
+vla:
+  action_tokenizer: extra_action_tokenizer
+  base_vlm: /iliad_nfs/ajaysri/mini_vlm/
+  data_mix: xembod_robocasa_full
+  ee_pose_2D_stride: 5
+  enable_gradient_checkpointing: true
+  enable_mixed_precision_training: true
+  epochs: 1000
+  expected_world_size: 4
+  freeze_llm_backbone: false
+  freeze_vision_backbone: false
+  future_2D_trace_window_size: 40
+  future_obj_pose_window_size: 40
+  global_batch_size: 4
+  image_sequence_len: 2
+  input_seq_pad_length: 96
+  learning_rate: 2.0e-05
+  lr_scheduler_type: constant
+  max_grad_norm: 1.0
+  max_steps: 100000
+  normalize_data: true
+  obj_pose_stride: 5
+  past_2D_trace_window_size: 0
+  past_obj_pose_window_size: 0
+  per_device_batch_size: 1
+  reduce_in_full_precision: true
+  save_every_n_steps: 25000
+  shuffle_buffer_size: 256000
+  train_strategy: fsdp-full-shard
+  transform_types: action
+  transform_weights: null
+  type: prism-qwen25-resnet50-224px+0_5b+mx-xembod-robocasa-full
+  unfreeze_last_llm_layer: false
+  use_wrist_image: true
+  vision_backbone_id: resnet50-224px
+  vla_id: prism-qwen25-resnet50-224px+0_5b+mx-xembod-robocasa-full
+  warmup_ratio: 0.0
+  weight_decay: 0.0
+wandb_entity: ajaysridhar
+wandb_project: xla_debug

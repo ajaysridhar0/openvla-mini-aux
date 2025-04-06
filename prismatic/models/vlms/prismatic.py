@@ -358,6 +358,7 @@ class PrismaticVLM(VLM):
         """Run a forward pass through the VLM, returning a CausalLMOutputWithPast instance (contains loss)."""
 
         # Handle Inference (leverage cache, short-circuit on just LLM forward)
+        # TODO (ajaysridhar): not sure if this is correct for TPUs
         if input_ids.shape[1] == 1 and past_key_values is not None:
             # We're leveraging the cache, so just redirect to `self.llm_backbone` with `input_ids` and `past_key_values`
             output = self.llm_backbone(

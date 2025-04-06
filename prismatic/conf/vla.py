@@ -72,6 +72,8 @@ class VLAConfig(ChoiceRegistry):
 
     normalize_data: bool = True  # Add this field
 
+    # XLA / TPU Parameters
+    input_seq_pad_length: int = 512                  # XLA / TPU expects fixed length batches; set `input_ids` padding
 
 # === OpenVLA Training Configurations ===
 

@@ -10,7 +10,7 @@ heavy lifting.
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, Optional, Union, Dict, Any
 
 import torch
 import torch.distributed as dist
@@ -21,7 +21,7 @@ from transformers.modeling_outputs import CausalLMOutputWithPast
 from prismatic.models.vlms import PrismaticVLM
 from prismatic.overwatch import initialize_overwatch
 from prismatic.training.metrics import Metrics, VLAMetrics
-from prismatic.util import check_bloat16_supported
+from prismatic.util import check_bfloat16_supported
 from prismatic.util.batching_utils import SplitModalitySampler
 from prismatic.util.data_utils import PaddedCollatorForActionPrediction, PaddedCollatorForLanguageModeling
 from prismatic.vla.action_tokenizer import ActionTokenizer
@@ -102,7 +102,8 @@ class TrainingStrategy(ABC):
         reduce_in_full_precision: bool = False,
         mixed_precision_dtype: torch.dtype = torch.bfloat16,
         worker_init_fn: Optional[Callable[[int], None]] = None,
-        save_every_n_steps: Optional[int] = None,
+        save_interval: int = 2500,
+        log_interval: int = 1,
         **_: str,
     ) -> None:
         self.vlm, self.device_id, self.stage = vlm, device_id, stage
@@ -132,9 +133,8 @@ class TrainingStrategy(ABC):
         self.optimizer, self.lr_scheduler = None, None
 
         # how often to save checkpoints
-        self.save_every_n_steps = save_every_n_steps
-        if save_every_n_steps is not None:
-            assert save_every_n_steps > 0
+        self.save_interval = save_interval
+        self.log_interval = log_interval
 
         # Lightweight Validation
         assert (
@@ -143,7 +143,7 @@ class TrainingStrategy(ABC):
         self.grad_accumulation_steps = self.global_batch_size // self.per_device_batch_size // overwatch.world_size()
         if self.enable_mixed_precision_training:
             assert self.mixed_precision_dtype == torch.bfloat16, "Only BF16 mixed precision training is supported!"
-            assert check_bloat16_supported(), "BFloat16 is not supported on this hardware; unset `mixed_precision`"
+            assert check_bfloat16_supported(), "BFloat16 is not supported on this hardware; unset `mixed_precision`"
 
     @abstractmethod
     def save_checkpoint(
@@ -155,11 +155,30 @@ class TrainingStrategy(ABC):
         only_trainable: bool = True,
     ) -> None: ...
 
+    def load_checkpoint(self, resume_dir: Path, metrics: Union[Metrics, VLAMetrics]):
+        raise ValueError(f"Checkpoint loading not implemented for train strategy {type(self)}.")
+
     @abstractmethod
     def run_setup(self, run_dir: Path, n_train_examples: int) -> None: ...
 
     @abstractmethod
     def clip_grad_norm(self) -> None: ...
+
+    @abstractmethod
+    def clip_grad_norm(self) -> None: ...
+
+    @staticmethod
+    def wrap_dataloader(dataloader: DataLoader) -> DataLoader:
+        return dataloader
+
+    @staticmethod
+    def barrier(tag: Optional[str] = "Default Barrier") -> None:
+        overwatch.info(f"Barrier: {tag}")
+        dist.barrier()
+
+    @property
+    def device_type(self) -> str:
+        return "cuda"
 
     def run_training(
         self,
@@ -305,7 +324,101 @@ class TrainingStrategy(ABC):
                 self.save_checkpoint(metrics.run_dir, metrics.global_step, epoch, loss.item())
                 dist.barrier()
 
+    
     # === VLA Training ===
+
+    def update_vla_logs_and_progress(
+        self,
+        metrics: VLAMetrics,
+        progress: tqdm,
+        log_info: Dict[str, Any],
+    ) -> None:
+        if (metrics.global_step + 1) % self.log_interval != 0:
+            metrics.commit(global_step=metrics.global_step + 1)
+            progress.update()
+            return
+
+        # === Compute Action Token Accuracy & L1 Loss ===
+
+        # To compute action token accuracy, we need to identify the locations of the action tokens
+        # in both `output.logits` and `batch["labels"]`. We know that when "right" padding, we
+        # insert `self.vlm.vision_backbone.num_patches` at index 1.
+        #
+        # Computing `action_prediction_accuracy` is then pretty straightforward:
+        #   1) Extract "aligned" predictions & labels
+        #   2) Compute boolean "mask" where "labels > 2" (where 2 is ID for `EOS_TOKEN`)
+        #           => If masking out EOS, then it's just "labels != -100 (IGNORE_INDEX)
+        #   3) Compute masked accuracy as `(preds == logits) & mask` --> sum/divide by # unmasked!
+        if self.verbose_logging:
+            overwatch.info("--> [Update Logs] Accessing logits...")
+        action_preds = log_info["logits"][:, self.vlm.vision_backbone.num_patches : -1].argmax(dim=2)
+        if self.verbose_logging:
+            overwatch.info("--> [Update Logs] Accessing labels...")
+        action_gt = log_info["labels"][:, 1:].to(action_preds.device)
+        if self.verbose_logging:
+            overwatch.info("--> [Update Logs] Logits & labels accessed.")
+        mask = action_gt > log_info["action_tokenizer"].action_token_begin_idx
+
+        # Compute Accuracy
+        if self.verbose_logging:
+            overwatch.info("--> [Update Logs] Computing accuracy...")
+        correct_preds = (action_preds == action_gt) & mask
+        action_accuracy = correct_preds.sum().float() / mask.sum().float()
+        if self.verbose_logging:
+            overwatch.info("--> [Update Logs] Accuracy computed.")
+
+        # Compute L1 Loss on Predicted (Continuous) Actions
+        # TODO (ajaysri) =>> Add back in
+        # continuous_actions_pred = torch.tensor(
+        #     log_info["action_tokenizer"].decode_token_ids_to_actions(action_preds[mask].cpu().numpy())
+        # )
+        # continuous_actions_gt = torch.tensor(
+        #     log_info["action_tokenizer"].decode_token_ids_to_actions(action_gt[mask].cpu().numpy())
+        # )
+        # action_l1_loss = torch.nn.functional.l1_loss(continuous_actions_pred, continuous_actions_gt)
+
+        if self.verbose_logging:
+            overwatch.info("--> [Update Logs] Computing L1 loss...")
+            # TODO (ajaysri) =>> Add back in
+            # overwatch.info("--> [Update Logs] Calling .cpu() on action_preds[mask]...")
+            # pred_np = action_preds[mask].cpu().numpy()
+            # overwatch.info("--> [Update Logs] .cpu() on action_preds complete.")
+            # continuous_actions_pred = torch.tensor(
+            #     log_info["action_tokenizer"].decode_token_ids_to_actions(pred_np)
+            # )
+            # overwatch.info("--> [Update Logs] Calling .cpu() on action_gt[mask]...")
+            # gt_np = action_gt[mask].cpu().numpy()
+            # overwatch.info("--> [Update Logs] .cpu() on action_gt complete.")
+            # continuous_actions_gt = torch.tensor(
+            #     log_info["action_tokenizer"].decode_token_ids_to_actions(gt_np)
+            # )
+            # overwatch.info("--> [Update Logs] Calculating torch l1_loss...")
+            # action_l1_loss = torch.nn.functional.l1_loss(continuous_actions_pred, continuous_actions_gt)
+            # overwatch.info("--> [Update Logs] L1 loss computed.")
+        action_l1_loss = torch.tensor(0.0) # Dummy value
+
+        # Commit metrics
+        metrics.commit(
+            global_step=metrics.global_step + 1,
+            epoch=log_info["epoch"],
+            lr=log_info["lr"],
+            loss=log_info["loss"],
+            action_accuracy=action_accuracy,
+            l1_loss=action_l1_loss,
+            update_step_time=True,
+        )
+
+        # Push Metrics to Trackers
+        status = metrics.push()
+        progress.set_description(status)
+
+        # Update Progress Bar
+        progress.update()
+
+    
+    def finish_vla_train_step(self, metrics: VLAMetrics, progress: tqdm, log_info: Dict[str, Any]) -> None:
+        self.update_vla_logs_and_progress(metrics, progress, log_info)
+    
 
     def run_vla_training(
         self,
@@ -337,13 +450,17 @@ class TrainingStrategy(ABC):
             worker_init_fn=self.worker_init_fn,
         )
 
+        dataloader = self.wrap_dataloader(dataloader) # No-op if not XLA
+
         # === Train ===
         status = metrics.get_status()
+        initial_step = metrics.global_step
         with tqdm(
             total=(self.epochs * len(dataloader)) if self.max_steps is None else self.max_steps,
             desc=status,
             leave=False,
             disable=not overwatch.is_rank_zero(),
+            initial=initial_step,
         ) as progress:
             self.vlm.train()
 
@@ -357,7 +474,7 @@ class TrainingStrategy(ABC):
                 # Note that we'll unpack batch (and let AMP/FSDP do its thing) in the VLM.forward() call
                 #   => Basically, if we're using mixed precision (or not), autocast()/FSDP will move to device!
                 with torch.autocast(
-                    "cuda", dtype=self.mixed_precision_dtype, enabled=self.enable_mixed_precision_training
+                    self.device_type, dtype=self.mixed_precision_dtype, enabled=self.enable_mixed_precision_training
                 ):
                     # [Contract] self.vlm.forward() must automatically compute `loss` and return!
                     output: CausalLMOutputWithPast = self.vlm(

@@ -42,7 +42,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 # Initialize Overwatch =>> Wraps `logging.Logger`
 overwatch = initialize_overwatch(__name__)
 
-DATA_DIR = os.environ["DATA_DIR"]
+# DATA_DIR = os.environ["DATA_DIR"]
 
 @dataclass
 class TrainConfig:
@@ -57,7 +57,8 @@ class TrainConfig:
     data_root_dir: Path = Path(                                     # Path to Open-X dataset directory
         "datasets/open-x-embodiment"
     )
-    run_root_dir: Path = Path(DATA_DIR, "runs")                               # Path to directory to store logs & checkpoints
+    run_root_dir: Path = Path("runs")                               # Path to directory to store logs & checkpoints
+    resume_dir: Path = None
 
     # Resume Run Parameters
     pretrained_checkpoint: Optional[Path] = None                    # Absolute Path to Checkpoint
@@ -94,6 +95,10 @@ class TrainConfig:
     # Example: 0.25 to use only 25% of all datasets in the mixture
     global_subset_fraction: Optional[float] = None                  # Fraction (0.0-1.0) of each dataset to use
 
+    # Training Strategy
+    log_interval: int = 1
+    save_interval: int = 2500
+
     def __post_init__(self) -> None:
         """Lift optimization parameters from `self.vla` for ease of use =>> validate on `expected_world_size`"""
         self.epochs = self.vla.epochs
@@ -108,7 +113,6 @@ class TrainConfig:
         self.warmup_ratio = self.vla.warmup_ratio
 
         self.train_strategy = self.vla.train_strategy
-        self.save_every_n_steps = self.vla.save_every_n_steps
 
         self.action_tokenizer = self.vla.action_tokenizer
 
@@ -116,6 +120,8 @@ class TrainConfig:
         self.use_wrist_image = self.vla.use_wrist_image
 
         self.normalize_data = self.vla.normalize_data
+
+        self.train_strategy = self.vla.train_strategy if not overwatch.use_tpu else "fsdp-full-shard-tpu"
 
         # [Validate] Assert on `expected_world_size`
         assert (
@@ -130,8 +136,11 @@ def train(cfg: TrainConfig) -> None:
     overwatch.info("OpenVLA Training :: Warming Up")
 
     # Note => Under `torchrun` initializing `overwatch` will automatically set up `torch.distributed`
-    torch.cuda.set_device(device_id := overwatch.local_rank())
-    torch.cuda.empty_cache()
+    if not overwatch.use_tpu:
+        torch.cuda.set_device(device_id := overwatch.local_rank())
+        torch.cuda.empty_cache()
+    else:
+        device_id = overwatch.rank()
 
     # Configure Unique Run Name & Save Directory
     vla_id = cfg.vla.vla_id
@@ -265,6 +274,7 @@ def train(cfg: TrainConfig) -> None:
         past_2D_trace_window_size=cfg.vla.past_2D_trace_window_size,
         subset_percentages=subset_percentages,
         global_subset_fraction=cfg.global_subset_fraction,
+        xla_seq_pad_len=cfg.vla.input_seq_pad_length if overwatch.use_tpu else None,
     )
 
     # Save dataset statistics for de-normalization at inference time
@@ -291,7 +301,8 @@ def train(cfg: TrainConfig) -> None:
         enable_mixed_precision_training=cfg.vla.enable_mixed_precision_training,
         reduce_in_full_precision=cfg.vla.reduce_in_full_precision,
         worker_init_fn=worker_init_fn,
-        save_every_n_steps=cfg.save_every_n_steps,
+        save_interval=cfg.save_interval,
+        log_interval=cfg.log_interval,
     )
     train_strategy.run_setup(run_dir=run_dir, n_train_examples=len(vla_dataset))
 
@@ -319,13 +330,19 @@ def train(cfg: TrainConfig) -> None:
         sequence_level_decoding=isinstance(action_tokenizer, FastActionTokenizer),
     )
 
+    # Optionally resume from checkpoint
+    if cfg.resume_dir is not None:
+        train_strategy.load_checkpoint(cfg.resume_dir, metrics)
+
     # Finalize
     overwatch.info("Done with Training =>> Finalizing Metrics")
+    train_strategy.run_vla_training(vla_dataset, collator, action_tokenizer, metrics)
+
     metrics.finalize()
 
     # And... we're done!
     overwatch.info("... and that's all, folks!")
-    dist.barrier()
+    train_strategy.barrier("Finished Training")
     dist.destroy_process_group()
 
 

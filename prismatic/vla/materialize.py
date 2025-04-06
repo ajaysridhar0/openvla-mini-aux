@@ -52,6 +52,7 @@ def get_vla_dataset_and_collator(
     past_2D_trace_window_size: int = 0,
     subset_percentages: Optional[Dict[str, float]] = None,
     global_subset_fraction: Optional[float] = None,
+    xla_seq_pad_len: Optional[int] = None,
 ) -> Tuple[Dataset, ActionTokenizer, PaddedCollatorForActionPrediction]:
     """Initialize RLDS Dataset (wraps TFDS), ActionTokenizer, and initialize transform/collation functions."""
 
@@ -114,7 +115,11 @@ def get_vla_dataset_and_collator(
         batch_transforms.append((rlds_transform, weight))
 
     collator = PaddedCollatorForActionPrediction(
-        tokenizer.model_max_length, tokenizer.pad_token_id, padding_side=padding_side
+        tokenizer.model_max_length, 
+        tokenizer.pad_token_id, 
+        default_image_resolution,
+        padding_side=padding_side,
+        xla_seq_pad_len=xla_seq_pad_len,
     )
 
     # Build RLDS Iterable Dataset

@@ -9,7 +9,7 @@ import math
 from collections import OrderedDict
 from functools import partial
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, Optional, Tuple
 
 import torch
 import torch.distributed as dist
@@ -59,7 +59,8 @@ class FSDPStrategy(TrainingStrategy):
         worker_init_fn: Optional[Callable[[int], None]] = None,
         sharding_strategy: str = "shard-grad-op",
         state_dict_type: StateDictType = StateDictType.FULL_STATE_DICT,
-        save_every_n_steps: Optional[int] = None,
+        save_interval: int = 2500,
+        log_interval: int = 1,
     ) -> None:
         super().__init__(
             vlm=vlm,
@@ -79,7 +80,8 @@ class FSDPStrategy(TrainingStrategy):
             reduce_in_full_precision=reduce_in_full_precision,
             mixed_precision_dtype=mixed_precision_dtype,
             worker_init_fn=worker_init_fn,
-            save_every_n_steps=save_every_n_steps,
+            save_interval=save_interval,
+            log_interval=log_interval,
         )
 
         # FSDP-Specific Parameters
@@ -134,61 +136,9 @@ class FSDPStrategy(TrainingStrategy):
                 # TODO (siddk) :: This breaks w/ Sagemaker default permissions (root vs. <user>)... skip?
                 # shutil.copy(checkpoint_path, checkpoint_dir / "latest-checkpoint.pt")
 
-    def run_setup(self, run_dir: Path, n_train_examples: int) -> None:
-        # Iteratively Assemble FSDP Wrapping Policy by fetching the wrapping policies for each backbone/constituent
-        vlm_fsdp_wrapping_policy = self.vlm.get_fsdp_wrapping_policy()
-
-        # Assemble the Default FSDP Mixed Precision Policy
-        if self.enable_mixed_precision_training and self.mixed_precision_dtype == torch.bfloat16:
-            # MixedPrecision `param_dtype` specifies *compute* dtype (for forward/backward only)
-            #   => Reference: https://pytorch.org/docs/stable/fsdp.html#torch.distributed.fsdp.MixedPrecision
-            reduce_buffer_dtype = torch.bfloat16 if not self.reduce_in_full_precision else torch.float32
-            fsdp_precision_policy = MixedPrecision(
-                param_dtype=torch.bfloat16, reduce_dtype=reduce_buffer_dtype, buffer_dtype=reduce_buffer_dtype
-            )
-
-            # When running FSDP with a frozen vision backbone --> move to half precision!
-            if self.stage not in {"full-finetune", "vla-full-train", "vla-sandwich-train"}:
-                overwatch.info("Casting Vision Backbone to *Half Precision* via `.to(dtype=...)`")
-                self.vlm.vision_backbone.to(dtype=self.vlm.vision_backbone.half_precision_dtype)
-
-        else:
-            # If we're not using mixed precision, everything is in default full precision!
-            fsdp_precision_policy = MixedPrecision(
-                param_dtype=torch.float32, reduce_dtype=torch.float32, buffer_dtype=torch.float32
-            )
-
-        # <FSDP> => note that FSDP will automatically take care of device placement (similar to `autocast`)
-        self.vlm = FSDP(
-            self.vlm,
-            auto_wrap_policy=vlm_fsdp_wrapping_policy,
-            mixed_precision=fsdp_precision_policy,
-            sharding_strategy=self.fsdp_sharding_strategy,
-            device_id=torch.cuda.current_device(),
-            limit_all_gathers=True,
-            use_orig_params=True,
-        )
-
-        # Gradient Checkpoint Setup
-        if self.enable_gradient_checkpointing:
-            # For Gradient Checkpointing under FSDP --> we make the same assumption as in the DDP/other strategies; the
-            #   bulk of activation memory is taken up by the LLM activations. However, unlike other strategies, we
-            #   cannot rely on the HF Transformers default `gradient_checkpointing_enable()` --> FSDP breaks semantics!
-            #
-            # Instead, we need to write our own *NO-REENTRANT* wrapper, and apply it to the LLM's Transformer Layer.
-            non_reentrant_wrapper = partial(checkpoint_wrapper, checkpoint_impl=CheckpointImpl.NO_REENTRANT)
-
-            def check_fn(submodule: nn.Module) -> bool:
-                return isinstance(submodule, self.llm_transformer_layer_cls)
-
-            # Note that the terms "activation checkpointing" and "gradient checkpointing" are synonymous!
-            apply_activation_checkpointing(self.vlm, checkpoint_wrapper_fn=non_reentrant_wrapper, check_fn=check_fn)
-
-        # Barrier =>> Sharding takes a minute?
-        dist.barrier()
-
-        # Create Optimizer and LR Scheduler =>> note that most of the LR Schedulers we use require `max_steps/epochs`
-        #   => Optimizer should only operate on parameters that are *unfrozen* / trainable!
+    
+    def create_optimizer(self, n_train_examples: int) -> Tuple[int, int]:
+        """Create Optimizer and LR Scheduler (instance variables), and return warmup/total steps for logging."""
         n_train_examples = math.ceil(n_train_examples / self.global_batch_size) * self.global_batch_size
         if self.max_steps is None:
             num_training_steps = (n_train_examples * self.epochs) // self.global_batch_size
@@ -246,6 +196,64 @@ class FSDPStrategy(TrainingStrategy):
 
         else:
             raise ValueError(f"Learning Rate Schedule with type `{self.lr_scheduler_type}` is not supported!")
+
+        return num_warmup_steps, num_training_steps
+    
+
+    def run_setup(self, run_dir: Path, n_train_examples: int) -> None:
+        # Iteratively Assemble FSDP Wrapping Policy by fetching the wrapping policies for each backbone/constituent
+        vlm_fsdp_wrapping_policy = self.vlm.get_fsdp_wrapping_policy()
+
+        # Assemble the Default FSDP Mixed Precision Policy
+        if self.enable_mixed_precision_training and self.mixed_precision_dtype == torch.bfloat16:
+            # MixedPrecision `param_dtype` specifies *compute* dtype (for forward/backward only)
+            #   => Reference: https://pytorch.org/docs/stable/fsdp.html#torch.distributed.fsdp.MixedPrecision
+            reduce_buffer_dtype = torch.bfloat16 if not self.reduce_in_full_precision else torch.float32
+            fsdp_precision_policy = MixedPrecision(
+                param_dtype=torch.bfloat16, reduce_dtype=reduce_buffer_dtype, buffer_dtype=reduce_buffer_dtype
+            )
+
+            # When running FSDP with a frozen vision backbone --> move to half precision!
+            if self.stage not in {"full-finetune", "vla-full-train", "vla-sandwich-train"}:
+                overwatch.info("Casting Vision Backbone to *Half Precision* via `.to(dtype=...)`")
+                self.vlm.vision_backbone.to(dtype=self.vlm.vision_backbone.half_precision_dtype)
+
+        else:
+            # If we're not using mixed precision, everything is in default full precision!
+            fsdp_precision_policy = MixedPrecision(
+                param_dtype=torch.float32, reduce_dtype=torch.float32, buffer_dtype=torch.float32
+            )
+
+        # <FSDP> => note that FSDP will automatically take care of device placement (similar to `autocast`)
+        self.vlm = FSDP(
+            self.vlm,
+            auto_wrap_policy=vlm_fsdp_wrapping_policy,
+            mixed_precision=fsdp_precision_policy,
+            sharding_strategy=self.fsdp_sharding_strategy,
+            device_id=torch.cuda.current_device(),
+            limit_all_gathers=True,
+            use_orig_params=True,
+        )
+
+        # Gradient Checkpoint Setup
+        if self.enable_gradient_checkpointing:
+            # For Gradient Checkpointing under FSDP --> we make the same assumption as in the DDP/other strategies; the
+            #   bulk of activation memory is taken up by the LLM activations. However, unlike other strategies, we
+            #   cannot rely on the HF Transformers default `gradient_checkpointing_enable()` --> FSDP breaks semantics!
+            #
+            # Instead, we need to write our own *NO-REENTRANT* wrapper, and apply it to the LLM's Transformer Layer.
+            non_reentrant_wrapper = partial(checkpoint_wrapper, checkpoint_impl=CheckpointImpl.NO_REENTRANT)
+
+            def check_fn(submodule: nn.Module) -> bool:
+                return isinstance(submodule, self.llm_transformer_layer_cls)
+
+            # Note that the terms "activation checkpointing" and "gradient checkpointing" are synonymous!
+            apply_activation_checkpointing(self.vlm, checkpoint_wrapper_fn=non_reentrant_wrapper, check_fn=check_fn)
+
+        # Barrier =>> Sharding takes a minute?
+        self.barrier("Finished Sharding")
+
+        num_training_steps, num_warmup_steps = self.create_optimizer(n_train_examples)
 
         # Finalize Setup =>> Log!
         overwatch.info(

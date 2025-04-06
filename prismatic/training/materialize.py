@@ -10,7 +10,7 @@ from typing import Callable, Optional
 import torch
 
 from prismatic.models.vlms import PrismaticVLM
-from prismatic.training.strategies import FSDPStrategy, TrainingStrategy, LoraDDPStrategy
+from prismatic.training.strategies import FSDPStrategy, TrainingStrategy, LoraDDPStrategy, FSDPXLAStrategy
 
 # Registry =>> Maps ID --> {cls(), kwargs} :: supports FSDP for now, but DDP handler is also implemented!
 TRAIN_STRATEGIES = {
@@ -19,6 +19,7 @@ TRAIN_STRATEGIES = {
     "ddp-lora": {"cls": LoraDDPStrategy, "kwargs": {"lora_rank": 32,
                                                     "lora_alpha": 16,
                                                     "lora_dropout": 0}},
+    "fsdp-full-shard-tpu": {"cls": FSDPXLAStrategy, "kwargs": {"sharding_strategy": "full-shard"}},
 }
 
 
@@ -41,7 +42,8 @@ def get_train_strategy(
     reduce_in_full_precision: bool = False,
     mixed_precision_dtype: torch.dtype = torch.bfloat16,
     worker_init_fn: Optional[Callable[[int], None]] = None,
-    save_every_n_steps: Optional[int] = None,
+    save_interval: int = 2500,
+    log_interval: int = 1,
 ) -> TrainingStrategy:
     if train_strategy in TRAIN_STRATEGIES:
         strategy_cfg = TRAIN_STRATEGIES[train_strategy]
@@ -63,7 +65,8 @@ def get_train_strategy(
             reduce_in_full_precision=reduce_in_full_precision,
             mixed_precision_dtype=mixed_precision_dtype,
             worker_init_fn=worker_init_fn,
-            save_every_n_steps=save_every_n_steps,
+            save_interval=save_interval,
+            log_interval=log_interval,
             **strategy_cfg["kwargs"],
         )
         return strategy

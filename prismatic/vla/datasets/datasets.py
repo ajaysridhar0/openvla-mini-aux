@@ -399,6 +399,10 @@ class RLDSDataset(IterableDataset):
             mixture_spec = [(self.data_mix, 1.0)]
 
         # fmt: off
+        data_dir = str(self.data_root_dir)
+        if data_dir.startswith("gs://"):
+            data_dir = "gs://" + data_dir[4:] # Path does not play nicely with double-slash in Google
+
         per_dataset_kwargs, weights = get_oxe_dataset_kwargs_and_weights(
             self.data_root_dir,
             mixture_spec,

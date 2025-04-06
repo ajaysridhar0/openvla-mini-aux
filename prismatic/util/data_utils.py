@@ -5,7 +5,7 @@ General utilities and classes for facilitating data loading and collation.
 """
 
 from dataclasses import dataclass
-from typing import Callable, Dict, Sequence, Tuple
+from typing import Callable, Dict, Sequence, Tuple, Optional
 
 import numpy as np
 import torch
@@ -101,8 +101,18 @@ class PaddedCollatorForLanguageModeling:
 class PaddedCollatorForActionPrediction:
     model_max_length: int
     pad_token_id: int
+    default_image_resolution: Tuple[int, int, int]
     padding_side: str = "right"
     pixel_values_dtype: torch.dtype = torch.float32
+    xla_seq_pad_len: Optional[int] = None
+
+    def __post_init__(self) -> None:
+        self.dummy_pixel_values = torch.zeros(self.default_image_resolution, dtype=self.pixel_values_dtype)
+
+        # XLA / TPU Training expects *fixed size* sequences for static graph compilation; create dummy pad values
+        if self.xla_seq_pad_len is not None:
+            self.pad_input_ids = torch.tensor([self.pad_token_id for _ in range(self.xla_seq_pad_len)])
+            self.pad_labels = torch.tensor([IGNORE_INDEX for _ in range(self.xla_seq_pad_len)])
 
     def __call__(self, instances: Sequence[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tensor]:
         input_ids, labels = tuple([instance[key] for instance in instances] for key in ("input_ids", "labels"))
@@ -115,11 +125,22 @@ class PaddedCollatorForActionPrediction:
         # For now, we only support Tokenizers with `padding_side = "right"` during training
         #   => Handle padding via RNN Utils => `pad_sequence`
         assert self.padding_side == "right", f"Invalid Tokenizer `{self.padding_side = }`"
-        input_ids = pad_sequence(input_ids, batch_first=True, padding_value=self.pad_token_id)
-        labels = pad_sequence(labels, batch_first=True, padding_value=IGNORE_INDEX)
 
-        # Truncate (if necessary)
-        input_ids, labels = input_ids[:, : self.model_max_length], labels[:, : self.model_max_length]
+        if not self.xla_seq_pad_len:
+            input_ids = pad_sequence(input_ids, batch_first=True, padding_value=self.pad_token_id)
+            labels = pad_sequence(labels, batch_first=True, padding_value=IGNORE_INDEX)
+
+            # Truncate (if necessary)
+            input_ids, labels = input_ids[:, : self.model_max_length], labels[:, : self.model_max_length]
+        else:
+            # Add dummy sequence of `xla_seq_pad_len` to beginning of batch prior to `pad_sequence` call
+            #   =>> Everything will get padded to at least this length; remember to *pop* dummy elements!
+            input_ids = pad_sequence([self.pad_input_ids, *input_ids], batch_first=True, padding_value=self.pad_token_id)
+            labels = pad_sequence([self.pad_labels, *labels], batch_first=True, padding_value=IGNORE_INDEX)
+            input_ids, labels = input_ids[1:], labels[1:]
+
+            # Truncate to `xla_seq_pad_len` (if necessary)
+            input_ids, labels = input_ids[:, : self.xla_seq_pad_len], labels[:, : self.xla_seq_pad_len]
 
         # Get `attention_mask` by checking for `pad_token_id`
         attention_mask = input_ids.ne(self.pad_token_id)

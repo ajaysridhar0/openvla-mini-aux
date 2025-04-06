@@ -121,10 +121,11 @@ class HFCausalLLMBackbone(LLMBackbone, ABC):
         if not self.inference_mode:
             if pretrained:
                 overwatch.info(f"Loading [bold]{llm_family}[/] LLM from [underline]`{hf_hub_path}`[/]", ctx_level=1)
+                use_flash_attention_2 = use_flash_attention_2 and not self.inference_mode and not overwatch.use_tpu
                 self.llm = llm_cls.from_pretrained(
                     hf_hub_path,
                     token=hf_token,
-                    use_flash_attention_2=use_flash_attention_2 if not self.inference_mode else False,
+                    use_flash_attention_2=use_flash_attention_2,
                     # The following parameters are set to prevent `UserWarnings` from HF; we want greedy decoding!
                     do_sample=False,
                     temperature=1.0,
