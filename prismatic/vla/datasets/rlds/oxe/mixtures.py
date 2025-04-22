@@ -358,8 +358,18 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("solid_u_r5e_mimicgen", 1.0),
         ("solid__kinova3_mimicgen", 1.0),
     ],
-
-    
+    "viper_pnpcountertosink_421": [
+        ("viper_pnpcountertosink_421", 1.0),
+    ],
+    "viper_pnpsinktocounter_421": [
+        ("viper_pnpsinktocounter_421", 1.0),
+    ],
+    "viper_rlds": [
+        ("viper_rlds", 1.0),
+    ],
+    "robot_lightning_rlds": [
+        ("robot_lightning_rlds", 1.0),
+    ],
     # TODO (ajaysri): add partial held-out mixture
 }
 # fmt: on

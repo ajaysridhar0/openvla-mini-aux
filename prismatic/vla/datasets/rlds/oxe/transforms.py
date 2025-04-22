@@ -952,4 +952,8 @@ OXE_STANDARDIZATION_TRANSFORMS = {
     "sawyer_500_pnpcountertocab": libero_dataset_transform,
     "sawyer_500_pnpcountertomicrowave": libero_dataset_transform,
     "sawyer_500_pnpsinktocounter": libero_dataset_transform,
+    "viper_pnpcountertosink_421": bridge_orig_dataset_transform,
+    "viper_pnpsinktocounter_421": bridge_orig_dataset_transform,
+    "viper_rlds": bridge_orig_dataset_transform,
+    "robot_lightning_rlds": libero_dataset_transform,
 }
