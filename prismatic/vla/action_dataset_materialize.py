@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Tuple, Optional
 
 from prismatic.vla.datasets.datasets import EpisodicRLDSDataset, RLDSDataset
 
@@ -33,6 +33,7 @@ def get_vla_action_dataset(
     image_aug: bool = False,
     future_action_window_size: int = 0,
     include_images: bool = True,
+    dataset_statistics_map: Optional[Dict] = None,
 ):
     """Only get the image / action / instruction, don't do any tokenization."""
 
@@ -51,6 +52,7 @@ def get_vla_action_dataset(
         image_aug=image_aug,
         # did not add support for below kwargs with episodic dataset
         future_action_window_size=future_action_window_size,
+        dataset_statistics_map=dataset_statistics_map,
     )
 
     return dataset

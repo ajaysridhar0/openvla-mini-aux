@@ -33,12 +33,13 @@ def main():
     p.add_argument("--data_mix", type=str, required=True, help="The name of the data [mix] to use")
     p.add_argument("--save_folder", type=str, default="vq/", help="Folder to save the final vq model (under <exp_name>)")
     p.add_argument("--shuffle_buffer_size", type=int, default=256_000)
+    p.add_argument("--dataset_statistics_map", type=json.loads, default=None)
 
     # train arguments
     p.add_argument("--wandb_project", type=str, default="prismatic-vq-vla")
     p.add_argument("--wandb_entity", type=str, default=None)
     p.add_argument("--batch_size", type=int, default=1028)
-    p.add_argument("--epochs", type=int, default=200)
+    p.add_argument("--epochs", type=int, default=10)
     p.add_argument("--save_every_n_epochs", type=int, default=2)
     p.add_argument("--device", type=str, default="cuda")
 
@@ -78,6 +79,7 @@ def main():
         future_action_window_size=args.future_action_horizon,
         default_image_resolution=tuple(args.default_image_resolution),
         include_images=False,
+        dataset_statistics_map=args.dataset_statistics_map,
     )
 
     vq_config = {

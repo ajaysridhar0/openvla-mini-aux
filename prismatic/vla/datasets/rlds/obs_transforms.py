@@ -11,6 +11,7 @@ from typing import Dict, Tuple, Union
 import dlimp as dl
 import tensorflow as tf
 from absl import logging
+from prismatic.vla.datasets.rlds.augmentations import augment_image
 
 
 # ruff: noqa: B023
@@ -24,22 +25,29 @@ def augment(obs: Dict, seed: tf.Tensor, augment_kwargs: Union[Dict, Dict[str, Di
     if "augment_order" in augment_kwargs:
         augment_kwargs = {name: augment_kwargs for name in image_names}
 
+    aug_infos = {}
+
     for i, name in enumerate(image_names):
         if name not in augment_kwargs:
             continue
         kwargs = augment_kwargs[name]
         logging.debug(f"Augmenting image_{name} with kwargs {kwargs}")
-        obs[f"image_{name}"] = tf.cond(
+
+        default_aug_info = {"crop_bbox": tf.convert_to_tensor([0.0, 0.0, 1.0, 1.0])}
+
+        obs[f"image_{name}"], aug_info = tf.cond(
             obs["pad_mask_dict"][f"image_{name}"],
-            lambda: dl.transforms.augment_image(
+            lambda: augment_image(
                 obs[f"image_{name}"],
                 **kwargs,
                 seed=seed + i,  # augment each image differently
-            ),
-            lambda: obs[f"image_{name}"],  # skip padding images
+            )[None],
+            lambda: (obs[f"image_{name}"][None], default_aug_info),  # skip padding images
         )
 
-    return obs
+        aug_infos[name] = aug_info
+
+    return obs, aug_infos
 
 
 def decode_and_resize(

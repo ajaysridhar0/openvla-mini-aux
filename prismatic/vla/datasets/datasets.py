@@ -40,7 +40,7 @@ def _get_bbox_qa(rlds_batch: Dict[str, Any], lang: str) -> Tuple[str, str]:
     bbox_coords = rlds_batch["obj_bboxes"]
     bbox_answer = ""
     for i in range(len(obj_bbox_names)):
-        bbox_coord_tokenized = str([round(e, 3) for e in bbox_coords[i]])
+        bbox_coord_tokenized = str([round(e, 2) for e in bbox_coords[i]])
         bbox_answer += f"{obj_bbox_names[i]}: {bbox_coord_tokenized}"
         if i < len(obj_bbox_names) - 1:
             bbox_answer += ", "
@@ -74,7 +74,7 @@ def _get_obj_pose_answer(
                 past_history = "Given the movement of the target object(s): "
                 for i, obj_name in enumerate(obj_bbox_names):
                     if obj_name in dyn_obj_names:
-                        past_history += f"{obj_name}: {str([(round(x, 3), round(y, 3)) for x, y in past_poses[:, i]])}; "
+                        past_history += f"{obj_name}: {str([(round(x, 2), round(y, 2)) for x, y in past_poses[:, i]])}; "
                 past_history = past_history[:-2] + ", "
 
         # Combine current and future poses
@@ -89,7 +89,7 @@ def _get_obj_pose_answer(
             for i, obj_name in enumerate(obj_bbox_names):
                 if obj_name in dyn_obj_names:
                     obj_pose_answer += f"{obj_name}: "
-                    obj_pose_answer += str([(round(x, 3), round(y, 3)) for x, y in poses[:, i]])
+                    obj_pose_answer += str([(round(x, 2), round(y, 2)) for x, y in poses[:, i]])
                     obj_pose_answer += ", "
             obj_pose_answer = obj_pose_answer[:-2]
     else:
@@ -107,7 +107,7 @@ def _get_ee_pose_2D_answer(
     if "ee_pose_2D_past" in rlds_batch:
         past_poses = rlds_batch['ee_pose_2D_past']
         if len(past_poses) > 0:
-            past_history = f"Given the end-effector's previous trace: {str([(round(x, 3), round(y, 3)) for x, y in past_poses])}, "
+            past_history = f"Given the end-effector's previous trace: {str([(round(x, 2), round(y, 2)) for x, y in past_poses])}, "
 
     # Format current and future poses
     poses_list = []
@@ -118,7 +118,7 @@ def _get_ee_pose_2D_answer(
         
     if poses_list:  # If we have any poses
         poses = np.concatenate(poses_list, axis=0)
-        ee_pose_2D_answer = str([(round(x, 3), round(y, 3)) for x, y in poses])
+        ee_pose_2D_answer = str([(round(x, 2), round(y, 2)) for x, y in poses])
     else:
         ee_pose_2D_answer = "N/A"
 
@@ -382,6 +382,7 @@ class RLDSDataset(IterableDataset):
         normalize_data: bool = True,
         subset_percentages: Optional[Dict[str, float]] = None,
         global_subset_fraction: Optional[float] = None,
+        dataset_statistics_map: Optional[Dict] = None,
     ) -> None:
         """Lightweight wrapper around RLDS TFDS Pipeline for use with PyTorch/OpenVLA Data Loaders."""
         self.data_root_dir, self.data_mix, self.batch_transforms = data_root_dir, data_mix, batch_transforms
@@ -435,6 +436,7 @@ class RLDSDataset(IterableDataset):
             traj_read_threads=len(mixture_spec),
             train=train,
             normalize_data=normalize_data,
+            dataset_statistics_map=dataset_statistics_map,
         )
 
         # If applicable, enable image augmentations

@@ -357,7 +357,7 @@ ACTION_TOKENIZERS = {
         VQActionTokenizer, vq_vae_path="/iliad/u/belkhale/openvla-mini/vq/pretrain_vq+mx-libero_90+fach-7+ng-7+nemb-128+nlatent-512"
     ),
     "libero_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer, vq_vae_path="/u/ajaysri/openvla-mini-aux-tasks/vq/pretrain_vq+mx-libero_90+fach-7+ng-7+nemb-128+nlatent-512", use_extra=True
+        VQActionTokenizer, vq_vae_path="/workspace/openvla-mini-aux/vq/pretrain_vq+mx-libero_90+fach-7+ng-7+nemb-128+nlatent-512", use_extra=True
     ),
     "libero_vq_h0_extra_action_tokenizer": partial(
         VQActionTokenizer, vq_vae_path="/iliad/u/belkhale/openvla-mini/vq/pretrain_vq+mx-libero_90+fach-0+ng-7+nemb-128+nlatent-512", use_extra=True
@@ -366,7 +366,7 @@ ACTION_TOKENIZERS = {
     "fast_action_tokenizer": FastActionTokenizer,
     "robocasa_fast_tokenizer_noop_filter": partial(
         FastActionTokenizer,
-        tokenizer_path="/u/ajaysri/openvla-mini-aux-tasks/fast_tokenizer",
+        tokenizer_path="fast_tokenizer",
         use_extra=True
     ),
     # bridge
@@ -377,7 +377,52 @@ ACTION_TOKENIZERS = {
     ),
     "robocasa_vq_extra_action_tokenizer": partial(
         VQActionTokenizer,
-        vq_vae_path="/afs/.ir/users/a/j/ajaysri/openvla-mini-aux/vq/vq_noop_filter",
+        vq_vae_path="vq/vq_noop_filter",
+        use_extra=True,
+    ),
+    "panda_sink_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/pretrain_vq+mx-panda_pnp_counter_to_sink+fach-7+ng-7+nemb-256+nlatent-512",
+        use_extra=True,
+    ),
+    "panda_sink+pretrain_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda_pnp_counter_to_sink+pretrain",
+        use_extra=True,
+    ),
+    "panda_sink+pretrain_vq_extra_action_tokenizer_aligned": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda_pnp_counter_to_sink+pretrain_aligned",
+        use_extra=True,
+    ),
+    "panda+kinova_sink_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda+kinova_pnp_counter_to_sink",
+        use_extra=True,
+    ),
+    "panda+kinova_sink_vq_extra_action_tokenizer_aligned": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda+kinova_pnp_counter_to_sink_aligned",
+        use_extra=True,
+    ),
+    "xembod_sink_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/xembod_pnp_counter_to_sink",
+        use_extra=True,
+    ),
+    "mg_pnp_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_pnp",
+        use_extra=True,
+    ),
+    "mg_kinova_pnp_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_pnp",
+        use_extra=True,
+    ),
+    "panda_pnp_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda_pnp",
         use_extra=True,
     ),
 }

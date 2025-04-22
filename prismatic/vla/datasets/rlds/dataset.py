@@ -450,6 +450,39 @@ def apply_frame_transforms(
         frame["task"] = fn(frame["task"])
         frame["observation"] = dl.vmap(fn)(frame["observation"])
         return frame
+    
+    def convert_coord_to_cropped(coord, crop_bbox):
+        new_x = (coord[..., 0] - crop_bbox[0]) / (crop_bbox[2] - crop_bbox[0])
+        new_y = (coord[..., 1] - crop_bbox[1]) / (crop_bbox[3] - crop_bbox[1])
+
+        return new_x, new_y
+
+    # NOTE: this probably only works when window_size is 1, since chunking isn't handled
+    def apply_obs_augment(fn: Callable[[Dict], Dict], frame: Dict) -> Dict:
+        frame["task"], _ = fn(frame["task"])
+        obs_augment, aug_infos = fn(frame["observation"])
+
+        # for key in obs_augment:
+        #     if key.startswith("image_"):
+        #         obs_augment[key] = obs_augment[key][None]
+
+        frame["observation"] = obs_augment
+        crop_bbox = aug_infos.get("primary", {}).get("crop_bbox", None)
+
+        if crop_bbox is not None:
+            for key in frame.keys():
+                if "bboxes" in key:
+                    new_x_min, new_y_min = convert_coord_to_cropped(frame[key][..., :2], crop_bbox)
+                    new_x_max, new_y_max = convert_coord_to_cropped(frame[key][..., 2:], crop_bbox)
+                    new_bbox = tf.stack([new_x_min, new_y_min, new_x_max, new_y_max], axis=-1)
+                    frame[key] = tf.clip_by_value(new_bbox, 0.0, 1.0)
+
+                elif "pose" in key:
+                    new_x, new_y = convert_coord_to_cropped(frame[key], crop_bbox)
+                    new_pose = tf.stack([new_x, new_y], axis=-1)
+                    frame[key] = tf.clip_by_value(new_pose, 0.0, 1.0)
+
+        return frame
 
     # Decode + resize images (and depth images)
     dataset = dataset.frame_map(
@@ -465,7 +498,7 @@ def apply_frame_transforms(
         def aug(frame: dict):
             seed = tf.random.uniform([2], maxval=tf.dtypes.int32.max, dtype=tf.int32)
             aug_fn = partial(obs_transforms.augment, seed=seed, augment_kwargs=image_augment_kwargs)
-            return apply_obs_transform(aug_fn, frame)
+            return apply_obs_augment(aug_fn, frame)
 
         dataset = dataset.frame_map(aug, num_parallel_calls)
 
@@ -515,6 +548,7 @@ def make_interleaved_dataset(
     traj_transform_threads: Optional[int] = None,
     traj_read_threads: Optional[int] = None,
     normalize_data: bool = True,
+    dataset_statistics_map: Optional[Dict] = None,
 ) -> dl.DLataset:
     """
     Creates an interleaved dataset from list of dataset configs (kwargs). Returns a dataset of batched frames.
@@ -594,12 +628,21 @@ def make_interleaved_dataset(
             if "dataset_frame_transform_kwargs" in dataset_kwargs
             else {}
         )
+
+        dataset_name = dataset_kwargs["name"]
+        if dataset_statistics_map is not None and dataset_name in dataset_statistics_map:
+            dataset_statistics_name = dataset_statistics_map[dataset_name]
+            overwatch.info(f"Using dataset statistics from {dataset_statistics_name} for {dataset_name}")
+        else:
+            dataset_statistics_name = dataset_name
+        dataset_statistics = all_dataset_statistics[dataset_statistics_name]
+
         dataset, _ = make_dataset_from_rlds(
             **dataset_kwargs,
             train=train,
             num_parallel_calls=threads,
             num_parallel_reads=reads,
-            dataset_statistics=all_dataset_statistics[dataset_kwargs["name"]],
+            dataset_statistics=dataset_statistics,
             normalize_data=normalize_data,
         )
         dataset = apply_trajectory_transforms(

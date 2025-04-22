@@ -52,6 +52,7 @@ def get_vla_dataset_and_collator(
     past_2D_trace_window_size: int = 0,
     subset_percentages: Optional[Dict[str, float]] = None,
     global_subset_fraction: Optional[float] = None,
+    dataset_statistics_map: Optional[Dict] = None,
 ) -> Tuple[Dataset, ActionTokenizer, PaddedCollatorForActionPrediction]:
     """Initialize RLDS Dataset (wraps TFDS), ActionTokenizer, and initialize transform/collation functions."""
 
@@ -139,6 +140,7 @@ def get_vla_dataset_and_collator(
         normalize_data=normalize_data,
         subset_percentages=subset_percentages,
         global_subset_fraction=global_subset_fraction,
+        dataset_statistics_map=dataset_statistics_map,
     )
 
     return dataset, action_tokenizer, collator

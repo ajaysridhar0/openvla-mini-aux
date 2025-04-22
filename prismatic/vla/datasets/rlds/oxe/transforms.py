@@ -952,4 +952,12 @@ OXE_STANDARDIZATION_TRANSFORMS = {
     "sawyer_500_pnpcountertocab": libero_dataset_transform,
     "sawyer_500_pnpcountertomicrowave": libero_dataset_transform,
     "sawyer_500_pnpsinktocounter": libero_dataset_transform,
+    "panda_pnp_counter_to_sink": libero_dataset_transform,
+    "kinova_pnp_counter_to_sink": libero_dataset_transform,
+    "sawyer_pnp_counter_to_sink": libero_dataset_transform,
+    "ur5_pnp_counter_to_sink": libero_dataset_transform,
+    "panda_pnp_pretrain": libero_dataset_transform,
+    "mg_pnp": libero_dataset_transform,
+    "mg_kinova_pnp": libero_dataset_transform,
+    "panda_pnp": libero_dataset_transform,
 }

@@ -296,17 +296,10 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("solid__kinova3_mimicgen", 1.0),
     ],
     "half_sawyer_half_garbage": [
-        ("sawyer__pn_p_counter_to_cab_aux", 0.28849956172432545),
-        ("sawyer__pn_p_counter_to_sink_aux", 0.3604427773684267),
-        ("sawyer__pn_p_sink_to_counter_aux", 0.25923149024504605),
-        ("ghost__kinova3_mimicgen", 0.0114782713327753),
-        ("ghost__panda_mimicgen", 0.0114782713327753),
-        ("ghost__sawyer_mimicgen", 0.0114782713327753),
-        ("ghost__ur5e_mimicgen", 0.0114782713327753),
-        ("solid__kinova3_mimicgen", 0.0114782713327753),
-        ("solid__panda_mimicgen", 0.0114782713327753),
-        ("solid__sawyer_mimicgen", 0.0114782713327753),
-        ("solid__ur5e_mimicgen", 0.0114782713327753),
+        ("sawyer__pn_p_counter_to_cab_aux", 1.0),
+        ("sawyer__pn_p_counter_to_sink_aux", 1.0),
+        ("sawyer__pn_p_sink_to_counter_aux", 1.0),
+        ("solid__sawyer_mimicgen", 0.1),
     ],
      "good_saywer_garbage_everything": [
         ("sawyer__pn_p_counter_to_cab_aux", 1),
@@ -355,10 +348,43 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         # solid
         ("solid__sawyer_mimicgen", 1.0),
         ("solid__panda_mimicgen", 1.0),
-        ("solid_u_r5e_mimicgen", 1.0),
+        ("solid__ur5e_mimicgen", 1.0),
         ("solid__kinova3_mimicgen", 1.0),
     ],
 
+    "panda_pnp_counter_to_sink": [
+        ("panda_pnp_counter_to_sink", 1.0),
+    ],
+
+    "xembod_pnp_counter_to_sink": [
+        ("panda_pnp_counter_to_sink", 1.0),
+        ("kinova_pnp_counter_to_sink", 1.0),
+        ("sawyer_pnp_counter_to_sink", 1.0),
+        ("ur5_pnp_counter_to_sink", 1.0),
+    ],
+
+    "panda+kinova_pnp_counter_to_sink": [
+        ("panda_pnp_counter_to_sink", 1.0),
+        ("kinova_pnp_counter_to_sink", 1.0),
+    ],
+
+    "panda_pnp_counter_to_sink+pretrain": [
+        ("panda_pnp_counter_to_sink", 1.0),
+        ("panda_pnp_pretrain", 1.0)
+    ],
+    "mg_pnp": [
+        ("mg_pnp", 1.0),
+    ],
+    "mg_kinova_np": [
+        ("mg_kinova_pnp", 1.0),
+    ],
+   "panda+mg": [
+        ("mg_pnp", 0.01),
+        ("panda_pnp", 1.0)
+    ],
+   "panda_pnp": [
+        ("panda_pnp", 1.0)
+    ],
     
     # TODO (ajaysri): add partial held-out mixture
 }

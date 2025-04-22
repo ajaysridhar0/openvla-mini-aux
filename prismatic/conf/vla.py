@@ -67,8 +67,8 @@ class VLAConfig(ChoiceRegistry):
     future_2D_trace_window_size: int = 40           # Future 2D Trace Window Size
     past_obj_pose_window_size: int = 0              # Past Object Pose Window Size
     past_2D_trace_window_size: int = 0              # Past 2D Trace Window Size
-    obj_pose_stride: int = 5                       # Object Pose Stride
-    ee_pose_2D_stride: int = 5                      # End-Effector 2D Trace Stride
+    obj_pose_stride: int = 8                        # Object Pose Stride
+    ee_pose_2D_stride: int = 8                      # End-Effector 2D Trace Stride
 
     normalize_data: bool = True  # Add this field
 

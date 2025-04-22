@@ -20,14 +20,14 @@ import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, Dict
 
 import draccus
 import torch
 import torch.distributed as dist
 import yaml
 
-from prismatic.conf import VLAConfig, VLARegistry
+from prismatic.conf import VLAConfig, VLARegistry, DatasetConfig
 from prismatic.models import load, load_vla
 from prismatic.overwatch import initialize_overwatch
 from prismatic.training import VLAMetrics, get_train_strategy
@@ -35,6 +35,8 @@ from prismatic.util import set_global_seed
 from prismatic.vla import get_vla_dataset_and_collator
 from prismatic.vla.datasets.rlds.utils.data_utils import save_dataset_statistics
 from prismatic.vla.action_tokenizer import FastActionTokenizer
+from prismatic.preprocessing import get_dataset_and_collator
+
 # Sane Defaults
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -42,7 +44,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 # Initialize Overwatch =>> Wraps `logging.Logger`
 overwatch = initialize_overwatch(__name__)
 
-DATA_DIR = os.environ["DATA_DIR"]
+DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.path.dirname(__file__), "../"))
 
 @dataclass
 class TrainConfig:
@@ -57,7 +59,7 @@ class TrainConfig:
     data_root_dir: Path = Path(                                     # Path to Open-X dataset directory
         "datasets/open-x-embodiment"
     )
-    run_root_dir: Path = Path(DATA_DIR, "runs")                               # Path to directory to store logs & checkpoints
+    run_root_dir: Path = Path(DATA_DIR, "runs")                     # Path to directory to store logs & checkpoints
 
     # Resume Run Parameters
     pretrained_checkpoint: Optional[Path] = None                    # Absolute Path to Checkpoint
@@ -69,9 +71,10 @@ class TrainConfig:
     # Run Arguments
     run_id: Optional[str] = None                                    # Run ID for logging, Weights & Biases
     run_id_note: Optional[str] = None                               # Extra note for logging, Weights & Biases
-    save_interval: int = 2500                                       # Interval for saving checkpoints (in steps)
+    save_interval: int = 10000                                       # Interval for saving checkpoints (in steps)
     image_aug: bool = False                                         # Whether to enable image augmentations
     seed: int = 7                                                   # Random seed (for reproducibility)
+    dataset_statistics_map: Dict[str, str] = None                   # Dict for action norm using other dataset stats
 
     # HF Hub Credentials (for any gated models)
     hf_token: Union[str, Path] = Path(".hf_token")                  # Environment variable or Path to HF Token
@@ -79,7 +82,7 @@ class TrainConfig:
     # Tracking Parameters
     trackers: Tuple[str, ...] = ("jsonl", "wandb")                  # Trackers to initialize (if W&B, add config!)
     # TODO (ajaysri): debug wandb
-    wandb_project: str = "prismatic"                                # Name of W&B project to log to (use default!)
+    wandb_project: str = "prismatic-aux"                            # Name of W&B project to log to (use default!)
     wandb_entity: str = "ajaysridhar"                               # Name of entity to log under
 
     random_llm_weights: bool = False
@@ -265,6 +268,7 @@ def train(cfg: TrainConfig) -> None:
         past_2D_trace_window_size=cfg.vla.past_2D_trace_window_size,
         subset_percentages=subset_percentages,
         global_subset_fraction=cfg.global_subset_fraction,
+        dataset_statistics_map=cfg.dataset_statistics_map,
     )
 
     # Save dataset statistics for de-normalization at inference time
