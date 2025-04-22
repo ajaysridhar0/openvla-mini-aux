@@ -97,10 +97,14 @@ def main():
     vqvae_model = VqVae(**vq_config)
 
     wandb.init(name=exp_name, project=args.wandb_project, entity=args.wandb_entity, config=vars(args))
-
     # make all required directories.
     save_path = Path(args.save_folder) / exp_name
-    save_path.mkdir(parents=True, exist_ok=False)
+    # Check if directory exists, if so create a new one with datetime suffix
+    if save_path.exists():
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        save_path = Path(args.save_folder) / f"{exp_name}_{timestamp}"
+    save_path.mkdir(parents=True, exist_ok=True)
     (save_path / "checkpoints").mkdir()
 
     # save to experiment
