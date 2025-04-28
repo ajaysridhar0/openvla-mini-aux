@@ -41,9 +41,11 @@ def augment(obs: Dict, seed: tf.Tensor, augment_kwargs: Union[Dict, Dict[str, Di
                 obs[f"image_{name}"],
                 **kwargs,
                 seed=seed + i,  # augment each image differently
-            )[None],
-            lambda: (obs[f"image_{name}"][None], default_aug_info),  # skip padding images
+            ),
+            lambda: (obs[f"image_{name}"], default_aug_info),  # skip padding images
         )
+
+        obs[f"image_{name}"] = obs[f"image_{name}"][None]
 
         aug_infos[name] = aug_info
 

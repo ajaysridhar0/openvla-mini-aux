@@ -375,16 +375,64 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
     "mg_pnp": [
         ("mg_pnp", 1.0),
     ],
-    "mg_kinova_np": [
+    "mg_pnp_lite": [
+        ("mg_pnp_lite", 1.0),
+    ],
+    "mg_kinova_pnp": [
         ("mg_kinova_pnp", 1.0),
     ],
-   "panda+mg": [
+    "mg_kinova_pnp_lite": [
+        ("mg_kinova_pnp_lite", 1.0),
+    ],
+    "mg_ur5e_pnp": [
+        ("mg_ur5e_pnp", 1.0),
+    ],
+    "mg_ur5e_pnp_lite": [
+        ("mg_ur5e_pnp_lite", 1.0),
+    ],
+    "mg_iiwa_pnp": [
+        ("mg_iiwa_pnp", 1.0),
+    ],
+    "mg_iiwa_pnp_lite": [
+        ("mg_iiwa_pnp_lite", 1.0),
+    ],
+    "panda+mg": [
         ("mg_pnp", 0.01),
         ("panda_pnp", 1.0)
     ],
-   "panda_pnp": [
+    "panda+mg_lite": [
+        ("mg_pnp_lite", 0.05),
         ("panda_pnp", 1.0)
     ],
+    "panda_pnp": [
+        ("panda_pnp", 1.0)
+    ],
+    "jaco_pnp": [
+        ("jaco_pnp", 1.0)
+    ],
+    "jaco+mg": [
+        ("mg_pnp", 0.01),
+        ("jaco_pnp", 1.0)
+    ],
+    "jaco+mg_lite": [
+        ("mg_pnp_lite", 0.05),
+        ("jaco_pnp", 1.0)
+    ],
+    "panda_real": [
+        ("franka_pnpcountertosink_aux", 1.0),
+        ("franka_pnpsinktocounter_aux", 1.0)
+    ],
+    "viper_real": [
+        ("viper_pnpcountertosink_aux", 1.0),
+        ("viper_pnpsinktocounter_aux", 1.0)
+    ],
+    "panda_viper_real_mg": [
+        ("franka_pnpcountertosink_aux", 1.0),
+        ("franka_pnpsinktocounter_aux", 1.0),
+        ("viper_pnpcountertosink_aux", 1.0),
+        ("viper_pnpsinktocounter_aux", 1.0),
+        ("mg_pnp", 0.01)  # 0.002 for tokenizer
+    ]
     
     # TODO (ajaysri): add partial held-out mixture
 }

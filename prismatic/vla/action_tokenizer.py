@@ -415,14 +415,69 @@ ACTION_TOKENIZERS = {
         vq_vae_path="vq/mg_pnp",
         use_extra=True,
     ),
+    "mg_pnp_lite_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_pnp_lite",
+        use_extra=True,
+    ),
     "mg_kinova_pnp_vq_extra_action_tokenizer": partial(
         VQActionTokenizer,
-        vq_vae_path="vq/mg_pnp",
+        vq_vae_path="vq/mg_kinova_pnp",
+        use_extra=True,
+    ),
+    "mg_kinova_pnp_lite_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_kinova_pnp_lite",
+        use_extra=True,
+    ),
+    "mg_ur5e_pnp_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_ur5e_pnp",
+        use_extra=True,
+    ),
+    "mg_ur5e_pnp_lite_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_ur5e_pnp_lite",
+        use_extra=True,
+    ),
+    "mg_iiwa_pnp_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_iiwa_pnp",
+        use_extra=True,
+    ),
+    "mg_iiwa_pnp_lite_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_iiwa_pnp_lite",
         use_extra=True,
     ),
     "panda_pnp_vq_extra_action_tokenizer": partial(
         VQActionTokenizer,
         vq_vae_path="vq/panda_pnp",
+        use_extra=True,
+    ),
+    "jaco_pnp_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/jaco_pnp",
+        use_extra=True,
+    ),
+    "panda_real_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda_real",
+        use_extra=True,
+    ),
+    "viper_real_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/viper_real",
+        use_extra=True,
+    ),
+    "panda_viper_real_mg_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda_viper_real_mg",
+        use_extra=True,
+    ),
+    "panda_viper_real_mg_decoder_only_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda_viper_real_mg_decoder_only",
         use_extra=True,
     ),
 }
