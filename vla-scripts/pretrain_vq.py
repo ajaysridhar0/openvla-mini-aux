@@ -42,6 +42,7 @@ def main():
     p.add_argument("--epochs", type=int, default=10)
     p.add_argument("--save_every_n_epochs", type=int, default=2)
     p.add_argument("--device", type=str, default="cuda")
+    # p.add_argument("--train_decoder_only", action="store_true")
 
     # residual VQ arguments
     p.add_argument("--action_dim", type=int, required=True, help="Action dimension (usually 7)")
@@ -94,6 +95,7 @@ def main():
         "load_dir": args.load_dir,
         "encoder_loss_multiplier": args.encoder_loss_multiplier,
         "act_scale": args.act_scale,
+        # "train_decoder_only": args.train_decoder_only
     }
 
     vqvae_model = VqVae(**vq_config)

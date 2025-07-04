@@ -415,9 +415,29 @@ ACTION_TOKENIZERS = {
         vq_vae_path="vq/mg_pnp",
         use_extra=True,
     ),
+    "mg_turn_on_sink_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_turn_on_sink",
+        use_extra=True,
+    ),
+    "mg_flip_mug_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_flip_mug",
+        use_extra=True,
+    ),
     "mg_pnp_lite_vq_extra_action_tokenizer": partial(
         VQActionTokenizer,
         vq_vae_path="vq/mg_pnp_lite",
+        use_extra=True,
+    ),
+    "mg_turn_on_sink_lite_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_turn_on_sink_lite",
+        use_extra=True,
+    ),
+    "mg_flip_mug_lite_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_flip_mug_lite",
         use_extra=True,
     ),
     "mg_kinova_pnp_vq_extra_action_tokenizer": partial(
@@ -460,9 +480,34 @@ ACTION_TOKENIZERS = {
         vq_vae_path="vq/jaco_pnp",
         use_extra=True,
     ),
+    "panda_turn_on_sink_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda_turn_on_sink",
+        use_extra=True,
+    ),
+    "jaco_turn_on_sink_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/jaco_turn_on_sink",
+        use_extra=True,
+    ),
     "panda_real_vq_extra_action_tokenizer": partial(
         VQActionTokenizer,
         vq_vae_path="vq/panda_real",
+        use_extra=True,
+    ),
+    "panda_real_vary_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda_real_vary",
+        use_extra=True,
+    ),
+    "viper_real_vary_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/viper_real_vary",
+        use_extra=True,
+    ),
+    "panda_viper_real_mg_vary_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda_viper_real_mg_vary",
         use_extra=True,
     ),
     "viper_real_vq_extra_action_tokenizer": partial(

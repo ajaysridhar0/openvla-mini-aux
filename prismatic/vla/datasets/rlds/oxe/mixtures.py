@@ -375,8 +375,20 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
     "mg_pnp": [
         ("mg_pnp", 1.0),
     ],
+    "mg_turn_on_sink": [
+        ("mg_turn_on_sink", 1.0),
+    ],
+    "mg_flip_mug": [
+        ("mg_flip_mug", 1.0),
+    ],
     "mg_pnp_lite": [
         ("mg_pnp_lite", 1.0),
+    ],
+    "mg_turn_on_sink_lite": [
+        ("mg_turn_on_sink_lite", 1.0),
+    ],
+    "mg_flip_mug_lite": [
+        ("mg_flip_mug_lite", 1.0),
     ],
     "mg_kinova_pnp": [
         ("mg_kinova_pnp", 1.0),
@@ -407,6 +419,50 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
     "panda_pnp": [
         ("panda_pnp", 1.0)
     ],
+    "panda_turn_on_sink": [
+        ("panda_turn_on_sink", 1.0)
+    ],
+    "jaco_turn_on_sink": [
+        ("jaco_turn_on_sink", 1.0)
+    ],
+    "panda+mg_turn_on_sink": [
+        ("mg_turn_on_sink", 0.01),
+        ("panda_turn_on_sink", 1.0)
+    ],
+    "jaco+mg_turn_on_sink": [
+        ("mg_turn_on_sink", 0.01),
+        ("jaco_turn_on_sink", 1.0)
+    ],
+    "panda+mg_turn_on_sink_lite": [
+        ("mg_turn_on_sink_lite", 0.05),
+        ("panda_turn_on_sink", 1.0)
+    ],
+    "jaco+mg_turn_on_sink_lite": [
+        ("mg_turn_on_sink_lite", 0.05),
+        ("jaco_turn_on_sink", 1.0)
+    ],
+    "panda_flip_mug": [
+        ("panda_flip_mug", 1.0)
+    ],
+    "jaco_flip_mug": [
+        ("jaco_flip_mug", 1.0)
+    ],
+    "panda+mg_flip_mug": [
+        ("mg_flip_mug", 0.01),
+        ("panda_flip_mug", 1.0)
+    ],
+    "jaco+mg_flip_mug": [
+        ("mg_flip_mug", 0.01),
+        ("jaco_flip_mug", 1.0)
+    ],
+    "panda+mg_flip_mug_lite": [
+        ("mg_flip_mug_lite", 0.05),
+        ("panda_flip_mug", 1.0)
+    ],
+    "jaco+mg_flip_mug_lite": [
+        ("mg_flip_mug_lite", 0.05),
+        ("jaco_flip_mug", 1.0)
+    ],
     "jaco_pnp": [
         ("jaco_pnp", 1.0)
     ],
@@ -422,14 +478,29 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("franka_pnpcountertosink_aux", 1.0),
         ("franka_pnpsinktocounter_aux", 1.0)
     ],
+    "panda_real_vary": [
+        ("franka_pnpcountertosink_vary_aux", 1.0),
+        ("franka_pnpsinktocounter_aux", 1.0)
+    ],
     "viper_real": [
         ("viper_pnpcountertosink_aux", 1.0),
+        ("viper_pnpsinktocounter_aux", 1.0)
+    ],
+    "viper_real_vary": [
+        ("viper_pnpcountertosink_vary_aux", 1.0),
         ("viper_pnpsinktocounter_aux", 1.0)
     ],
     "panda_viper_real_mg": [
         ("franka_pnpcountertosink_aux", 1.0),
         ("franka_pnpsinktocounter_aux", 1.0),
         ("viper_pnpcountertosink_aux", 1.0),
+        ("viper_pnpsinktocounter_aux", 1.0),
+        ("mg_pnp", 0.01)  # 0.002 for tokenizer
+    ],
+    "panda_viper_real_vary_mg": [
+        ("franka_pnpcountertosink_vary_aux", 1.0),
+        ("franka_pnpsinktocounter_aux", 1.0),
+        ("viper_pnpcountertosink_vary_aux", 1.0),
         ("viper_pnpsinktocounter_aux", 1.0),
         ("mg_pnp", 0.01)  # 0.002 for tokenizer
     ]

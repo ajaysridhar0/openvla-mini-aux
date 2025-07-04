@@ -53,6 +53,7 @@ def get_vla_dataset_and_collator(
     subset_percentages: Optional[Dict[str, float]] = None,
     global_subset_fraction: Optional[float] = None,
     dataset_statistics_map: Optional[Dict] = None,
+    non_action_datasets: Optional[List] = None,
 ) -> Tuple[Dataset, ActionTokenizer, PaddedCollatorForActionPrediction]:
     """Initialize RLDS Dataset (wraps TFDS), ActionTokenizer, and initialize transform/collation functions."""
 
@@ -82,6 +83,7 @@ def get_vla_dataset_and_collator(
     }
 
     batch_transforms = []
+    non_action_transforms = []
     # remove whitespace
     transform_types = transform_types.replace(" ", "")
     transform_types = transform_types.split(",")
@@ -93,6 +95,7 @@ def get_vla_dataset_and_collator(
         transform_weights = [1/len(transform_types)] * len(transform_types) # default to equal weighting
 
     for transform_type, weight in zip(transform_types, transform_weights):
+        non_action_rlds_transform = None
         if '->' in transform_type:
             chained_transforms = transform_type.split("->")
             if "" in chained_transforms:
@@ -102,18 +105,40 @@ def get_vla_dataset_and_collator(
                 action_tokenizer=action_tokenizer,
                 aux_task_types=chained_transforms,
             )
+
+            non_action_chained_transforms = chained_transforms.copy()
+
+            if "low_level_motion" in non_action_chained_transforms:  # requires action for annotation
+                non_action_chained_transforms.remove("low_level_motion")
+
+            if non_action_chained_transforms:
+                non_action_rlds_transform = RLDSAuxTransform(
+                    **transform_base_args,
+                    aux_task_type=non_action_chained_transforms[0]  # only use first transform for now
+                )
+
         elif transform_type == "action":
             rlds_transform = RLDSBatchTransform(
                 **transform_base_args, 
                 action_tokenizer=action_tokenizer, 
-            )
+            )            
         else:
             rlds_transform = RLDSAuxTransform(
                 **transform_base_args, 
                 aux_task_type=transform_type, 
             )
-        batch_transforms.append((rlds_transform, weight))
 
+            if transform_type != "low_level_motion":  # requires action for annotation
+                non_action_rlds_transform = rlds_transform
+
+        batch_transforms.append((rlds_transform, weight))
+        if non_action_rlds_transform is not None:
+            non_action_transforms.append((non_action_rlds_transform, weight))
+
+    if non_action_transforms:
+        sum_weights = sum([weight for transform, weight in non_action_transforms])
+        non_action_transforms = [(transform, weight / sum_weights) for transform, weight in non_action_transforms]
+    
     collator = PaddedCollatorForActionPrediction(
         tokenizer.model_max_length, tokenizer.pad_token_id, padding_side=padding_side
     )
@@ -141,6 +166,8 @@ def get_vla_dataset_and_collator(
         subset_percentages=subset_percentages,
         global_subset_fraction=global_subset_fraction,
         dataset_statistics_map=dataset_statistics_map,
+        non_action_datasets=non_action_datasets,
+        non_action_transforms=non_action_transforms,
     )
 
     return dataset, action_tokenizer, collator

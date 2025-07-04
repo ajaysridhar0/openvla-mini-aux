@@ -20,7 +20,7 @@ import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional, Tuple, Union, Dict
+from typing import Optional, Tuple, Union, Dict, List
 
 import draccus
 import torch
@@ -75,6 +75,7 @@ class TrainConfig:
     image_aug: bool = False                                         # Whether to enable image augmentations
     seed: int = 7                                                   # Random seed (for reproducibility)
     dataset_statistics_map: Dict[str, str] = None                   # Dict for action norm using other dataset stats
+    non_action_datasets: Optional[List] = None
 
     # HF Hub Credentials (for any gated models)
     hf_token: Union[str, Path] = Path(".hf_token")                  # Environment variable or Path to HF Token
@@ -269,6 +270,7 @@ def train(cfg: TrainConfig) -> None:
         subset_percentages=subset_percentages,
         global_subset_fraction=cfg.global_subset_fraction,
         dataset_statistics_map=cfg.dataset_statistics_map,
+        non_action_datasets=cfg.non_action_datasets,
     )
 
     # Save dataset statistics for de-normalization at inference time

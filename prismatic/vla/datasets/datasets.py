@@ -383,14 +383,29 @@ class RLDSDataset(IterableDataset):
         subset_percentages: Optional[Dict[str, float]] = None,
         global_subset_fraction: Optional[float] = None,
         dataset_statistics_map: Optional[Dict] = None,
+        non_action_datasets: Optional[List] = None,
+        non_action_transforms: Optional[List[Tuple[RLDSBatchTransform, float]]] = None,
     ) -> None:
         """Lightweight wrapper around RLDS TFDS Pipeline for use with PyTorch/OpenVLA Data Loaders."""
         self.data_root_dir, self.data_mix, self.batch_transforms = data_root_dir, data_mix, batch_transforms
+        self.non_action_datasets = non_action_datasets
+        if self.non_action_datasets is None:
+            self.non_action_datasets = []
 
         if not isinstance(self.batch_transforms, list):
             self.batch_transforms = [(self.batch_transforms, 1.0)]
         else:
             assert abs(sum(weight for _, weight in self.batch_transforms) - 1.0) < 1e-6, "Batch transform weights must sum to 1.0!"
+
+        if len(self.non_action_datasets) == 0:
+            self.non_action_transforms = None
+        else:
+            assert non_action_transforms is not None
+            if not isinstance(self.non_action_transforms, list):
+                self.non_action_transforms = [(non_action_transforms, 1.0)]
+            else:
+                self.non_action_transforms = non_action_transforms
+                assert abs(sum(weight for _, weight in self.non_action_transforms) - 1.0) < 1e-6, "Non action transform weights must sum to 1.0!"
 
         # Configure RLDS Dataset(s)
         if self.data_mix in OXE_NAMED_MIXTURES:
@@ -464,9 +479,15 @@ class RLDSDataset(IterableDataset):
         return make_interleaved_dataset(**rlds_config)
 
     def __iter__(self) -> Dict[str, Any]:
-        transforms, weights = zip(*self.batch_transforms)
         for rlds_batch in self.dataset.as_numpy_iterator():
             # Select a random transform using fixed ordering of transforms and weights
+
+            dataset_name = rlds_batch["dataset_name"].decode()
+            if dataset_name in self.non_action_datasets:
+                transforms, weights = zip(*self.non_action_transforms)
+            else:
+                transforms, weights = zip(*self.batch_transforms)
+
             transform = np.random.choice(transforms, p=weights)
             yield transform(rlds_batch)
 

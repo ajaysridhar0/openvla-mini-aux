@@ -320,8 +320,19 @@ class VLAMetrics:
         loss = torch.stack(list(self.state["loss"])).mean().item()
         step_time, lr = np.mean(list(self.state["step_time"])), self.state["lr"][-1]
         status = self.get_status(loss)
-        l1_loss = torch.stack(list(self.state["l1_loss"])).mean().item()
-        action_accuracy = torch.stack(list(self.state["action_accuracy"])).mean().item()
+
+        l1_loss = list(self.state["l1_loss"])
+        action_accuracy = list(self.state["action_accuracy"])
+
+        if l1_loss:
+            l1_loss = torch.stack(l1_loss).mean().item()
+        else:
+            l1_loss = np.nan
+            
+        if action_accuracy:
+            action_accuracy = torch.stack(action_accuracy).mean().item()
+        else:
+            l1_loss = np.nan
 
         # Get metrics per dataset and prediction type
         dataset_metrics = {}
