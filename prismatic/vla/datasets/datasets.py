@@ -401,7 +401,7 @@ class RLDSDataset(IterableDataset):
             self.non_action_transforms = None
         else:
             assert non_action_transforms is not None
-            if not isinstance(self.non_action_transforms, list):
+            if not isinstance(non_action_transforms, list):
                 self.non_action_transforms = [(non_action_transforms, 1.0)]
             else:
                 self.non_action_transforms = non_action_transforms
