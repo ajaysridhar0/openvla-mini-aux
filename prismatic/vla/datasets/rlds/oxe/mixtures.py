@@ -412,15 +412,29 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("mg_pnp", 0.01),
         ("panda_pnp", 1.0)
     ],
+    "panda_og+mg": [
+        ("mg_pnp", 0.01),
+        ("panda_og_pnp", 1.0)
+    ],
     "panda+mg_lite": [
         ("mg_pnp_lite", 0.05),
         ("panda_pnp", 1.0)
     ],
+    "panda_og+mg_lite": [
+        ("mg_pnp_lite", 0.05),
+        ("panda_og_pnp", 1.0)
+    ],
     "panda_pnp": [
         ("panda_pnp", 1.0)
     ],
+    "panda_og_pnp": [
+        ("panda_og_pnp", 1.0)
+    ],
     "panda_turn_on_sink": [
         ("panda_turn_on_sink", 1.0)
+    ],
+    "panda_og_turn_on_sink": [
+        ("panda_og_turn_on_sink", 1.0)
     ],
     "jaco_turn_on_sink": [
         ("jaco_turn_on_sink", 1.0)
@@ -428,6 +442,10 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
     "panda+mg_turn_on_sink": [
         ("mg_turn_on_sink", 0.01),
         ("panda_turn_on_sink", 1.0)
+    ],
+    "panda_og+mg_turn_on_sink": [
+        ("mg_turn_on_sink", 0.01),
+        ("panda_og_turn_on_sink", 1.0)
     ],
     "jaco+mg_turn_on_sink": [
         ("mg_turn_on_sink", 0.01),
@@ -437,6 +455,10 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("mg_turn_on_sink_lite", 0.05),
         ("panda_turn_on_sink", 1.0)
     ],
+    "panda_og+mg_turn_on_sink_lite": [
+        ("mg_turn_on_sink_lite", 0.05),
+        ("panda_og_turn_on_sink", 1.0)
+    ],
     "jaco+mg_turn_on_sink_lite": [
         ("mg_turn_on_sink_lite", 0.05),
         ("jaco_turn_on_sink", 1.0)
@@ -444,12 +466,23 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
     "panda_flip_mug": [
         ("panda_flip_mug", 1.0)
     ],
+    "panda_og_flip_mug": [
+        ("panda_og_flip_mug", 1.0)
+    ],
     "jaco_flip_mug": [
         ("jaco_flip_mug", 1.0)
     ],
     "panda+mg_flip_mug": [
         ("mg_flip_mug", 0.01),
         ("panda_flip_mug", 1.0)
+    ],
+    "panda_og+mg_flip_mug": [
+        ("mg_flip_mug", 0.01),
+        ("panda_og_flip_mug", 1.0)
+    ],
+    "panda_og+mg_flip_mug_lite": [
+        ("mg_flip_mug_lite", 0.05),
+        ("panda_og_flip_mug", 1.0)
     ],
     "jaco+mg_flip_mug": [
         ("mg_flip_mug", 0.01),

@@ -974,8 +974,10 @@ OXE_STANDARDIZATION_TRANSFORMS = {
     "panda_pnp": libero_dataset_transform,
     "jaco_pnp": libero_dataset_transform,
     "panda_turn_on_sink": libero_dataset_transform,
+    "panda_og_turn_on_sink": libero_dataset_transform,
     "panda_turn_on_sink_lite": libero_dataset_transform,
     "jaco_turn_on_sink": libero_dataset_transform,
     "panda_flip_mug": libero_dataset_transform,
+    "panda_og_flip_mug": libero_dataset_transform,
     "jaco_flip_mug": libero_dataset_transform,
 }

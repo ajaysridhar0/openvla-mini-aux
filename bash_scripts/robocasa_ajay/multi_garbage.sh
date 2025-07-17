@@ -1,0 +1,16 @@
+torchrun --standalone --nnodes 1 --nproc-per-node 8 vla-scripts/train.py \
+    --vla.type prism-qwen25-dinosiglip-224px+0_5b+mx-xembod-robocasa-full \
+    --vla.base_vlm /workspace/openvla-mini-aux/runs/prism-qwen25-extra-dinosiglip-224px+0_5b+stage-finetune+x7/ \
+    --vla.data_mix good_saywer_garbage_everything \
+    --data_root_dir /datasets/jensen/xembod_data_human_rlds_final_filter_noop_actions/ \
+    --vla.action_tokenizer extra_action_tokenizer \
+    --vla.expected_world_size 8 \
+    --vla.global_batch_size 128 \
+    --vla.per_device_batch_size 16 \
+    --vla.lr_scheduler_type "constant" \
+    --vla.max_steps 200000 \
+    --image_aug True \
+    --wandb_entity="jensen_team" \
+    --run_id_note sawyer--image_aug \
+    --run_id="multitask_1step_good_saywer_garbage_xembod" \
+    --vla.transform_types="bbox->,obj_pose->,low_level_motion->,ee_pose_2D->,action"

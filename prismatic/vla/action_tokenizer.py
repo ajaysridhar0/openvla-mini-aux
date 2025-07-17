@@ -475,14 +475,39 @@ ACTION_TOKENIZERS = {
         vq_vae_path="vq/panda_pnp",
         use_extra=True,
     ),
+    "panda_og_pnp_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda_og_pnp",
+        use_extra=True,
+    ),
     "jaco_pnp_vq_extra_action_tokenizer": partial(
         VQActionTokenizer,
         vq_vae_path="vq/jaco_pnp",
         use_extra=True,
     ),
+    "panda_flip_mug_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda_flip_mug",
+        use_extra=True,
+    ),
+    "panda_og_flip_mug_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda_og_flip_mug",
+        use_extra=True,
+    ),
+    "jaco_flip_mug_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/jaco_flip_mug",
+        use_extra=True,
+    ),
     "panda_turn_on_sink_vq_extra_action_tokenizer": partial(
         VQActionTokenizer,
         vq_vae_path="vq/panda_turn_on_sink",
+        use_extra=True,
+    ),
+    "panda_og_turn_on_sink_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/panda_og_turn_on_sink",
         use_extra=True,
     ),
     "jaco_turn_on_sink_vq_extra_action_tokenizer": partial(

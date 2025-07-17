@@ -1,0 +1,22 @@
+torchrun --standalone --nnodes 1 --nproc-per-node 8 vla-scripts/train.py \
+    --vla.type prism-qwen25-dinosiglip-224px+0_5b+mx-xembod-robocasa-full \
+    --vla.base_vlm /workspace/openvla-mini-aux/runs/prism-qwen25-extra-dinosiglip-224px+0_5b+stage-finetune+x7/ \
+    --vla.data_mix panda_viper_real_vary_mg \
+    --data_root_dir /datasets/jensen/jensen_xembod_human_data \
+    --vla.action_tokenizer panda_viper_real_mg_vary_vq_extra_action_tokenizer \
+    --vla.expected_world_size 8 \
+    --vla.global_batch_size 256 \
+    --vla.per_device_batch_size 32 \
+    --vla.lr_scheduler_type "constant" \
+    --vla.max_steps 30000 \
+    --vla.use_wrist_image False \
+    --vla.image_sequence_len 1 \
+    --wandb_entity="jensen_team" \
+    --run_id_note "panda+viper+mg_real_vary" \
+    --run_id="base" \
+    --pretrained_checkpoint "/workspace/openvla-mini-aux/runs/base--panda+viper+mg_real_vary_cont_from_5k/checkpoints/step-005000-epoch-27-loss=1.9729.pt" \
+    --is_resume True \
+    --resume_epoch 27 \
+    --resume_step 5000 \
+    --dataset_statistics_map '{"viper_pnpsinktocounter_aux": "viper_pnpcountertosink_vary_aux", "franka_pnpsinktocounter_aux": "franka_pnpcountertosink_vary_aux"}' \
+    --save_interval 5000 
