@@ -980,4 +980,13 @@ OXE_STANDARDIZATION_TRANSFORMS = {
     "panda_flip_mug": libero_dataset_transform,
     "panda_og_flip_mug": libero_dataset_transform,
     "jaco_flip_mug": libero_dataset_transform,
+    "mg_panda_pnp": libero_dataset_transform,
+    "mg_panda_flip_mug": libero_dataset_transform,
+    "mg_panda_turn_on_sink": libero_dataset_transform,
+    "mg_panda_og_pnp": libero_dataset_transform,
+    "mg_panda_og_flip_mug": libero_dataset_transform,
+    "mg_panda_og_turn_on_sink": libero_dataset_transform,
+    "mg_jaco_pnp": libero_dataset_transform,
+    "mg_jaco_flip_mug": libero_dataset_transform,
+    "mg_jaco_turn_on_sink": libero_dataset_transform,
 }

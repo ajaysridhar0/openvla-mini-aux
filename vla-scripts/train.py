@@ -46,6 +46,10 @@ overwatch = initialize_overwatch(__name__)
 
 DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.path.dirname(__file__), "../"))
 
+CHECKPOINT_PATTERN = re.compile(
+    r"step-(\d+)-epoch-(\d+)-loss=.*"
+)
+
 @dataclass
 class TrainConfig:
     # fmt: off
@@ -67,6 +71,7 @@ class TrainConfig:
                                                                     #   (only applicable given pretrained checkpoint)
     resume_step: Optional[int] = None                               # Global Step to Resume (should match checkpoint)
     resume_epoch: Optional[int] = None                              # Epoch to Resume (should match checkpoint)
+    resume_from_last: bool = False
 
     # Run Arguments
     run_id: Optional[str] = None                                    # Run ID for logging, Weights & Biases
@@ -166,7 +171,41 @@ def train(cfg: TrainConfig) -> None:
     # Load VLA checkpoint (if resuming from training) or Base VLM otherwise (from `cfg.vla.base_vlm` ID or Path)
     #   =>> Note :: Verifies that all parameters are loaded in FP32 on load!
     overwatch.info(f"Loading Base VLM `{cfg.vla.base_vlm}` from ID/Path")
-    if cfg.pretrained_checkpoint is not None:
+
+    vlm = None
+    if cfg.resume_from_last:
+        ckpt_dir = cfg.run_root_dir / cfg.run_id / "checkpoints"
+
+        candidates = []
+        for path in ckpt_dir.iterdir():
+            if not path.is_file():
+                continue
+
+            match = CHECKPOINT_PATTERN.match(path.name)
+            if match:
+                step = int(match.group(1))
+                epoch = int(match.group(2))
+                candidates.append((step, epoch, path))
+
+        candidates.sort(key=lambda x: x[0], reverse=True)
+        ckpt_idx = 0
+        while ckpt_idx < len(candidates):
+            ckpt = candidates[ckpt_idx]
+            try:
+                vlm = load_vla(
+                    ckpt[2],
+                    hf_token=hf_token,
+                    load_for_training=True,
+                    image_sequence_len=cfg.image_sequence_len,
+                    random_llm_weights=cfg.random_llm_weights,
+                )
+                cfg.resume_step = ckpt[0]
+                cfg.resume_epoch = ckpt[1]
+                break
+            except:
+                ckpt_idx += 1
+
+    if vlm is None and cfg.pretrained_checkpoint is not None:
         # [Validate] Pretrained Checkpoint `step` and `epoch` should match `resume_step` and `resume_epoch`
         #   =>> Note :: We make developers pass in `resume_*` arguments as an extra sanity check!
         if cfg.is_resume:
@@ -181,7 +220,7 @@ def train(cfg: TrainConfig) -> None:
             random_llm_weights=cfg.random_llm_weights,
         )
 
-    else:
+    elif vlm is None:
         vlm = load(
             cfg.vla.base_vlm, 
             hf_token=hf_token, 

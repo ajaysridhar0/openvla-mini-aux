@@ -536,8 +536,77 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("viper_pnpcountertosink_vary_aux", 1.0),
         ("viper_pnpsinktocounter_aux", 1.0),
         ("mg_pnp", 0.01)  # 0.002 for tokenizer
-    ]
-    
+    ],
+
+    # mg target datasets
+    "mg_panda_pnp": [
+        ("mg_panda_pnp", 1.0),
+    ],
+    "mg_panda_flip_mug": [
+        ("mg_panda_flip_mug", 1.0),
+    ],
+    "mg_panda_turn_on_sink": [
+        ("mg_panda_turn_on_sink", 1.0),
+    ],
+
+    "panda+mg_panda_pnp": [
+        ("panda_pnp", 1.0),
+        ("mg_panda_pnp", 0.05),
+    ],
+    "panda+mg_panda_flip_mug": [
+        ("panda_flip_mug", 1.0),
+        ("mg_panda_flip_mug", 0.05),
+    ],
+    "panda+mg_panda_pnp": [
+        ("panda_turn_on_sink", 1.0),
+        ("mg_panda_turn_on_sink", 0.05),
+    ],
+
+    "mg_panda_og_pnp": [
+        ("mg_panda_og_pnp", 1.0),
+    ],
+    "mg_panda_og_flip_mug": [
+        ("mg_panda_og_flip_mug", 1.0),
+    ],
+    "mg_panda_og_turn_on_sink": [
+        ("mg_panda_og_turn_on_sink", 1.0),
+    ],
+
+    "panda_og+mg_panda_og_pnp": [
+        ("panda_og_pnp", 1.0),
+        ("mg_panda_og_pnp", 0.05),
+    ],
+    "panda_og+mg_panda_og_flip_mug": [
+        ("panda_og_flip_mug", 1.0),
+        ("mg_panda_og_flip_mug", 0.05),
+    ],
+    "panda_og+mg_panda_og_turn_on_sink": [
+        ("panda_og_turn_on_sink", 1.0),
+        ("mg_panda_og_turn_on_sink", 0.05),
+    ],
+
+    "mg_jaco_pnp": [
+        ("mg_jaco_pnp", 1.0),
+    ],
+    "mg_jaco_flip_mug": [
+        ("mg_jaco_flip_mug", 1.0),
+    ],
+    "mg_jaco_turn_on_sink": [
+        ("mg_jaco_turn_on_sink", 1.0),
+    ],
+
+    "jaco+mg_jaco_pnp": [
+        ("jaco_pnp", 1.0),
+        ("mg_jaco_pnp", 0.05),
+    ],
+    "jaco+mg_jaco_flip_mug": [
+        ("jaco_flip_mug", 1.0),
+        ("mg_jaco_flip_mug", 0.05),
+    ],
+    "jaco+mg_jaco_turn_on_sink": [
+        ("jaco_turn_on_sink", 1.0),
+        ("mg_jaco_turn_on_sink", 0.05),
+    ],
     # TODO (ajaysri): add partial held-out mixture
 }
 # fmt: on

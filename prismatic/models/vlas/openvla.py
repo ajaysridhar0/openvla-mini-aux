@@ -47,6 +47,7 @@ class OpenVLA(PrismaticVLM):
         instruction: str,
         unnorm_key: Optional[str] = None,
         aux_task_types: Optional[List[str]] = None,
+        predict_chunk: Optional[bool] = False,
         **kwargs: str,
     ) -> Dict[str, Union[str, np.ndarray]]:
         """
@@ -122,10 +123,14 @@ class OpenVLA(PrismaticVLM):
 
             self._aux_cache_counter += 1
             output.update(aux_answers)
-        
 
-        # Add Final Action Prompt
-        prompt_builder.add_turn(role="human", message=f"What action should the robot take to {instruction.lower()}?")
+            # Add Final Action Prompt
+            prompt_builder.add_turn(role="human", message=f"Given this information, what action should the robot take?")
+
+        
+        else:
+            # Add Final Action Prompt
+            prompt_builder.add_turn(role="human", message=f"What action should the robot take to {instruction.lower()}?")
 
         prompt_text = prompt_builder.get_prompt()
 
@@ -147,7 +152,7 @@ class OpenVLA(PrismaticVLM):
 
         # Extract predicted action tokens and translate into (normalized) continuous actions
         predicted_action_token_ids = generated_ids[0, -self.get_action_dim(unnorm_key) :]
-        normalized_actions = self.action_tokenizer.decode_token_ids_to_actions(predicted_action_token_ids.cpu().numpy())
+        normalized_actions = self.action_tokenizer.decode_token_ids_to_actions(predicted_action_token_ids.cpu().numpy(), return_chunk=predict_chunk)
 
         # Un-normalize Actions
         action_norm_stats = self.get_action_stats(unnorm_key)

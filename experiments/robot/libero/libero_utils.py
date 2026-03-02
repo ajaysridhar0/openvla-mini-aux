@@ -6,11 +6,11 @@ import os
 import imageio
 import numpy as np
 import tensorflow as tf
-from libero.libero import get_libero_path
-try:
-    from libero.libero.envs import OffScreenRenderEnv
-except ImportError:
-    print("could not import libero.libero.envs.OffScreenRenderEnv since you are probably using robosuite version != 1.4.1")
+# from libero.libero import get_libero_path
+# try:
+#     from libero.libero.envs import OffScreenRenderEnv
+# except ImportError:
+#     print("could not import libero.libero.envs.OffScreenRenderEnv since you are probably using robosuite version != 1.4.1")
 
 from PIL import Image
 from experiments.robot.robot_utils import (
@@ -19,14 +19,14 @@ from experiments.robot.robot_utils import (
 )
 
 
-def get_libero_env(task, model_family, resolution=256):
-    """Initializes and returns the LIBERO environment, along with the task description."""
-    task_description = task.language
-    task_bddl_file = os.path.join(get_libero_path("bddl_files"), task.problem_folder, task.bddl_file)
-    env_args = {"bddl_file_name": task_bddl_file, "camera_heights": resolution, "camera_widths": resolution}
-    env = OffScreenRenderEnv(**env_args)
-    env.seed(0)  # IMPORTANT: seed seems to affect object positions even when using fixed initial state
-    return env, task_description
+# def get_libero_env(task, model_family, resolution=256):
+#     """Initializes and returns the LIBERO environment, along with the task description."""
+#     task_description = task.language
+#     task_bddl_file = os.path.join(get_libero_path("bddl_files"), task.problem_folder, task.bddl_file)
+#     env_args = {"bddl_file_name": task_bddl_file, "camera_heights": resolution, "camera_widths": resolution}
+#     env = OffScreenRenderEnv(**env_args)
+#     env.seed(0)  # IMPORTANT: seed seems to affect object positions even when using fixed initial state
+#     return env, task_description
 
 
 def get_libero_dummy_action(model_family: str):
@@ -36,19 +36,19 @@ def get_libero_dummy_action(model_family: str):
 
 def get_robocasa_dummy_action(robot_name: str):
     """Get dummy/no-op action, used to roll out the simulation while the robot does nothing."""
-    if robot_name == "panda":
+    if robot_name == "PandaOmron":
         return [0] * 6 + [-1] + [0] * 4 + [-1]
     else:
-        return [0] * 10 + [-1]
+        return [0] * 10 + [-1] + [-1]
     
 
 def pad_action_robocasa(action: list, robot_type: str):
-    if robot_type == "panda":
+    if robot_type == "PandaOmron":
         action = action + [0] * 4 + [-1]
         assert len(action) == 12
     else:
-        action = action[:6] + [0] * 4 + action[6:]
-        assert len(action) == 11
+        action = action[:6] + [0] * 4 + action[6:] + [-1]
+        assert len(action) == 12
     return action
 
 
@@ -94,9 +94,10 @@ def patch_model_for_generation(model):
     return model
 
 
-def save_rollout_video(rollout_images, idx, success, task_description, log_file=None):
+def save_rollout_video(rollout_images, idx, success, task_description, log_file=None, rollout_dir=None):
     """Saves an MP4 replay of an episode."""
-    rollout_dir = f"./rollouts/{DATE}"
+    if rollout_dir is None:
+        rollout_dir = f"./rollouts/{DATE}"
     os.makedirs(rollout_dir, exist_ok=True)
     processed_task_description = task_description.lower().replace(" ", "_").replace("\n", "_").replace(".", "_")[:50]
     mp4_path = f"{rollout_dir}/{DATE_TIME}--episode={idx}--success={success}--task={processed_task_description}.mp4"

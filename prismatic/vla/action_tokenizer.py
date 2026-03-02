@@ -204,7 +204,7 @@ class VQActionTokenizer(ActionTokenizer):
         # for example, code 0 maps to vocab_size - 1
         return self.tokenizer.decode(list(self.tokenizer_len - 1 - vq_code[0].numpy()))
 
-    def decode_token_ids_to_actions(self, action_token_ids: np.ndarray) -> np.ndarray:
+    def decode_token_ids_to_actions(self, action_token_ids: np.ndarray, return_chunk=False) -> np.ndarray:
         # first convert from tokens to bins (inverse of what happens in __call__)
         action_token_ids = self.tokenizer_len - 1 - action_token_ids
         initial_shape = action_token_ids.shape
@@ -219,11 +219,13 @@ class VQActionTokenizer(ActionTokenizer):
 
         # reshape to be a flat array if the input was a single action
         if action_token_ids.shape[0] == 1 and len(initial_shape) == 1:
-            return ret_action[0, 0]
+            ret_action = ret_action[0]
 
         # get the first horizon element of the returned actions (VQ might return an action horizon)
         # TODO parameterize this
-        return ret_action[:, 0]
+        if return_chunk:
+            return ret_action
+        return ret_action[0]
 
     @property
     def required_future_horizon(self) -> int:
@@ -548,6 +550,60 @@ ACTION_TOKENIZERS = {
     "panda_viper_real_mg_decoder_only_vq_extra_action_tokenizer": partial(
         VQActionTokenizer,
         vq_vae_path="vq/panda_viper_real_mg_decoder_only",
+        use_extra=True,
+    ),
+
+    "mg_panda_pnp_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_panda_pnp",
+        use_extra=True,
+    ),
+
+    "mg_panda_flip_mug_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_panda_flip_mug",
+        use_extra=True,
+    ),
+
+    "mg_panda_turn_on_sink_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_panda_turn_on_sink",
+        use_extra=True,
+    ),
+
+    "mg_panda_og_pnp_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_panda_og_pnp",
+        use_extra=True,
+    ),
+
+    "mg_panda_og_flip_mug_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_panda_og_flip_mug",
+        use_extra=True,
+    ),
+
+    "mg_panda_og_turn_on_sink_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_panda_og_turn_on_sink",
+        use_extra=True,
+    ),
+
+    "mg_jaco_pnp_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_jaco_pnp",
+        use_extra=True,
+    ),
+
+    "mg_jaco_flip_mug_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_jaco_flip_mug",
+        use_extra=True,
+    ),
+
+    "mg_jaco_turn_on_sink_vq_extra_action_tokenizer": partial(
+        VQActionTokenizer,
+        vq_vae_path="vq/mg_jaco_turn_on_sink",
         use_extra=True,
     ),
 }
