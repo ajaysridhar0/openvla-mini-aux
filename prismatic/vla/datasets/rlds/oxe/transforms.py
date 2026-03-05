@@ -990,4 +990,5 @@ OXE_STANDARDIZATION_TRANSFORMS = {
     "mg_jaco_pnp": libero_dataset_transform,
     "mg_jaco_flip_mug": libero_dataset_transform,
     "mg_jaco_turn_on_sink": libero_dataset_transform,
+    "mg_jaco_pnp_single_cam": libero_dataset_transform,
 }

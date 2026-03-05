@@ -603,6 +603,16 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("mg_jaco_turn_on_sink", 1.0),
     ],
 
+    "mg_jaco_pnp_single_cam": [
+        ("mg_jaco_pnp_single_cam", 1.0),
+    ],
+
+    "jaco+mg_jaco_pnp_single_cam": [
+        ("jaco_pnp", 1.0),
+        ("mg_jaco_pnp_single_cam", 0.05),
+    ],
+
+
     "jaco+mg_jaco_pnp": [
         ("jaco_pnp", 1.0),
         ("mg_jaco_pnp", 0.05),
