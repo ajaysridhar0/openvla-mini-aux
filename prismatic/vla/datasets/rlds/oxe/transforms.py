@@ -983,6 +983,7 @@ OXE_STANDARDIZATION_TRANSFORMS = {
     "mg_panda_pnp": libero_dataset_transform,
     "mg_panda_flip_mug": libero_dataset_transform,
     "mg_panda_turn_on_sink": libero_dataset_transform,
+    "mg_panda_pnp_single_cam": libero_dataset_transform,
     "mg_panda_og_pnp": libero_dataset_transform,
     "mg_panda_og_flip_mug": libero_dataset_transform,
     "mg_panda_og_turn_on_sink": libero_dataset_transform,

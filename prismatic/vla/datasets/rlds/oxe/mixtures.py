@@ -548,6 +548,9 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
     "mg_panda_turn_on_sink": [
         ("mg_panda_turn_on_sink", 1.0),
     ],
+    "mg_panda_pnp_single_cam": [
+        ("mg_panda_pnp_single_cam", 1.0),
+    ],
 
     "panda+mg_panda_pnp": [
         ("panda_pnp", 1.0),
@@ -557,9 +560,14 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("panda_flip_mug", 1.0),
         ("mg_panda_flip_mug", 0.05),
     ],
-    "panda+mg_panda_pnp": [
+    "panda+mg_panda_turn_on_sink": [
         ("panda_turn_on_sink", 1.0),
         ("mg_panda_turn_on_sink", 0.05),
+    ],
+
+    "panda+mg_panda_pnp_single_cam": [
+        ("panda_pnp", 1.0),
+        ("mg_panda_pnp_single_cam", 0.05),
     ],
 
     "mg_panda_og_pnp": [
