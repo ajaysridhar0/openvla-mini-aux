@@ -186,38 +186,36 @@ Examples:
 | Target-only baseline | `robocasa-x-target-panda-pnp` | `robocasa-x-target-panda-pnp-vq-extra-action-tokenizer` |
 
 The public RoboCasa-X tokenizer names above are the names to pass to `--vla.action_tokenizer`. Internally, the
-current code still loads those tokenizers from the historical local directory names under `vq/`, so download each
-tokenizer repo into the matching local directory.
+recommended local layout uses the RoboCasa-X directory names directly under `vq/`. If you are reusing an older BARX
+tree, create the compatibility symlink overlay once with:
 
-Common download mappings:
+```bash
+python scripts/additional-datasets/setup_robocasa_x_vq_symlinks.py
+```
 
-| Hugging Face tokenizer repo | Local directory expected by the code |
-| --- | --- |
-| `ajaysri/robocasa-x-xp3k-pnp-vq-extra-action-tokenizer` | `vq/mg_pnp` |
-| `ajaysri/robocasa-x-xp900-pnp-vq-extra-action-tokenizer` | `vq/mg_pnp_lite` |
-| `ajaysri/robocasa-x-sp900-panda-pnp-vq-extra-action-tokenizer` | `vq/mg_panda_pnp` |
-| `ajaysri/robocasa-x-target-panda-pnp-vq-extra-action-tokenizer` | `vq/panda_pnp` |
+That gives you canonical `vq/robocasa_x_*` directories while keeping the legacy `vq/mg_*`, `vq/panda_*`, and
+`vq/mg_panda_*` names available as backward-compatible symlinks.
 
 For example:
 
 ```bash
 huggingface-cli download ajaysri/robocasa-x-xp900-pnp-vq-extra-action-tokenizer \
     --repo-type model \
-    --local-dir vq/mg_pnp_lite
+    --local-dir vq/robocasa_x_xp900_pnp
 ```
 
 At minimum, BARX training expects these prior-tokenizer directories under `vq/`:
 
-- `vq/mg_pnp`, `vq/mg_pnp_lite`
-- `vq/mg_turn_on_sink`, `vq/mg_turn_on_sink_lite`
-- `vq/mg_flip_mug`, `vq/mg_flip_mug_lite`
+- `vq/robocasa_x_xp3k_pnp`, `vq/robocasa_x_xp900_pnp`
+- `vq/robocasa_x_xp3k_turn_on_sink_faucet`, `vq/robocasa_x_xp900_turn_on_sink_faucet`
+- `vq/robocasa_x_xp3k_flip_mug_upright`, `vq/robocasa_x_xp900_flip_mug_upright`
 
 Depending on which runs you reproduce, you may also need the target-only and same-embodiment directories:
 
-- `vq/panda_pnp`, `vq/panda_og_pnp`, `vq/jaco_pnp`
-- `vq/panda_turn_on_sink`, `vq/panda_og_turn_on_sink`, `vq/jaco_turn_on_sink`
-- `vq/panda_flip_mug`, `vq/panda_og_flip_mug`, `vq/jaco_flip_mug`
-- `vq/mg_panda_*`, `vq/mg_panda_og_*`, `vq/mg_jaco_*`
+- `vq/robocasa_x_target_panda_pnp`, `vq/robocasa_x_target_panda_og_pnp`, `vq/robocasa_x_target_jaco_pnp`
+- `vq/robocasa_x_target_panda_turn_on_sink_faucet`, `vq/robocasa_x_target_panda_og_turn_on_sink_faucet`, `vq/robocasa_x_target_jaco_turn_on_sink_faucet`
+- `vq/robocasa_x_target_panda_flip_mug_upright`, `vq/robocasa_x_target_panda_og_flip_mug_upright`, `vq/robocasa_x_target_jaco_flip_mug_upright`
+- `vq/robocasa_x_sp900_panda_*`, `vq/robocasa_x_sp900_panda_og_*`, `vq/robocasa_x_sp900_jaco_*`
 
 ## Environment Variables
 
