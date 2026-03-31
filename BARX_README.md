@@ -145,6 +145,49 @@ already cached locally. In practice this means the first run may fetch:
 
 Subsequent runs reuse the local cache.
 
+### Released Pretraining Checkpoints (skip prior training)
+
+We release prior checkpoints for the two main paper methods so you can **go straight to finetuning**
+without reproducing the prior training phase yourself. These are the cross-embodiment prior
+models trained on all source robots; each one corresponds to a row in the
+[Pretraining Mixtures](#pretraining-mixtures) table.
+
+**Collection:** [BARX Pretraining Models — Joint Reps and No Reps](https://huggingface.co/collections/ajaysri/barx-pretraining-models-joint-reps-and-no-reps)
+
+| Checkpoint | Paper method | `run_id` | Prior data | When to use |
+| --- | --- | --- | --- | --- |
+| `barx-aux-xp3k-pnp` | Joint Reps | `aux` | XP-3K PnP | Finetune any target robot on PnP (XP-3K scale) |
+| `barx-aux-xp3k-turn-on-sink-faucet` | Joint Reps | `aux` | XP-3K Turn On Sink Faucet | Finetune any target robot on Turn On Sink Faucet (XP-3K scale) |
+| `barx-aux-xp3k-flip-mug-upright` | Joint Reps | `aux` | XP-3K Flip Mug Upright | Finetune any target robot on Flip Mug Upright (XP-3K scale) |
+| `barx-aux-xp900-pnp` | Joint Reps | `aux` | XP-900 PnP | Finetune any target robot on PnP (XP-900 scale) |
+| `barx-aux-xp900-turn-on-sink-faucet` | Joint Reps | `aux` | XP-900 Turn On Sink Faucet | Finetune any target robot on Turn On Sink Faucet (XP-900 scale) |
+| `barx-aux-xp900-flip-mug-upright` | Joint Reps | `aux` | XP-900 Flip Mug Upright | Finetune any target robot on Flip Mug Upright (XP-900 scale) |
+| `barx-base-xp3k-pnp` | No Reps | `base` | XP-3K PnP | No Reps baseline finetune on PnP (XP-3K scale) |
+| `barx-base-xp3k-turn-on-sink-faucet` | No Reps | `base` | XP-3K Turn On Sink Faucet | No Reps baseline finetune on Turn On Sink Faucet (XP-3K scale) |
+| `barx-base-xp3k-flip-mug-upright` | No Reps | `base` | XP-3K Flip Mug Upright | No Reps baseline finetune on Flip Mug Upright (XP-3K scale) |
+| `barx-base-xp900-pnp` | No Reps | `base` | XP-900 PnP | No Reps baseline finetune on PnP (XP-900 scale) |
+| `barx-base-xp900-turn-on-sink-faucet` | No Reps | `base` | XP-900 Turn On Sink Faucet | No Reps baseline finetune on Turn On Sink Faucet (XP-900 scale) |
+| `barx-base-xp900-flip-mug-upright` | No Reps | `base` | XP-900 Flip Mug Upright | No Reps baseline finetune on Flip Mug Upright (XP-900 scale) |
+
+Download a checkpoint and use it as `--pretrained_checkpoint` in the [Finetuning Command](#finetuning-command):
+
+```bash
+huggingface-cli download ajaysri/barx-aux-xp3k-pnp \
+    --repo-type model \
+    --local-dir runs/aux--robocasa-x-xp3k-pnp/checkpoints
+```
+
+Then point the finetune at the downloaded `.pt` file:
+
+```bash
+export PRETRAIN_CKPT=runs/aux--robocasa-x-xp3k-pnp/checkpoints/step-090000-epoch-38-loss=0.2513.pt
+```
+
+> **Tip:** If you only want to reproduce finetuning results from the paper, download a released
+> prior checkpoint and skip directly to the [Finetuning Command](#finetuning-command).
+> You only need to run [Prior Training](#prior-training-command) if you want to train a new
+> prior from scratch (e.g. for a new method variant or dataset scale).
+
 ### Datasets
 
 Released paper datasets live in the Hugging Face RoboCasa-X collection:
@@ -177,6 +220,11 @@ The training data should be available in TFDS format under a single root dir. Se
 Released VQ tokenizers live in the Hugging Face RoboCasa-X VQ Action Tokenizers collection:
 
 - https://huggingface.co/collections/ajaysri/robocasa-x-vq-action-tokenizers
+
+If you want to train your own tokenizer instead of using the released VQ assets, refer to the tokenizer / action
+chunking instructions in the OpenVLA-Mini repository:
+
+- https://github.com/Stanford-ILIAD/openvla-mini
 
 You usually do not choose the VQ tokenizer independently. Choose it from the training setup:
 
@@ -362,41 +410,6 @@ The action tokenizer follows the same `<data_mix>-vq-extra-action-tokenizer` pat
 | PnP | `robocasa-x-target-<robot>-pnp` | 3000 | 1000 |
 | Turn On Sink Faucet | `robocasa-x-target-<robot>-turn-on-sink-faucet` | 2000 | 500 |
 | Flip Mug Upright | `robocasa-x-target-<robot>-flip-mug-upright` | 2000 | 500 |
-
-## Fresh-User Smoke Test
-
-The fastest clean bootstrap test is a target-only Panda PnP run on one GPU with freshly downloaded assets.
-
-```bash
-export NUM_GPUS=1
-export TARGET_DATA_MIX=robocasa-x-target-panda-pnp
-export ACTION_TOKENIZER=robocasa-x-target-panda-pnp-vq-extra-action-tokenizer
-export RUN_ID=base
-export RUN_NOTE=robocasa-x-target-panda-pnp-smoke
-
-torchrun --standalone --nnodes 1 --nproc-per-node "$NUM_GPUS" vla-scripts/train.py \
-    --vla.type prism-qwen25-dinosiglip-224px+0_5b+mx-xembod-robocasa-full \
-    --vla.base_vlm "$BARX_BASE_VLM" \
-    --vla.data_mix "$TARGET_DATA_MIX" \
-    --data_root_dir "$BARX_DATA_ROOT" \
-    --vla.action_tokenizer "$ACTION_TOKENIZER" \
-    --vla.expected_world_size 1 \
-    --vla.global_batch_size 1 \
-    --vla.per_device_batch_size 1 \
-    --vla.lr_scheduler_type constant \
-    --vla.max_steps 1 \
-    --vla.use_wrist_image False \
-    --vla.image_sequence_len 1 \
-    --run_id_note "$RUN_NOTE" \
-    --run_id "$RUN_ID" \
-    --is_resume False \
-    --vla.transform_types action \
-    --hf_token HF_TOKEN \
-    --save_interval 1
-```
-
-This smoke test should create a run directory, write dataset statistics, and save a step-1 checkpoint without relying
-on any preexisting local BARX assets.
 
 ## Prior Training Command
 
