@@ -291,7 +291,7 @@ class RLDSAuxTransform(BaseRLDSTransform):
         assert self.aux_task_type in AUX_TASK_QA_FUNCTIONS, f"Invalid aux task type: {self.aux_task_type}!"
 
     def __call__(self, rlds_batch: Dict[str, Any]) -> Dict[str, Any]:
-        """Converts a RLDS batch to the format expected by the OpenVLA collator/models for aux prediction."""
+        """Converts a batch to aux-only supervision, e.g. `bbox` or `ee_pose_2D` without action labels."""
         dataset_name = rlds_batch["dataset_name"]
         lang = rlds_batch["task"]["language_instruction"].decode().lower()
         img = self._process_image(rlds_batch)
@@ -306,9 +306,9 @@ class RLDSAuxTransform(BaseRLDSTransform):
 
         input_ids, labels, _ = self._process_tokens(conversation, answer_token_lengths)
         pixel_values = self.image_transform(img)
-        transform_types = np.ones(len(AUX_TASK_QA_FUNCTIONS) + 1, dtype=np.int32) * -1
-        transform_types[0] = sorted(AUX_TASK_QA_FUNCTIONS.keys()).index(self.aux_task_type) + 1
-        return dict(pixel_values=pixel_values, input_ids=input_ids, labels=labels, dataset_name=dataset_name, transform_type=transform_types)
+        transform_ids = np.ones(len(AUX_TASK_QA_FUNCTIONS) + 1, dtype=np.int32) * -1
+        transform_ids[0] = sorted(AUX_TASK_QA_FUNCTIONS.keys()).index(self.aux_task_type) + 1
+        return dict(pixel_values=pixel_values, input_ids=input_ids, labels=labels, dataset_name=dataset_name, transform_type=transform_ids)
 
 
 @dataclass
@@ -322,7 +322,7 @@ class ChainedTransform(BaseRLDSTransform):
             assert aux_task_type in AUX_TASK_QA_FUNCTIONS, f"Invalid aux task type: {aux_task_type}!"
 
     def __call__(self, rlds_batch: Dict[str, Any]) -> Dict[str, Any]:
-        """Chains aux and action prediction in a CoT way with separate supervision."""
+        """Chains aux supervision left-to-right and always appends action supervision at the end."""
         dataset_name = rlds_batch["dataset_name"]
         lang = rlds_batch["task"]["language_instruction"].decode().lower()
         img = self._process_image(rlds_batch)
@@ -330,12 +330,12 @@ class ChainedTransform(BaseRLDSTransform):
 
         # First get aux answers
         qa_pairs = []
-        transform_types = np.ones(len(AUX_TASK_QA_FUNCTIONS) + 1, dtype=np.int32) * -1
+        transform_ids = np.ones(len(AUX_TASK_QA_FUNCTIONS) + 1, dtype=np.int32) * -1
         for i, aux_task_type in enumerate(self.aux_task_types):
             aux_task_question, aux_task_answer = AUX_TASK_QA_FUNCTIONS[aux_task_type](rlds_batch, lang)
             qa_pairs.append((aux_task_question, aux_task_answer))
-            transform_types[i] = sorted(AUX_TASK_QA_FUNCTIONS.keys()).index(aux_task_type) + 1
-        transform_types[i + 1] = 0
+            transform_ids[i] = sorted(AUX_TASK_QA_FUNCTIONS.keys()).index(aux_task_type) + 1
+        transform_ids[i + 1] = 0
         
         # Then get action answer
         action = rlds_batch["action"]
@@ -356,7 +356,7 @@ class ChainedTransform(BaseRLDSTransform):
             input_ids=input_ids,
             labels=labels,
             dataset_name=dataset_name,
-            transform_type=transform_types
+            transform_type=transform_ids
         )
     
 

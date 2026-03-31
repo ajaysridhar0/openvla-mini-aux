@@ -13,52 +13,11 @@ import numpy as np
 import torch
 from transformers import PreTrainedTokenizerBase
 from transformers.models.qwen2.tokenization_qwen2_fast import Qwen2TokenizerFast
-from transformers import AutoProcessor
 from prismatic.overwatch.overwatch import initialize_overwatch
-
-from prismatic.vla.fast_tokenizer import UniversalActionProcessor
-from transformers import PreTrainedTokenizerFast
-import pickle
+from prismatic.vla.robocasa_x_aliases import ROBOCASA_X_ACTION_TOKENIZER_ALIASES
 
 
 overwatch = initialize_overwatch(__name__)
-
-
-def load_universal_action_processor(tokenizer_path):
-    # Load the tokenizer
-    fast_tokenizer = PreTrainedTokenizerFast.from_pretrained(tokenizer_path)
-    
-    # Load the processor config
-    with open(f"{tokenizer_path}/processor_config.json", "r") as f:
-        config = json.load(f)
-    
-    # Create UniversalActionProcessor with the same parameters
-    processor = UniversalActionProcessor(
-        bpe_tokenizer=fast_tokenizer,
-        scale=config['scale'],
-        vocab_size=config['vocab_size'],
-        min_token=config.get('min_token', 0),  # Use default if not in config
-        action_dim=config.get('action_dim'),
-        time_horizon=config.get('time_horizon')
-    )
-    
-    return processor
-
-
-def create_sliding_windows(data, window_size):
-    """
-    Create sliding windows from a 2D array.
-    
-    Args:
-        data: numpy array of shape (T, D) where T is sequence length and D is feature dimension
-        window_size: int, size of sliding window W
-        
-    Returns:
-        numpy array of shape (T-W+1, W, D) containing overlapping windows
-    """
-    T, D = data.shape
-    windows = np.lib.stride_tricks.sliding_window_view(data, window_shape=(window_size, D))
-    return windows.reshape(-1, window_size, D)
 
 
 class ActionTokenizer:
@@ -233,150 +192,7 @@ class VQActionTokenizer(ActionTokenizer):
         return self.vq_vae.input_dim_h - 1
 
 
-class FastActionTokenizer(ActionTokenizer):
-    """Action tokenizer that uses the physical-intelligence/fast tokenizer from Hugging Face."""
-    
-    def __init__(
-        self,
-        tokenizer: PreTrainedTokenizerBase,
-        tokenizer_path: str = None,
-        use_extra: bool = False,
-        time_horizon: int = 8,
-        action_dim: int = 7,
-    ) -> None:
-        """Initialize the FastActionTokenizer.
-        
-        Args:
-            tokenizer: Base LLM/VLM tokenizer to extend.
-            use_extra: Use the extra tokens (not just the last ones), only implemented for Qwen2
-        """
-        from transformers import AutoProcessor
-        self.tokenizer = tokenizer
-        # to add to cache
-        self.fast_tokenizer = AutoProcessor.from_pretrained("physical-intelligence/fast", trust_remote_code=True)
-
-        if tokenizer_path is not None:
-            self.fast_tokenizer = load_universal_action_processor(tokenizer_path)
-
-        self.fast_tokenizer.time_horizon = time_horizon
-        self.fast_tokenizer.action_dim = action_dim
-
-        # elif data_path is not None:
-        #     data = np.load(data_path)
-        #     train_actions = data['train_actions']
-        #     action_data = create_sliding_windows(train_actions, time_horizon)
-        #     self.fast_tokenizer = self.fast_tokenizer.fit(action_data)
-        
-        # The UniversalActionProcessor uses a vocab size of 1024
-        self.n_bins = self.fast_tokenizer.vocab_size
-        
-        # Set up token ranges in VLA vocabulary - handle extra tokens like base ActionTokenizer
-        self.tokenizer_len = self.tokenizer.vocab_size
-        if isinstance(tokenizer, Qwen2TokenizerFast) and use_extra:
-            self.tokenizer_len = len(self.tokenizer)
-        elif use_extra:
-            raise NotImplementedError("Cannot use extra tokens for this tokenizer!")
-            
-        # [Contract] Set "action_token_begin_idx" based on `self.tokenizer.vocab_size - (self.n_bins + 1)`
-        #   =>> Assumes we're always overwriting the final `n_bins` tokens of the vocabulary!
-        self.action_token_begin_idx = int(self.tokenizer_len - (self.n_bins + 1))
-        self.action_token_end_idx = int(self.tokenizer_len)
-        
-        # Use the universal EOS token
-        self.stop_token = self.EOS_TOKEN_ID
-        
-    def __call__(self, action: np.ndarray) -> Union[str, List[str]]:
-        """Tokenize continuous robot actions using the fast tokenizer.
-        
-        Args:
-            action: Continuous action array to tokenize.
-            
-        Returns:
-            Decoded string representation of the action tokens.
-        """
-        if len(action.shape) == 2:
-            action = action[None]
-
-        # The UniversalActionProcessor returns a list of token lists
-        fast_tokens = self.fast_tokenizer(action)
-        
-        # Map tokens to VLA vocabulary space and append EOS token
-        if isinstance(fast_tokens[0], list):
-            # For batches, convert each sequence to token IDs in VLA vocab space
-            token_lists = [
-                [t + self.action_token_begin_idx for t in token_list] + [self.stop_token]
-                for token_list in fast_tokens
-            ]
-            # Take first sequence and decode to string
-            return self.tokenizer.decode(token_lists[0])
-            
-        # For single sequences, convert to token IDs in VLA vocab space
-        mapped_tokens = [t + self.action_token_begin_idx for t in fast_tokens] + [self.stop_token]
-        return self.tokenizer.decode(mapped_tokens)
-        
-    def decode_token_ids_to_actions(self, action_token_ids: List[List[int]]) -> np.ndarray:
-        """Decode tokenized actions back to continuous values.
-        
-        Args:
-            action_token_ids: Array of token IDs in VLA vocabulary space. 
-            NOTE: This list does NOT contain the stop token.
-            
-        Returns:
-            Continuous action array. Returns zero array of dim 7 if there is an error.
-        """
-        assert isinstance(action_token_ids, list)
-        if not isinstance(action_token_ids[0], list):
-            action_token_ids = [action_token_ids]
-            is_batched = False
-        else:
-            is_batched = True
-            
-        processed_action_token_ids = []
-        for action_tokens_list in action_token_ids:
-            action_token_list = self.tokenizer_len - 1 - np.array(action_tokens_list)
-            action_token_list = np.clip(action_token_list, 0, self.n_bins - 1)
-            processed_action_token_ids.append(action_token_list.tolist())
-
-        decoded_actions = self.fast_tokenizer.decode(processed_action_token_ids)
-
-        if not is_batched:
-            return decoded_actions[0]
-        else:
-            return decoded_actions
-
-    @property
-    def required_future_horizon(self) -> int:
-        # The UniversalActionProcessor uses DCT over a time horizon
-        # This will be determined by the input action shape
-        return self.fast_tokenizer.time_horizon - 1
-
-
 ACTION_TOKENIZERS = {
-    "action_tokenizer": ActionTokenizer,
-    "extra_action_tokenizer": partial(ActionTokenizer, use_extra=True),
-    # libero
-    "libero_vq_action_tokenizer": partial(
-        VQActionTokenizer, vq_vae_path="/iliad/u/belkhale/openvla-mini/vq/pretrain_vq+mx-libero_90+fach-7+ng-7+nemb-128+nlatent-512"
-    ),
-    "libero_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer, vq_vae_path="/workspace/openvla-mini-aux/vq/pretrain_vq+mx-libero_90+fach-7+ng-7+nemb-128+nlatent-512", use_extra=True
-    ),
-    "libero_vq_h0_extra_action_tokenizer": partial(
-        VQActionTokenizer, vq_vae_path="/iliad/u/belkhale/openvla-mini/vq/pretrain_vq+mx-libero_90+fach-0+ng-7+nemb-128+nlatent-512", use_extra=True
-    ),
-    # fast
-    "fast_action_tokenizer": FastActionTokenizer,
-    "robocasa_fast_tokenizer_noop_filter": partial(
-        FastActionTokenizer,
-        tokenizer_path="fast_tokenizer",
-        use_extra=True
-    ),
-    # bridge
-    "bridge_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/pretrain_modvq+mx-bridge_dataset+fach-7+ng-7+nemb-256+nlatent-512",
-        use_extra=True,
-    ),
     "robocasa_vq_extra_action_tokenizer": partial(
         VQActionTokenizer,
         vq_vae_path="vq/vq_noop_filter",
@@ -607,3 +423,6 @@ ACTION_TOKENIZERS = {
         use_extra=True,
     ),
 }
+
+for alias_name, canonical_name in ROBOCASA_X_ACTION_TOKENIZER_ALIASES.items():
+    ACTION_TOKENIZERS[alias_name] = ACTION_TOKENIZERS[canonical_name]

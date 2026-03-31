@@ -34,7 +34,6 @@ from prismatic.training import VLAMetrics, get_train_strategy
 from prismatic.util import set_global_seed
 from prismatic.vla import get_vla_dataset_and_collator
 from prismatic.vla.datasets.rlds.utils.data_utils import save_dataset_statistics
-from prismatic.vla.action_tokenizer import FastActionTokenizer
 from prismatic.preprocessing import get_dataset_and_collator
 
 # Sane Defaults
@@ -361,7 +360,7 @@ def train(cfg: TrainConfig) -> None:
         action_tokenizer,
         metrics,
         save_interval=cfg.save_interval,
-        sequence_level_decoding=isinstance(action_tokenizer, FastActionTokenizer),
+        sequence_level_decoding=False,
     )
 
     # Finalize

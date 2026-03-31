@@ -4,6 +4,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Tuple, Optional
 
+from prismatic.vla.robocasa_x_aliases import (
+    canonicalize_robocasa_x_dataset_statistics_map,
+    canonicalize_robocasa_x_subset_percentages,
+)
 from prismatic.vla.datasets.datasets import EpisodicRLDSDataset, RLDSDataset
 
 
@@ -34,8 +38,12 @@ def get_vla_action_dataset(
     future_action_window_size: int = 0,
     include_images: bool = True,
     dataset_statistics_map: Optional[Dict] = None,
+    subset_percentages: Optional[Dict[str, float]] = None,
 ):
     """Only get the image / action / instruction, don't do any tokenization."""
+
+    dataset_statistics_map = canonicalize_robocasa_x_dataset_statistics_map(dataset_statistics_map)
+    subset_percentages = canonicalize_robocasa_x_subset_percentages(subset_percentages)
 
     # TODO new batch transform
     batch_transform = RLDSActionBatchTransform(include_images=include_images)
@@ -53,6 +61,7 @@ def get_vla_action_dataset(
         # did not add support for below kwargs with episodic dataset
         future_action_window_size=future_action_window_size,
         dataset_statistics_map=dataset_statistics_map,
+        subset_percentages=subset_percentages,
     )
 
     return dataset

@@ -447,6 +447,200 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("jaco_turn_on_sink", 1.0),
         ("mg_jaco_turn_on_sink", 0.05),
     ],
+
+    # === RoboCasa-X Release Mixtures ===
+    "robocasa-x-xp3k-pnp": [
+        ("robocasa_x_xp3k_pnp", 1.0),
+    ],
+    "robocasa-x-xp900-pnp": [
+        ("robocasa_x_xp900_pnp", 1.0),
+    ],
+    "robocasa-x-xp3k-turn-on-sink-faucet": [
+        ("robocasa_x_xp3k_turn_on_sink_faucet", 1.0),
+    ],
+    "robocasa-x-xp900-turn-on-sink-faucet": [
+        ("robocasa_x_xp900_turn_on_sink_faucet", 1.0),
+    ],
+    "robocasa-x-xp3k-flip-mug-upright": [
+        ("robocasa_x_xp3k_flip_mug_upright", 1.0),
+    ],
+    "robocasa-x-xp900-flip-mug-upright": [
+        ("robocasa_x_xp900_flip_mug_upright", 1.0),
+    ],
+
+    "robocasa-x-target-panda-pnp": [
+        ("robocasa_x_target_panda_pnp", 1.0),
+    ],
+    "robocasa-x-target-panda-og-pnp": [
+        ("robocasa_x_target_panda_og_pnp", 1.0),
+    ],
+    "robocasa-x-target-jaco-pnp": [
+        ("robocasa_x_target_jaco_pnp", 1.0),
+    ],
+    "robocasa-x-target-panda-turn-on-sink-faucet": [
+        ("robocasa_x_target_panda_turn_on_sink_faucet", 1.0),
+    ],
+    "robocasa-x-target-panda-og-turn-on-sink-faucet": [
+        ("robocasa_x_target_panda_og_turn_on_sink_faucet", 1.0),
+    ],
+    "robocasa-x-target-jaco-turn-on-sink-faucet": [
+        ("robocasa_x_target_jaco_turn_on_sink_faucet", 1.0),
+    ],
+    "robocasa-x-target-panda-flip-mug-upright": [
+        ("robocasa_x_target_panda_flip_mug_upright", 1.0),
+    ],
+    "robocasa-x-target-panda-og-flip-mug-upright": [
+        ("robocasa_x_target_panda_og_flip_mug_upright", 1.0),
+    ],
+    "robocasa-x-target-jaco-flip-mug-upright": [
+        ("robocasa_x_target_jaco_flip_mug_upright", 1.0),
+    ],
+
+    "robocasa-x-xp3k-panda-pnp-mix": [
+        ("robocasa_x_xp3k_pnp", 0.01),
+        ("robocasa_x_target_panda_pnp", 1.0),
+    ],
+    "robocasa-x-xp3k-panda-og-pnp-mix": [
+        ("robocasa_x_xp3k_pnp", 0.01),
+        ("robocasa_x_target_panda_og_pnp", 1.0),
+    ],
+    "robocasa-x-xp3k-jaco-pnp-mix": [
+        ("robocasa_x_xp3k_pnp", 0.01),
+        ("robocasa_x_target_jaco_pnp", 1.0),
+    ],
+    "robocasa-x-xp900-panda-pnp-mix": [
+        ("robocasa_x_xp900_pnp", 0.05),
+        ("robocasa_x_target_panda_pnp", 1.0),
+    ],
+    "robocasa-x-xp900-panda-og-pnp-mix": [
+        ("robocasa_x_xp900_pnp", 0.05),
+        ("robocasa_x_target_panda_og_pnp", 1.0),
+    ],
+    "robocasa-x-xp900-jaco-pnp-mix": [
+        ("robocasa_x_xp900_pnp", 0.05),
+        ("robocasa_x_target_jaco_pnp", 1.0),
+    ],
+
+    "robocasa-x-xp3k-panda-turn-on-sink-faucet-mix": [
+        ("robocasa_x_xp3k_turn_on_sink_faucet", 0.01),
+        ("robocasa_x_target_panda_turn_on_sink_faucet", 1.0),
+    ],
+    "robocasa-x-xp3k-panda-og-turn-on-sink-faucet-mix": [
+        ("robocasa_x_xp3k_turn_on_sink_faucet", 0.01),
+        ("robocasa_x_target_panda_og_turn_on_sink_faucet", 1.0),
+    ],
+    "robocasa-x-xp3k-jaco-turn-on-sink-faucet-mix": [
+        ("robocasa_x_xp3k_turn_on_sink_faucet", 0.01),
+        ("robocasa_x_target_jaco_turn_on_sink_faucet", 1.0),
+    ],
+    "robocasa-x-xp900-panda-turn-on-sink-faucet-mix": [
+        ("robocasa_x_xp900_turn_on_sink_faucet", 0.05),
+        ("robocasa_x_target_panda_turn_on_sink_faucet", 1.0),
+    ],
+    "robocasa-x-xp900-panda-og-turn-on-sink-faucet-mix": [
+        ("robocasa_x_xp900_turn_on_sink_faucet", 0.05),
+        ("robocasa_x_target_panda_og_turn_on_sink_faucet", 1.0),
+    ],
+    "robocasa-x-xp900-jaco-turn-on-sink-faucet-mix": [
+        ("robocasa_x_xp900_turn_on_sink_faucet", 0.05),
+        ("robocasa_x_target_jaco_turn_on_sink_faucet", 1.0),
+    ],
+
+    "robocasa-x-xp3k-panda-flip-mug-upright-mix": [
+        ("robocasa_x_xp3k_flip_mug_upright", 0.01),
+        ("robocasa_x_target_panda_flip_mug_upright", 1.0),
+    ],
+    "robocasa-x-xp3k-panda-og-flip-mug-upright-mix": [
+        ("robocasa_x_xp3k_flip_mug_upright", 0.01),
+        ("robocasa_x_target_panda_og_flip_mug_upright", 1.0),
+    ],
+    "robocasa-x-xp3k-jaco-flip-mug-upright-mix": [
+        ("robocasa_x_xp3k_flip_mug_upright", 0.01),
+        ("robocasa_x_target_jaco_flip_mug_upright", 1.0),
+    ],
+    "robocasa-x-xp900-panda-flip-mug-upright-mix": [
+        ("robocasa_x_xp900_flip_mug_upright", 0.05),
+        ("robocasa_x_target_panda_flip_mug_upright", 1.0),
+    ],
+    "robocasa-x-xp900-panda-og-flip-mug-upright-mix": [
+        ("robocasa_x_xp900_flip_mug_upright", 0.05),
+        ("robocasa_x_target_panda_og_flip_mug_upright", 1.0),
+    ],
+    "robocasa-x-xp900-jaco-flip-mug-upright-mix": [
+        ("robocasa_x_xp900_flip_mug_upright", 0.05),
+        ("robocasa_x_target_jaco_flip_mug_upright", 1.0),
+    ],
+
+    "robocasa-x-sp900-panda-pnp": [
+        ("robocasa_x_sp900_panda_pnp", 1.0),
+    ],
+    "robocasa-x-sp900-panda-og-pnp": [
+        ("robocasa_x_sp900_panda_og_pnp", 1.0),
+    ],
+    "robocasa-x-sp900-jaco-pnp": [
+        ("robocasa_x_sp900_jaco_pnp", 1.0),
+    ],
+    "robocasa-x-sp900-panda-turn-on-sink-faucet": [
+        ("robocasa_x_sp900_panda_turn_on_sink_faucet", 1.0),
+    ],
+    "robocasa-x-sp900-panda-og-turn-on-sink-faucet": [
+        ("robocasa_x_sp900_panda_og_turn_on_sink_faucet", 1.0),
+    ],
+    "robocasa-x-sp900-jaco-turn-on-sink-faucet": [
+        ("robocasa_x_sp900_jaco_turn_on_sink_faucet", 1.0),
+    ],
+    "robocasa-x-sp900-panda-flip-mug-upright": [
+        ("robocasa_x_sp900_panda_flip_mug_upright", 1.0),
+    ],
+    "robocasa-x-sp900-panda-og-flip-mug-upright": [
+        ("robocasa_x_sp900_panda_og_flip_mug_upright", 1.0),
+    ],
+    "robocasa-x-sp900-jaco-flip-mug-upright": [
+        ("robocasa_x_sp900_jaco_flip_mug_upright", 1.0),
+    ],
+
+    "robocasa-x-sp900-panda-pnp-mix": [
+        ("robocasa_x_target_panda_pnp", 1.0),
+        ("robocasa_x_sp900_panda_pnp", 0.05),
+    ],
+    "robocasa-x-sp900-panda-og-pnp-mix": [
+        ("robocasa_x_target_panda_og_pnp", 1.0),
+        ("robocasa_x_sp900_panda_og_pnp", 0.05),
+    ],
+    "robocasa-x-sp900-jaco-pnp-mix": [
+        ("robocasa_x_target_jaco_pnp", 1.0),
+        ("robocasa_x_sp900_jaco_pnp", 0.05),
+    ],
+    "robocasa-x-sp900-panda-turn-on-sink-faucet-mix": [
+        ("robocasa_x_target_panda_turn_on_sink_faucet", 1.0),
+        ("robocasa_x_sp900_panda_turn_on_sink_faucet", 0.05),
+    ],
+    "robocasa-x-sp900-panda-og-turn-on-sink-faucet-mix": [
+        ("robocasa_x_target_panda_og_turn_on_sink_faucet", 1.0),
+        ("robocasa_x_sp900_panda_og_turn_on_sink_faucet", 0.05),
+    ],
+    "robocasa-x-sp900-jaco-turn-on-sink-faucet-mix": [
+        ("robocasa_x_target_jaco_turn_on_sink_faucet", 1.0),
+        ("robocasa_x_sp900_jaco_turn_on_sink_faucet", 0.05),
+    ],
+    "robocasa-x-sp900-panda-flip-mug-upright-mix": [
+        ("robocasa_x_target_panda_flip_mug_upright", 1.0),
+        ("robocasa_x_sp900_panda_flip_mug_upright", 0.05),
+    ],
+    "robocasa-x-sp900-panda-og-flip-mug-upright-mix": [
+        ("robocasa_x_target_panda_og_flip_mug_upright", 1.0),
+        ("robocasa_x_sp900_panda_og_flip_mug_upright", 0.05),
+    ],
+    "robocasa-x-sp900-jaco-flip-mug-upright-mix": [
+        ("robocasa_x_target_jaco_flip_mug_upright", 1.0),
+        ("robocasa_x_sp900_jaco_flip_mug_upright", 0.05),
+    ],
     # TODO (ajaysri): add partial held-out mixture
 }
 # fmt: on
+
+
+# Backwards-compatible BARX CLI aliases for the released RoboCasa-X mixture names.
+for mixture_name in list(OXE_NAMED_MIXTURES.keys()):
+    if mixture_name.startswith("robocasa-x-"):
+        OXE_NAMED_MIXTURES.setdefault(mixture_name.replace("robocasa-x-", "barx-", 1), OXE_NAMED_MIXTURES[mixture_name])

@@ -7,14 +7,64 @@ It is built on top of the MiniVLA / OpenVLA-Mini codebase and focuses on three p
 - `Turn On Sink Faucet`
 - `Flip Mug Upright`
 
-This README covers simulation training reproduction. It does not cover evaluation or real-robot deployment.
+This README covers training with our simulation data from RoboCasa-X, our cross-embodiment benchmark.
+
+## RoboCasa-X Benchmark
+
+RoboCasa-X is a simulation benchmark for studying cross-embodiment transfer in robot manipulation. It is built on
+[RoboCasa](https://github.com/robocasa/robocasa), a platform with realistic and diverse kitchen scenes, and uses
+[MimicGen](https://mimicgen.github.io/) to scale demonstration data across embodiments.
+
+### Tasks
+
+RoboCasa-X includes four manipulation tasks that capture significant variation in kitchen layouts, textures, object
+types, and object poses:
+
+| Task | Description |
+| --- | --- |
+| PnP Counter to Sink | Pick an object from the counter and place it in the sink |
+| PnP Sink to Counter | Pick an object from the sink and place it on the counter |
+| Turn On Sink Faucet | Reach and turn on the kitchen faucet |
+| Flip Mug Upright | Flip an inverted mug to an upright position |
+
+PnP Counter to Sink and PnP Sink to Counter share a single model during training.
+
+### Embodiments
+
+The benchmark separates robots into **source** embodiments (used to generate large-scale prior data) and **target**
+embodiments (used to evaluate cross-embodiment transfer with limited data).
+
+| Role | Robot | Gripper |
+| --- | --- | --- |
+| Source | IIWA | Robotiq 2F-140 |
+| Source | Kinova3 | Robotiq 2F-85 |
+| Source | UR5e | Robotiq 2F-85 |
+| Target | Panda | Robotiq 2F-85 |
+| Target | Panda-OG | Franka Hand (original) |
+| Target | Jaco | Robotiq 2F-85 |
+
+Source data is generated with MimicGen from a small number of human demonstrations. Target data consists of 50 human
+demonstrations per task per robot. Camera pose is randomized across all embodiments to promote sim-to-real transfer.
+
+### Dataset Scales
+
+| Name | Description | Demos per task |
+| --- | --- | --- |
+| XP-3K | Cross-embodiment prior, 1000 demos per source robot | 3000 |
+| XP-900 | Cross-embodiment prior, 300 demos per source robot | 900 |
+| SP-900 | Same-embodiment prior, 900 demos of the target robot | 900 |
+| Target | Target-robot demonstrations only (no prior) | 50 |
+
+The cross-embodiment transfer workflow is: (1) pretrain a policy on source-robot data (XP-3K or XP-900),
+(2) co-fine-tune on the target-robot demonstrations plus down-weighted prior data. Target-only and same-embodiment
+(SP-900) baselines skip or replace the cross-embodiment prior, respectively.
 
 ## Installation
 
 These setup steps are the BARX-relevant parts of the main repo README, plus the VQ dependency BARX needs for action
 tokenization.
 
-The repository was developed and tested with:
+The repository uses:
 
 - Python `3.10`
 - PyTorch `2.2.0`
@@ -56,6 +106,11 @@ BARX also uses VQ-backed action tokenizers. Install the VQ-Bet dependency by fol
 
 The training code expects the BARX VQ assets to live under `vq/` relative to this repository.
 
+Training also expects a Hugging Face token (see [Environment Variables](#environment-variables) for setup).
+
+Run the training commands from the repository root if you rely on the default `.hf_token` path and `vq/` relative
+asset paths.
+
 ## Required Assets
 
 ### Base VLM
@@ -71,62 +126,93 @@ huggingface-cli download ajaysri/prism-qwen25-extra-dinosiglip-224px-0_5b-stage-
     --local-dir prism-qwen25-extra-dinosiglip-224px+0_5b+stage-finetune+x7
 ```
 
+Note: the first BARX training run may also download backbone weights from `timm` / `transformers` if they are not
+already cached locally. In practice this means the first run may fetch:
+
+- DINOv2 ViT-L backbone weights
+- SigLIP SO400M backbone weights
+- Qwen2.5-0.5B model/tokenizer files
+
+Subsequent runs reuse the local cache.
+
 ### Datasets
 
-Released paper datasets live in the Hugging Face BARX Paper Datasets collection:
+Released paper datasets live in the Hugging Face RoboCasa-X collection:
 
-- https://huggingface.co/collections/ajaysri/barx-paper-datasets-69ca39478824752feea55460
+- https://huggingface.co/collections/ajaysri/robocasa-x
 
-The collection uses paper-facing dataset names. The BARX release also adds paper-facing aliases for
+The collection uses the released RoboCasa-X dataset names. The codebase also adds RoboCasa-X aliases for
 `--vla.data_mix`, `--vla.action_tokenizer`, `--dataset_statistics_map`, and `--non_action_datasets`.
-This README uses those aliases throughout. Historical BARX `mg_*` names remain supported for backwards compatibility.
+This README uses those aliases throughout. Historical `barx-*` and `mg_*` names remain supported for backwards
+compatibility.
 
 Released dataset repo names follow this scheme:
 
-- `barx-xp3k-<task>` for cross-embodiment `XP-3K`
-- `barx-xp900-<task>` for cross-embodiment `XP-900`
-- `barx-sp900-<robot>-<task>` for same-embodiment `SP-900`
+- `robocasa-x-xp3k-<task>` for cross-embodiment `XP-3K`
+- `robocasa-x-xp900-<task>` for cross-embodiment `XP-900`
+- `robocasa-x-sp900-<robot>-<task>` for same-embodiment `SP-900`
 
-For finetune mixtures, BARX uses two additional alias patterns:
+For finetune mixtures, RoboCasa-X uses two additional alias patterns:
 
-- `barx-xp{3k,900}-<robot>-<task>-mix` for cross-embodiment finetuning
-- `barx-sp900-<robot>-<task>-mix` for same-embodiment finetuning
+- `robocasa-x-xp{3k,900}-<robot>-<task>-mix` for cross-embodiment finetuning
+- `robocasa-x-sp900-<robot>-<task>-mix` for same-embodiment finetuning
 
 For target-only baselines, use:
 
-- `barx-target-<robot>-<task>`
+- `robocasa-x-target-<robot>-<task>`
 
-The training data should be available in TFDS format under a root such as:
-
-- `/iliad2/u/jenseng/tensorflow_datasets`
-
-Required cross-embodiment datasets:
-
-- `barx-xp3k-pnp`, `barx-xp900-pnp`
-- `barx-xp3k-turn-on-sink-faucet`, `barx-xp900-turn-on-sink-faucet`
-- `barx-xp3k-flip-mug-upright`, `barx-xp900-flip-mug-upright`
-
-Required target datasets:
-
-- `barx-target-panda-pnp`, `barx-target-panda-og-pnp`, `barx-target-jaco-pnp`
-- `barx-target-panda-turn-on-sink-faucet`, `barx-target-panda-og-turn-on-sink-faucet`, `barx-target-jaco-turn-on-sink-faucet`
-- `barx-target-panda-flip-mug-upright`, `barx-target-panda-og-flip-mug-upright`, `barx-target-jaco-flip-mug-upright`
-
-Required same-embodiment prior datasets:
-
-- `barx-sp900-panda-pnp`, `barx-sp900-panda-og-pnp`, `barx-sp900-jaco-pnp`
-- `barx-sp900-panda-turn-on-sink-faucet`, `barx-sp900-panda-og-turn-on-sink-faucet`, `barx-sp900-jaco-turn-on-sink-faucet`
-- `barx-sp900-panda-flip-mug-upright`, `barx-sp900-panda-og-flip-mug-upright`, `barx-sp900-jaco-flip-mug-upright`
+The training data should be available in TFDS format under a single root dir. See the
+[Task And Mixture Mapping](#task-and-mixture-mapping) tables for every concrete dataset name.
 
 ### VQ Assets
 
-At minimum, BARX training expects these VQ directories under `vq/`:
+Released VQ tokenizers live in the Hugging Face RoboCasa-X VQ Action Tokenizers collection:
+
+- https://huggingface.co/collections/ajaysri/robocasa-x-vq-action-tokenizers
+
+You usually do not choose the VQ tokenizer independently. Choose it from the training setup:
+
+1. Prior training: use the tokenizer that matches the prior dataset exactly.
+2. Finetuning from a prior: keep using the prior tokenizer, even though `--vla.data_mix` is now a `*-mix` dataset.
+3. Target-only baselines: use the tokenizer that matches the target dataset exactly.
+
+Examples:
+
+| Training setup | `--vla.data_mix` | `--vla.action_tokenizer` |
+| --- | --- | --- |
+| Cross-emb prior | `robocasa-x-xp900-pnp` | `robocasa-x-xp900-pnp-vq-extra-action-tokenizer` |
+| Cross-emb finetune from XP-3K prior | `robocasa-x-xp3k-panda-pnp-mix` | `robocasa-x-xp3k-pnp-vq-extra-action-tokenizer` |
+| Same-emb finetune from SP-900 prior | `robocasa-x-sp900-panda-pnp-mix` | `robocasa-x-sp900-panda-pnp-vq-extra-action-tokenizer` |
+| Target-only baseline | `robocasa-x-target-panda-pnp` | `robocasa-x-target-panda-pnp-vq-extra-action-tokenizer` |
+
+The public RoboCasa-X tokenizer names above are the names to pass to `--vla.action_tokenizer`. Internally, the
+current code still loads those tokenizers from the historical local directory names under `vq/`, so download each
+tokenizer repo into the matching local directory.
+
+Common download mappings:
+
+| Hugging Face tokenizer repo | Local directory expected by the code |
+| --- | --- |
+| `ajaysri/robocasa-x-xp3k-pnp-vq-extra-action-tokenizer` | `vq/mg_pnp` |
+| `ajaysri/robocasa-x-xp900-pnp-vq-extra-action-tokenizer` | `vq/mg_pnp_lite` |
+| `ajaysri/robocasa-x-sp900-panda-pnp-vq-extra-action-tokenizer` | `vq/mg_panda_pnp` |
+| `ajaysri/robocasa-x-target-panda-pnp-vq-extra-action-tokenizer` | `vq/panda_pnp` |
+
+For example:
+
+```bash
+huggingface-cli download ajaysri/robocasa-x-xp900-pnp-vq-extra-action-tokenizer \
+    --repo-type model \
+    --local-dir vq/mg_pnp_lite
+```
+
+At minimum, BARX training expects these prior-tokenizer directories under `vq/`:
 
 - `vq/mg_pnp`, `vq/mg_pnp_lite`
 - `vq/mg_turn_on_sink`, `vq/mg_turn_on_sink_lite`
 - `vq/mg_flip_mug`, `vq/mg_flip_mug_lite`
 
-Depending on which runs you reproduce, you may also need:
+Depending on which runs you reproduce, you may also need the target-only and same-embodiment directories:
 
 - `vq/panda_pnp`, `vq/panda_og_pnp`, `vq/jaco_pnp`
 - `vq/panda_turn_on_sink`, `vq/panda_og_turn_on_sink`, `vq/jaco_turn_on_sink`
@@ -136,21 +222,30 @@ Depending on which runs you reproduce, you may also need:
 ## Environment Variables
 
 ```bash
-export BARX_DATA_ROOT=/path/to/tensorflow_datasets
+export BARX_DATA_ROOT=/path/to/rlds_datasets
 export BARX_BASE_VLM=/path/to/prism-qwen25-extra-dinosiglip-224px+0_5b+stage-finetune+x7
-export BARX_PRIOR_ROOT=/path/to/barx_runs/priors
-export BARX_FT_ROOT=/path/to/barx_runs/finetunes
-export NUM_GPUS=8
-export PER_DEVICE_BATCH_SIZE=32
-export GLOBAL_BATCH_SIZE=$((NUM_GPUS * PER_DEVICE_BATCH_SIZE))
 export WANDB_ENTITY=your_wandb_entity
+
+# Option A: default path used by train.py
+echo "hf_..." > .hf_token
+chmod 600 .hf_token
+
+# Option B: environment variable
+export HF_TOKEN=hf_...
+
+# Set to the number of GPUs available on your machine.
+# Adjust global_batch_size in the training commands accordingly.
+export NUM_GPUS=8
 ```
 
-Training also expects a valid Hugging Face token through `.hf_token` or an environment variable.
+If you use `HF_TOKEN` instead of `.hf_token`, add `--hf_token HF_TOKEN` to the training command.
 
 ## BARX Training Setup
 
 BARX uses `vla-scripts/train.py` for both prior training and target-robot finetuning.
+Run outputs are written to `runs/<run_id>--<run_id_note>/`; for example, a Joint Reps prior on
+XP-900 PnP lands in `runs/aux--robocasa-x-xp900-pnp/`. The finetuning command references
+checkpoints from this path.
 
 High-level workflow:
 
@@ -165,24 +260,6 @@ All BARX examples below use:
 - `--vla.image_sequence_len 1`
 - constant LR schedule
 
-## Naming Convention
-
-`vla-scripts/train.py` writes runs to:
-
-```text
-<run_root_dir>/<run_id>--<run_id_note>
-```
-
-Examples:
-
-- `run_id="aux"` and `run_id_note="barx-xp900-pnp"` -> `aux--barx-xp900-pnp`
-- `run_id="bbox"` and `run_id_note="barx-xp900-panda-flip-mug-upright-mix"` -> `bbox--barx-xp900-panda-flip-mug-upright-mix`
-
-Important: `run_id_note` is just a label. The actual training mixture comes from `--vla.data_mix`, which must match a
-registered mixture id in [`prismatic/vla/datasets/rlds/oxe/mixtures.py`](/iliad2/u/ajaysri/openvla-mini-aux/prismatic/vla/datasets/rlds/oxe/mixtures.py).
-The BARX release aliases are supported directly there, so you can use paper-facing names in both `run_id_note` and
-`data_mix`.
-
 ## Method Mapping
 
 | Paper method | `run_id` | `--vla.transform_types` |
@@ -192,73 +269,104 @@ The BARX release aliases are supported directly there, so you can use paper-faci
 | Bounding Box | `bbox` | `"bbox->,action"` |
 | EE Trace | `ee` | `"ee_pose_2D->,action"` |
 | Language Motions | `lm` | `"low_level_motion->,action"` |
-| ECoT | `chain` | `"bbox->obj_pose->low_level_motion->ee_pose_2D,action"` |
+| ECoT | `chain` | `"bbox->low_level_motion->ee_pose_2D,action"` |
 
-Historical BARX launch scripts often used `chain` with `"bbox->ee_pose_2D->low_level_motion->,action"`. The BARX code
-also supports `obj_pose`, so the table above is the preferred release-time ECoT definition.
+## Aux Transform Syntax
+
+`--vla.transform_types` is a comma-separated list of transform modes. Each comma-separated entry is sampled as its own
+mode during training.
+
+- `action` means direct action supervision only.
+- `bbox`, `obj_pose`, `low_level_motion`, and `ee_pose_2D` mean aux-only supervision for that target.
+- Any transform containing `->` is a chained aux-to-action sample. The aux tasks are supervised left-to-right in the
+  order you write them, and action supervision is appended automatically at the end.
+- You can choose any ordered subset of the supported aux tasks. For example, `bbox->obj_pose` and `obj_pose->bbox`
+  are different chains.
+- For a single-step chain, use a trailing arrow: `bbox->` means "predict bbox, then predict action". Plain `bbox`
+  means aux-only and does not include the action target.
+- Do not write `action` inside a chain. `bbox->ee_pose_2D` already means `bbox`, then `ee_pose_2D`, then action.
+- `--vla.transform_weights` can weight the comma-separated entries. Its weights must align with the transform list and
+  sum to `1.0`.
+
+Examples:
+
+- `"action"`: direct action prediction only.
+- `"bbox"`: bbox-only aux supervision.
+- `"bbox->"`: bbox followed by action.
+- `"bbox->,action"`: mixture of bbox-then-action samples and pure action samples.
+- `"bbox->obj_pose->ee_pose_2D"`: custom left-to-right chain ending in action.
+- `"bbox->ee_pose_2D,low_level_motion->,action"`: two custom chained modes plus a pure action mode.
+- `--vla.transform_types "bbox->obj_pose->ee_pose_2D,action" --vla.transform_weights "0.7,0.3"`: spend 70% of
+  samples on that custom chain and 30% on pure action supervision.
 
 ## Task And Mixture Mapping
 
-### Cross-Embodiment Priors
+BARX training is two-phase: **pretrain** a prior on a large multi-robot mixture, then **finetune** on a
+target-robot mixture. Target-only baselines skip the pretraining step entirely.
+The tables below map paper settings to the CLI values used in each phase.
 
-| Task | Scale | Prior `data_mix` | Action tokenizer |
-| --- | --- | --- | --- |
-| `PnP` | `XP-3K` | `barx-xp3k-pnp` | `barx-xp3k-pnp-vq-extra-action-tokenizer` |
-| `PnP` | `XP-900` | `barx-xp900-pnp` | `barx-xp900-pnp-vq-extra-action-tokenizer` |
-| `Turn On Sink Faucet` | `XP-3K` | `barx-xp3k-turn-on-sink-faucet` | `barx-xp3k-turn-on-sink-faucet-vq-extra-action-tokenizer` |
-| `Turn On Sink Faucet` | `XP-900` | `barx-xp900-turn-on-sink-faucet` | `barx-xp900-turn-on-sink-faucet-vq-extra-action-tokenizer` |
-| `Flip Mug Upright` | `XP-3K` | `barx-xp3k-flip-mug-upright` | `barx-xp3k-flip-mug-upright-vq-extra-action-tokenizer` |
-| `Flip Mug Upright` | `XP-900` | `barx-xp900-flip-mug-upright` | `barx-xp900-flip-mug-upright-vq-extra-action-tokenizer` |
+In all tables below, `<robot>` is one of `panda`, `panda-og`, or `jaco`.
 
-### Cross-Embodiment Finetunes
+### Pretraining Mixtures
 
-| Task | Scale | Finetune `data_mix` | `dataset_statistics_map` |
-| --- | --- | --- | --- |
-| `PnP` | `XP-3K` | `barx-xp3k-<robot>-pnp-mix` | `{"barx-target-<robot>-pnp": "barx-xp3k-pnp"}` |
-| `PnP` | `XP-900` | `barx-xp900-<robot>-pnp-mix` | `{"barx-target-<robot>-pnp": "barx-xp900-pnp"}` |
-| `Turn On Sink Faucet` | `XP-3K` | `barx-xp3k-<robot>-turn-on-sink-faucet-mix` | `{"barx-target-<robot>-turn-on-sink-faucet": "barx-xp3k-turn-on-sink-faucet"}` |
-| `Turn On Sink Faucet` | `XP-900` | `barx-xp900-<robot>-turn-on-sink-faucet-mix` | `{"barx-target-<robot>-turn-on-sink-faucet": "barx-xp900-turn-on-sink-faucet"}` |
-| `Flip Mug Upright` | `XP-3K` | `barx-xp3k-<robot>-flip-mug-upright-mix` | `{"barx-target-<robot>-flip-mug-upright": "barx-xp3k-flip-mug-upright"}` |
-| `Flip Mug Upright` | `XP-900` | `barx-xp900-<robot>-flip-mug-upright-mix` | `{"barx-target-<robot>-flip-mug-upright": "barx-xp900-flip-mug-upright"}` |
+Use these with the [Prior Training Command](#prior-training-command). Each row is a standalone prior run.
+The action tokenizer for any `data_mix` is always `<data_mix>-vq-extra-action-tokenizer`.
 
-`<robot>` is one of `panda`, `panda-og`, or `jaco`.
+| Paradigm | Task | `data_mix` |
+| --- | --- | --- |
+| Cross-emb XP-3K | PnP | `robocasa-x-xp3k-pnp` |
+| Cross-emb XP-3K | Turn On Sink Faucet | `robocasa-x-xp3k-turn-on-sink-faucet` |
+| Cross-emb XP-3K | Flip Mug Upright | `robocasa-x-xp3k-flip-mug-upright` |
+| Cross-emb XP-900 | PnP | `robocasa-x-xp900-pnp` |
+| Cross-emb XP-900 | Turn On Sink Faucet | `robocasa-x-xp900-turn-on-sink-faucet` |
+| Cross-emb XP-900 | Flip Mug Upright | `robocasa-x-xp900-flip-mug-upright` |
+| Same-emb SP-900 | PnP | `robocasa-x-sp900-<robot>-pnp` |
+| Same-emb SP-900 | Turn On Sink Faucet | `robocasa-x-sp900-<robot>-turn-on-sink-faucet` |
+| Same-emb SP-900 | Flip Mug Upright | `robocasa-x-sp900-<robot>-flip-mug-upright` |
 
-### Same-Embodiment Priors And Finetunes
+### Finetuning Mixtures
 
-| Task | Same prior `data_mix` | Same finetune `data_mix` | `dataset_statistics_map` |
-| --- | --- | --- | --- |
-| `PnP` | `barx-sp900-<robot>-pnp` | `barx-sp900-<robot>-pnp-mix` | `{"barx-target-<robot>-pnp": "barx-sp900-<robot>-pnp"}` |
-| `Turn On Sink Faucet` | `barx-sp900-<robot>-turn-on-sink-faucet` | `barx-sp900-<robot>-turn-on-sink-faucet-mix` | `{"barx-target-<robot>-turn-on-sink-faucet": "barx-sp900-<robot>-turn-on-sink-faucet"}` |
-| `Flip Mug Upright` | `barx-sp900-<robot>-flip-mug-upright` | `barx-sp900-<robot>-flip-mug-upright-mix` | `{"barx-target-<robot>-flip-mug-upright": "barx-sp900-<robot>-flip-mug-upright"}` |
+Use these with the [Finetuning Command](#finetuning-command). Each finetune continues from a
+pretrained prior checkpoint.
 
-The corresponding same-embodiment tokenizers follow the same naming pattern:
+Each finetune mixture includes the **prior dataset** (down-weighted) alongside the **target robot dataset**
+(weight 1.0). XP-3K finetunes weight the prior at 1%; XP-900 and SP-900 finetunes weight it at 5%.
+The action tokenizer carries over from the prior. Set `--dataset_statistics_map` to
+`{"robocasa-x-target-<robot>-<task>": "<prior_data_mix>"}` (maps the target dataset to the prior's normalization stats).
 
-- `barx-sp900-<robot>-pnp-vq-extra-action-tokenizer`
-- `barx-sp900-<robot>-turn-on-sink-faucet-vq-extra-action-tokenizer`
-- `barx-sp900-<robot>-flip-mug-upright-vq-extra-action-tokenizer`
+| Paradigm | Task | `data_mix` |
+| --- | --- | --- |
+| Cross-emb XP-3K | PnP | `robocasa-x-xp3k-<robot>-pnp-mix` |
+| Cross-emb XP-3K | Turn On Sink Faucet | `robocasa-x-xp3k-<robot>-turn-on-sink-faucet-mix` |
+| Cross-emb XP-3K | Flip Mug Upright | `robocasa-x-xp3k-<robot>-flip-mug-upright-mix` |
+| Cross-emb XP-900 | PnP | `robocasa-x-xp900-<robot>-pnp-mix` |
+| Cross-emb XP-900 | Turn On Sink Faucet | `robocasa-x-xp900-<robot>-turn-on-sink-faucet-mix` |
+| Cross-emb XP-900 | Flip Mug Upright | `robocasa-x-xp900-<robot>-flip-mug-upright-mix` |
+| Same-emb SP-900 | PnP | `robocasa-x-sp900-<robot>-pnp-mix` |
+| Same-emb SP-900 | Turn On Sink Faucet | `robocasa-x-sp900-<robot>-turn-on-sink-faucet-mix` |
+| Same-emb SP-900 | Flip Mug Upright | `robocasa-x-sp900-<robot>-flip-mug-upright-mix` |
 
 ### Target-Only Baselines
 
-For target-only baselines:
+Train directly on the target dataset with no prior. Omit `--pretrained_checkpoint` and `--dataset_statistics_map`.
+The action tokenizer follows the same `<data_mix>-vq-extra-action-tokenizer` pattern.
 
-- set `data_mix="barx-target-<robot>-<task>"`
-- use the matching target tokenizer `barx-target-<robot>-<task>-vq-extra-action-tokenizer`
-- omit `--pretrained_checkpoint`
-- omit `--dataset_statistics_map`
+| Task | `data_mix` | `max_steps` | `save_interval` |
+| --- | --- | --- | --- |
+| PnP | `robocasa-x-target-<robot>-pnp` | 3000 | 1000 |
+| Turn On Sink Faucet | `robocasa-x-target-<robot>-turn-on-sink-faucet` | 2000 | 500 |
+| Flip Mug Upright | `robocasa-x-target-<robot>-flip-mug-upright` | 2000 | 500 |
 
-Default target schedules from the released BARX scripts:
+## Prior Training Command
 
-- `PnP`: `max_steps=3000`, `save_interval=1000`
-- `Turn On Sink Faucet`: `max_steps=2000`, `save_interval=500`
-- `Flip Mug Upright`: `max_steps=2000`, `save_interval=500`
-
-## Prior Training Template
+The example below trains a Joint Reps (`aux`) prior on `XP-900 PnP`. Swap the first block of
+env vars to match your target task, scale, and method from the tables above.
 
 ```bash
-export PRIOR_DATA_MIX=barx-xp900-pnp
-export ACTION_TOKENIZER=barx-xp900-pnp-vq-extra-action-tokenizer
+export PRIOR_DATA_MIX=robocasa-x-xp900-pnp
+export ACTION_TOKENIZER=robocasa-x-xp900-pnp-vq-extra-action-tokenizer
 export RUN_ID=aux
-export RUN_NOTE=barx-xp900-pnp
+export RUN_NOTE=robocasa-x-xp900-pnp
 export TRANSFORM_TYPES='bbox->,low_level_motion->,ee_pose_2D->,action'
 export MAX_STEPS=100000
 export SAVE_INTERVAL=10000
@@ -268,11 +376,10 @@ torchrun --standalone --nnodes 1 --nproc-per-node "$NUM_GPUS" vla-scripts/train.
     --vla.base_vlm "$BARX_BASE_VLM" \
     --vla.data_mix "$PRIOR_DATA_MIX" \
     --data_root_dir "$BARX_DATA_ROOT" \
-    --run_root_dir "$BARX_PRIOR_ROOT" \
     --vla.action_tokenizer "$ACTION_TOKENIZER" \
     --vla.expected_world_size "$NUM_GPUS" \
-    --vla.global_batch_size "$GLOBAL_BATCH_SIZE" \
-    --vla.per_device_batch_size "$PER_DEVICE_BATCH_SIZE" \
+    --vla.global_batch_size 128 \
+    --vla.per_device_batch_size 16 \
     --vla.lr_scheduler_type constant \
     --vla.max_steps "$MAX_STEPS" \
     --vla.use_wrist_image False \
@@ -288,29 +395,31 @@ torchrun --standalone --nnodes 1 --nproc-per-node "$NUM_GPUS" vla-scripts/train.
 For an exact paper rerun, match `max_steps`, `save_interval`, and any resume fields to the released prior checkpoint
 configuration you are recreating.
 
-## Finetuning Template
+## Finetuning Command
+
+The example below finetunes Panda PnP Joint Reps from an `XP-3K` prior checkpoint. Swap the first
+block of env vars to match your target task, robot, scale, and method.
 
 ```bash
-export TARGET_DATA_MIX=barx-xp3k-panda-pnp-mix
-export ACTION_TOKENIZER=barx-xp3k-pnp-vq-extra-action-tokenizer
-export PRETRAIN_CKPT=$BARX_PRIOR_ROOT/aux--barx-xp3k-pnp/checkpoints/<step-file>.pt
+export TARGET_DATA_MIX=robocasa-x-xp3k-panda-pnp-mix
+export ACTION_TOKENIZER=robocasa-x-xp3k-pnp-vq-extra-action-tokenizer
+export PRETRAIN_CKPT=/path/to/aux--robocasa-x-xp3k-pnp/checkpoints/<step-file>.pt
 export RUN_ID=aux
-export RUN_NOTE=barx-xp3k-panda-pnp-mix
+export RUN_NOTE=robocasa-x-xp3k-panda-pnp-mix
 export TRANSFORM_TYPES='bbox->,low_level_motion->,ee_pose_2D->,action'
 export MAX_STEPS=3000
 export SAVE_INTERVAL=1000
-export DATASET_STATS_JSON='{"barx-target-panda-pnp":"barx-xp3k-pnp"}'
+export DATASET_STATS_JSON='{"robocasa-x-target-panda-pnp":"robocasa-x-xp3k-pnp"}'
 
 torchrun --standalone --nnodes 1 --nproc-per-node "$NUM_GPUS" vla-scripts/train.py \
     --vla.type prism-qwen25-dinosiglip-224px+0_5b+mx-xembod-robocasa-full \
     --vla.base_vlm "$BARX_BASE_VLM" \
     --vla.data_mix "$TARGET_DATA_MIX" \
     --data_root_dir "$BARX_DATA_ROOT" \
-    --run_root_dir "$BARX_FT_ROOT" \
     --vla.action_tokenizer "$ACTION_TOKENIZER" \
     --vla.expected_world_size "$NUM_GPUS" \
-    --vla.global_batch_size "$GLOBAL_BATCH_SIZE" \
-    --vla.per_device_batch_size "$PER_DEVICE_BATCH_SIZE" \
+    --vla.global_batch_size 16 \
+    --vla.per_device_batch_size 16 \
     --vla.lr_scheduler_type constant \
     --vla.max_steps "$MAX_STEPS" \
     --vla.use_wrist_image False \
@@ -326,58 +435,8 @@ torchrun --standalone --nnodes 1 --nproc-per-node "$NUM_GPUS" vla-scripts/train.
     --save_interval "$SAVE_INTERVAL"
 ```
 
-## Example: Panda PnP Joint Reps From The XP-3K Prior
 
-```bash
-export TARGET_DATA_MIX=barx-xp3k-panda-pnp-mix
-export ACTION_TOKENIZER=barx-xp3k-pnp-vq-extra-action-tokenizer
-export PRETRAIN_CKPT=$BARX_PRIOR_ROOT/aux--barx-xp3k-pnp/checkpoints/<step-file>.pt
-export DATASET_STATS_JSON='{"barx-target-panda-pnp":"barx-xp3k-pnp"}'
-
-torchrun --standalone --nnodes 1 --nproc-per-node "$NUM_GPUS" vla-scripts/train.py \
-    --vla.type prism-qwen25-dinosiglip-224px+0_5b+mx-xembod-robocasa-full \
-    --vla.base_vlm "$BARX_BASE_VLM" \
-    --vla.data_mix "$TARGET_DATA_MIX" \
-    --data_root_dir "$BARX_DATA_ROOT" \
-    --run_root_dir "$BARX_FT_ROOT" \
-    --vla.action_tokenizer "$ACTION_TOKENIZER" \
-    --vla.expected_world_size "$NUM_GPUS" \
-    --vla.global_batch_size "$GLOBAL_BATCH_SIZE" \
-    --vla.per_device_batch_size "$PER_DEVICE_BATCH_SIZE" \
-    --vla.lr_scheduler_type constant \
-    --vla.max_steps 3000 \
-    --vla.use_wrist_image False \
-    --vla.image_sequence_len 1 \
-    --wandb_entity "$WANDB_ENTITY" \
-    --run_id_note "barx-xp3k-panda-pnp-mix" \
-    --run_id aux \
-    --pretrained_checkpoint "$PRETRAIN_CKPT" \
-    --is_resume False \
-    --dataset_statistics_map "$DATASET_STATS_JSON" \
-    --vla.transform_types "bbox->,low_level_motion->,ee_pose_2D->,action" \
-    --vla.warmup_ratio 0.02 \
-    --save_interval 1000
-```
-
-## Action-Free Variants
-
-BARX also used action-free variants in some experiments.
-
-Historical scripts used:
-
-- a non-action prior stage such as `run_id="aux_no_act"` with `transform_types="bbox,ee_pose_2D"`
-- a target finetune stage that still uses the standard joint-reps transform string but adds:
-
-```bash
---non_action_datasets '["<prior_data_mix>"]'
-```
-
-and points `--pretrained_checkpoint` at the released action-free prior.
-
-If you release both `aux_no_act` and `aux_only`, include a manifest that says which one corresponds to the official
-paper result for each task.
-
-## Troubleshooting
+<!-- ## Troubleshooting
 
 If TFDS loading breaks, the main repo README recommends:
 
@@ -395,11 +454,4 @@ If a BARX VQ tokenizer fails to load, check:
 
 - the `vq/` symlink or directory exists
 - the expected `vq/<name>/config.json` exists
-- the expected `vq/<name>/checkpoints/model.pt` exists
-
-## Additional BARX Docs
-
-For BARX-specific inventory and release notes, see:
-
-- [README_BARX_reproduction.md](/iliad2/u/ajaysri/openvla-mini-aux/barx_checkpoint_agent_pkg/README_BARX_reproduction.md)
-- [README_BARX_checkpoint_audit.md](/iliad2/u/ajaysri/openvla-mini-aux/barx_checkpoint_agent_pkg/README_BARX_checkpoint_audit.md)
+- the expected `vq/<name>/checkpoints/model.pt` exists -->
