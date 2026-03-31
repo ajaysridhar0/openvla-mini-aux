@@ -150,9 +150,6 @@ export BARX_BASE_VLM=/path/to/prism-qwen25-extra-dinosiglip-224px+0_5b+stage-fin
 export HF_TOKEN=hf_...
 export WANDB_ENTITY=your_wandb_entity
 
-# Useful for fresh-user smoke tests.
-export WANDB_MODE=disabled
-
 # Set to the number of GPUs available on your machine.
 # Adjust global_batch_size in the training commands accordingly.
 export NUM_GPUS=8
@@ -225,8 +222,8 @@ All `data_mix` names follow a consistent pattern. `<task>` is `pnp`, `turn-on-si
 (weight 1.0). XP-900 and SP-900 finetunes weight the prior at 5%; XP-3K at 1%. The action tokenizer carries over
 from the prior. Set `--dataset_statistics_map '{"robocasa-x-target-<robot>-<task>": "<prior_data_mix>"}'`.
 
-**Target-only notes:** omit `--pretrained_checkpoint` and `--dataset_statistics_map`. Use `max_steps` 3000 /
-`save_interval` 1000 for PnP; 2000 / 500 for Turn On Sink Faucet and Flip Mug Upright.
+**Target-only notes:** omit `--pretrained_checkpoint` and `--dataset_statistics_map`. Use `max_steps` in the
+2000–3000 range and `save_interval` 500–1000.
 
 ## Prior Training Command
 
