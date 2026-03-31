@@ -16,11 +16,6 @@ from prismatic.models.backbones.vision import ImageTransform
 from prismatic.models.backbones.vision.base_vision import WrapSequenceImageTransform
 from prismatic.util.data_utils import PaddedCollatorForActionPrediction
 from prismatic.vla import ActionTokenizer, ACTION_TOKENIZERS
-from prismatic.vla.robocasa_x_aliases import (
-    canonicalize_robocasa_x_dataset_list,
-    canonicalize_robocasa_x_dataset_statistics_map,
-    canonicalize_robocasa_x_subset_percentages,
-)
 from prismatic.vla.datasets import EpisodicRLDSDataset, RLDSDataset
 from prismatic.vla.datasets.datasets import (
     AUX_TASK_QA_FUNCTIONS,
@@ -28,6 +23,43 @@ from prismatic.vla.datasets.datasets import (
     RLDSAuxTransform,
     ChainedTransform,
 )
+
+
+def _canonicalize_robocasa_x_dataset_name(name: str) -> str:
+    if name.startswith("robocasa-x-") and not name.endswith("-mix"):
+        return name.replace("-", "_")
+    return name
+
+
+def _canonicalize_robocasa_x_dataset_statistics_map(
+    dataset_statistics_map: Optional[Dict[str, str]]
+) -> Optional[Dict[str, str]]:
+    if dataset_statistics_map is None:
+        return None
+
+    return {
+        _canonicalize_robocasa_x_dataset_name(dataset_name): _canonicalize_robocasa_x_dataset_name(stats_name)
+        for dataset_name, stats_name in dataset_statistics_map.items()
+    }
+
+
+def _canonicalize_robocasa_x_dataset_list(dataset_names: Optional[List[str]]) -> Optional[List[str]]:
+    if dataset_names is None:
+        return None
+
+    return [_canonicalize_robocasa_x_dataset_name(dataset_name) for dataset_name in dataset_names]
+
+
+def _canonicalize_robocasa_x_subset_percentages(
+    subset_percentages: Optional[Dict[str, float]]
+) -> Optional[Dict[str, float]]:
+    if subset_percentages is None:
+        return None
+
+    return {
+        _canonicalize_robocasa_x_dataset_name(dataset_name): subset_fraction
+        for dataset_name, subset_fraction in subset_percentages.items()
+    }
 
 
 def _parse_transform_spec(transform_types: str) -> List[str]:
@@ -105,9 +137,9 @@ def get_vla_dataset_and_collator(
 ) -> Tuple[Dataset, ActionTokenizer, PaddedCollatorForActionPrediction]:
     """Initialize RLDS Dataset (wraps TFDS), ActionTokenizer, and initialize transform/collation functions."""
 
-    dataset_statistics_map = canonicalize_robocasa_x_dataset_statistics_map(dataset_statistics_map)
-    subset_percentages = canonicalize_robocasa_x_subset_percentages(subset_percentages)
-    non_action_datasets = canonicalize_robocasa_x_dataset_list(non_action_datasets)
+    dataset_statistics_map = _canonicalize_robocasa_x_dataset_statistics_map(dataset_statistics_map)
+    subset_percentages = _canonicalize_robocasa_x_subset_percentages(subset_percentages)
+    non_action_datasets = _canonicalize_robocasa_x_dataset_list(non_action_datasets)
     action_tokenizer: ActionTokenizer = ACTION_TOKENIZERS[action_tokenizer](tokenizer)
 
     # get the future action window needed from the tokenizer

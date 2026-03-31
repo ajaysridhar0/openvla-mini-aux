@@ -13,11 +13,39 @@ import numpy as np
 import torch
 from transformers import PreTrainedTokenizerBase
 from transformers.models.qwen2.tokenization_qwen2_fast import Qwen2TokenizerFast
+
 from prismatic.overwatch.overwatch import initialize_overwatch
-from prismatic.vla.robocasa_x_aliases import ROBOCASA_X_ACTION_TOKENIZER_ALIASES
 
 
 overwatch = initialize_overwatch(__name__)
+
+
+ROBOCASA_X_VQ_ACTION_TOKENIZER_DIRS = {
+    "robocasa-x-xp3k-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_xp3k_pnp",
+    "robocasa-x-xp900-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_xp900_pnp",
+    "robocasa-x-xp3k-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_xp3k_turn_on_sink_faucet",
+    "robocasa-x-xp900-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_xp900_turn_on_sink_faucet",
+    "robocasa-x-xp3k-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_xp3k_flip_mug_upright",
+    "robocasa-x-xp900-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_xp900_flip_mug_upright",
+    "robocasa-x-sp900-panda-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_panda_pnp",
+    "robocasa-x-sp900-panda-og-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_panda_og_pnp",
+    "robocasa-x-sp900-jaco-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_jaco_pnp",
+    "robocasa-x-sp900-panda-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_panda_turn_on_sink_faucet",
+    "robocasa-x-sp900-panda-og-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_panda_og_turn_on_sink_faucet",
+    "robocasa-x-sp900-jaco-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_jaco_turn_on_sink_faucet",
+    "robocasa-x-sp900-panda-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_panda_flip_mug_upright",
+    "robocasa-x-sp900-panda-og-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_panda_og_flip_mug_upright",
+    "robocasa-x-sp900-jaco-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_jaco_flip_mug_upright",
+    "robocasa-x-target-panda-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_target_panda_pnp",
+    "robocasa-x-target-panda-og-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_target_panda_og_pnp",
+    "robocasa-x-target-jaco-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_target_jaco_pnp",
+    "robocasa-x-target-panda-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_target_panda_turn_on_sink_faucet",
+    "robocasa-x-target-panda-og-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_target_panda_og_turn_on_sink_faucet",
+    "robocasa-x-target-jaco-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_target_jaco_turn_on_sink_faucet",
+    "robocasa-x-target-panda-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_target_panda_flip_mug_upright",
+    "robocasa-x-target-panda-og-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_target_panda_og_flip_mug_upright",
+    "robocasa-x-target-jaco-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_target_jaco_flip_mug_upright",
+}
 
 
 class ActionTokenizer:
@@ -228,111 +256,6 @@ ACTION_TOKENIZERS = {
         vq_vae_path="vq/xembod_pnp_counter_to_sink",
         use_extra=True,
     ),
-    "mg_pnp_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_pnp",
-        use_extra=True,
-    ),
-    "mg_turn_on_sink_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_turn_on_sink",
-        use_extra=True,
-    ),
-    "mg_flip_mug_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_flip_mug",
-        use_extra=True,
-    ),
-    "mg_pnp_lite_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_pnp_lite",
-        use_extra=True,
-    ),
-    "mg_turn_on_sink_lite_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_turn_on_sink_lite",
-        use_extra=True,
-    ),
-    "mg_flip_mug_lite_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_flip_mug_lite",
-        use_extra=True,
-    ),
-    "mg_kinova_pnp_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_kinova_pnp",
-        use_extra=True,
-    ),
-    "mg_kinova_pnp_lite_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_kinova_pnp_lite",
-        use_extra=True,
-    ),
-    "mg_ur5e_pnp_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_ur5e_pnp",
-        use_extra=True,
-    ),
-    "mg_ur5e_pnp_lite_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_ur5e_pnp_lite",
-        use_extra=True,
-    ),
-    "mg_iiwa_pnp_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_iiwa_pnp",
-        use_extra=True,
-    ),
-    "mg_iiwa_pnp_lite_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_iiwa_pnp_lite",
-        use_extra=True,
-    ),
-    "panda_pnp_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/panda_pnp",
-        use_extra=True,
-    ),
-    "panda_og_pnp_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/panda_og_pnp",
-        use_extra=True,
-    ),
-    "jaco_pnp_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/jaco_pnp",
-        use_extra=True,
-    ),
-    "panda_flip_mug_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/panda_flip_mug",
-        use_extra=True,
-    ),
-    "panda_og_flip_mug_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/panda_og_flip_mug",
-        use_extra=True,
-    ),
-    "jaco_flip_mug_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/jaco_flip_mug",
-        use_extra=True,
-    ),
-    "panda_turn_on_sink_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/panda_turn_on_sink",
-        use_extra=True,
-    ),
-    "panda_og_turn_on_sink_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/panda_og_turn_on_sink",
-        use_extra=True,
-    ),
-    "jaco_turn_on_sink_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/jaco_turn_on_sink",
-        use_extra=True,
-    ),
     "panda_real_vq_extra_action_tokenizer": partial(
         VQActionTokenizer,
         vq_vae_path="vq/panda_real",
@@ -368,61 +291,7 @@ ACTION_TOKENIZERS = {
         vq_vae_path="vq/panda_viper_real_mg_decoder_only",
         use_extra=True,
     ),
-
-    "mg_panda_pnp_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_panda_pnp",
-        use_extra=True,
-    ),
-
-    "mg_panda_flip_mug_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_panda_flip_mug",
-        use_extra=True,
-    ),
-
-    "mg_panda_turn_on_sink_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_panda_turn_on_sink",
-        use_extra=True,
-    ),
-
-    "mg_panda_og_pnp_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_panda_og_pnp",
-        use_extra=True,
-    ),
-
-    "mg_panda_og_flip_mug_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_panda_og_flip_mug",
-        use_extra=True,
-    ),
-
-    "mg_panda_og_turn_on_sink_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_panda_og_turn_on_sink",
-        use_extra=True,
-    ),
-
-    "mg_jaco_pnp_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_jaco_pnp",
-        use_extra=True,
-    ),
-
-    "mg_jaco_flip_mug_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_jaco_flip_mug",
-        use_extra=True,
-    ),
-
-    "mg_jaco_turn_on_sink_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/mg_jaco_turn_on_sink",
-        use_extra=True,
-    ),
 }
 
-for alias_name, canonical_name in ROBOCASA_X_ACTION_TOKENIZER_ALIASES.items():
-    ACTION_TOKENIZERS[alias_name] = ACTION_TOKENIZERS[canonical_name]
+for tokenizer_name, vq_dir in ROBOCASA_X_VQ_ACTION_TOKENIZER_DIRS.items():
+    ACTION_TOKENIZERS[tokenizer_name] = partial(VQActionTokenizer, vq_vae_path=vq_dir, use_extra=True)

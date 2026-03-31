@@ -4,11 +4,37 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Tuple, Optional
 
-from prismatic.vla.robocasa_x_aliases import (
-    canonicalize_robocasa_x_dataset_statistics_map,
-    canonicalize_robocasa_x_subset_percentages,
-)
 from prismatic.vla.datasets.datasets import EpisodicRLDSDataset, RLDSDataset
+
+
+def _canonicalize_robocasa_x_dataset_name(name: str) -> str:
+    if name.startswith("robocasa-x-") and not name.endswith("-mix"):
+        return name.replace("-", "_")
+    return name
+
+
+def _canonicalize_robocasa_x_dataset_statistics_map(
+    dataset_statistics_map: Optional[Dict[str, str]]
+) -> Optional[Dict[str, str]]:
+    if dataset_statistics_map is None:
+        return None
+
+    return {
+        _canonicalize_robocasa_x_dataset_name(dataset_name): _canonicalize_robocasa_x_dataset_name(stats_name)
+        for dataset_name, stats_name in dataset_statistics_map.items()
+    }
+
+
+def _canonicalize_robocasa_x_subset_percentages(
+    subset_percentages: Optional[Dict[str, float]]
+) -> Optional[Dict[str, float]]:
+    if subset_percentages is None:
+        return None
+
+    return {
+        _canonicalize_robocasa_x_dataset_name(dataset_name): subset_fraction
+        for dataset_name, subset_fraction in subset_percentages.items()
+    }
 
 
 @dataclass
@@ -42,8 +68,8 @@ def get_vla_action_dataset(
 ):
     """Only get the image / action / instruction, don't do any tokenization."""
 
-    dataset_statistics_map = canonicalize_robocasa_x_dataset_statistics_map(dataset_statistics_map)
-    subset_percentages = canonicalize_robocasa_x_subset_percentages(subset_percentages)
+    dataset_statistics_map = _canonicalize_robocasa_x_dataset_statistics_map(dataset_statistics_map)
+    subset_percentages = _canonicalize_robocasa_x_subset_percentages(subset_percentages)
 
     # TODO new batch transform
     batch_transform = RLDSActionBatchTransform(include_images=include_images)

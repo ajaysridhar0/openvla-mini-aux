@@ -194,260 +194,6 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
     ],
 
 
-    # === RoboCasa-X Datasets ===
-    "mg_pnp": [
-        ("mg_pnp", 1.0),
-    ],
-    "mg_turn_on_sink": [
-        ("mg_turn_on_sink", 1.0),
-    ],
-    "mg_flip_mug": [
-        ("mg_flip_mug", 1.0),
-    ],
-    "mg_pnp_lite": [
-        ("mg_pnp_lite", 1.0),
-    ],
-    "mg_turn_on_sink_lite": [
-        ("mg_turn_on_sink_lite", 1.0),
-    ],
-    "mg_flip_mug_lite": [
-        ("mg_flip_mug_lite", 1.0),
-    ],
-    "mg_kinova_pnp": [
-        ("mg_kinova_pnp", 1.0),
-    ],
-    "mg_kinova_pnp_lite": [
-        ("mg_kinova_pnp_lite", 1.0),
-    ],
-    "mg_ur5e_pnp": [
-        ("mg_ur5e_pnp", 1.0),
-    ],
-    "mg_ur5e_pnp_lite": [
-        ("mg_ur5e_pnp_lite", 1.0),
-    ],
-    "mg_iiwa_pnp": [
-        ("mg_iiwa_pnp", 1.0),
-    ],
-    "mg_iiwa_pnp_lite": [
-        ("mg_iiwa_pnp_lite", 1.0),
-    ],
-    "panda+mg": [
-        ("mg_pnp", 0.01),
-        ("panda_pnp", 1.0)
-    ],
-    "panda_og+mg": [
-        ("mg_pnp", 0.01),
-        ("panda_og_pnp", 1.0)
-    ],
-    "panda+mg_lite": [
-        ("mg_pnp_lite", 0.05),
-        ("panda_pnp", 1.0)
-    ],
-    "panda_og+mg_lite": [
-        ("mg_pnp_lite", 0.05),
-        ("panda_og_pnp", 1.0)
-    ],
-    "panda_pnp": [
-        ("panda_pnp", 1.0)
-    ],
-    "panda_og_pnp": [
-        ("panda_og_pnp", 1.0)
-    ],
-    "panda_turn_on_sink": [
-        ("panda_turn_on_sink", 1.0)
-    ],
-    "panda_og_turn_on_sink": [
-        ("panda_og_turn_on_sink", 1.0)
-    ],
-    "jaco_turn_on_sink": [
-        ("jaco_turn_on_sink", 1.0)
-    ],
-    "panda+mg_turn_on_sink": [
-        ("mg_turn_on_sink", 0.01),
-        ("panda_turn_on_sink", 1.0)
-    ],
-    "panda_og+mg_turn_on_sink": [
-        ("mg_turn_on_sink", 0.01),
-        ("panda_og_turn_on_sink", 1.0)
-    ],
-    "jaco+mg_turn_on_sink": [
-        ("mg_turn_on_sink", 0.01),
-        ("jaco_turn_on_sink", 1.0)
-    ],
-    "panda+mg_turn_on_sink_lite": [
-        ("mg_turn_on_sink_lite", 0.05),
-        ("panda_turn_on_sink", 1.0)
-    ],
-    "panda_og+mg_turn_on_sink_lite": [
-        ("mg_turn_on_sink_lite", 0.05),
-        ("panda_og_turn_on_sink", 1.0)
-    ],
-    "jaco+mg_turn_on_sink_lite": [
-        ("mg_turn_on_sink_lite", 0.05),
-        ("jaco_turn_on_sink", 1.0)
-    ],
-    "panda_flip_mug": [
-        ("panda_flip_mug", 1.0)
-    ],
-    "panda_og_flip_mug": [
-        ("panda_og_flip_mug", 1.0)
-    ],
-    "jaco_flip_mug": [
-        ("jaco_flip_mug", 1.0)
-    ],
-    "panda+mg_flip_mug": [
-        ("mg_flip_mug", 0.01),
-        ("panda_flip_mug", 1.0)
-    ],
-    "panda_og+mg_flip_mug": [
-        ("mg_flip_mug", 0.01),
-        ("panda_og_flip_mug", 1.0)
-    ],
-    "panda_og+mg_flip_mug_lite": [
-        ("mg_flip_mug_lite", 0.05),
-        ("panda_og_flip_mug", 1.0)
-    ],
-    "jaco+mg_flip_mug": [
-        ("mg_flip_mug", 0.01),
-        ("jaco_flip_mug", 1.0)
-    ],
-    "panda+mg_flip_mug_lite": [
-        ("mg_flip_mug_lite", 0.05),
-        ("panda_flip_mug", 1.0)
-    ],
-    "jaco+mg_flip_mug_lite": [
-        ("mg_flip_mug_lite", 0.05),
-        ("jaco_flip_mug", 1.0)
-    ],
-    "jaco_pnp": [
-        ("jaco_pnp", 1.0)
-    ],
-    "jaco+mg": [
-        ("mg_pnp", 0.01),
-        ("jaco_pnp", 1.0)
-    ],
-    "jaco+mg_lite": [
-        ("mg_pnp_lite", 0.05),
-        ("jaco_pnp", 1.0)
-    ],
-    "panda_real": [
-        ("franka_pnpcountertosink_aux", 1.0),
-        ("franka_pnpsinktocounter_aux", 1.0)
-    ],
-    "panda_real_vary": [
-        ("franka_pnpcountertosink_vary_aux", 1.0),
-        ("franka_pnpsinktocounter_aux", 1.0)
-    ],
-    "viper_real": [
-        ("viper_pnpcountertosink_aux", 1.0),
-        ("viper_pnpsinktocounter_aux", 1.0)
-    ],
-    "viper_real_vary": [
-        ("viper_pnpcountertosink_vary_aux", 1.0),
-        ("viper_pnpsinktocounter_aux", 1.0)
-    ],
-    "panda_viper_real_mg": [
-        ("franka_pnpcountertosink_aux", 1.0),
-        ("franka_pnpsinktocounter_aux", 1.0),
-        ("viper_pnpcountertosink_aux", 1.0),
-        ("viper_pnpsinktocounter_aux", 1.0),
-        ("mg_pnp", 0.01)  # 0.002 for tokenizer
-    ],
-    "panda_viper_real_vary_mg": [
-        ("franka_pnpcountertosink_vary_aux", 1.0),
-        ("franka_pnpsinktocounter_aux", 1.0),
-        ("viper_pnpcountertosink_vary_aux", 1.0),
-        ("viper_pnpsinktocounter_aux", 1.0),
-        ("mg_pnp", 0.01)  # 0.002 for tokenizer
-    ],
-
-    # mg target datasets
-    "mg_panda_pnp": [
-        ("mg_panda_pnp", 1.0),
-    ],
-    "mg_panda_flip_mug": [
-        ("mg_panda_flip_mug", 1.0),
-    ],
-    "mg_panda_turn_on_sink": [
-        ("mg_panda_turn_on_sink", 1.0),
-    ],
-    "mg_panda_pnp_single_cam": [
-        ("mg_panda_pnp_single_cam", 1.0),
-    ],
-
-    "panda+mg_panda_pnp": [
-        ("panda_pnp", 1.0),
-        ("mg_panda_pnp", 0.05),
-    ],
-    "panda+mg_panda_flip_mug": [
-        ("panda_flip_mug", 1.0),
-        ("mg_panda_flip_mug", 0.05),
-    ],
-    "panda+mg_panda_turn_on_sink": [
-        ("panda_turn_on_sink", 1.0),
-        ("mg_panda_turn_on_sink", 0.05),
-    ],
-
-    "panda+mg_panda_pnp_single_cam": [
-        ("panda_pnp", 1.0),
-        ("mg_panda_pnp_single_cam", 0.05),
-    ],
-
-    "mg_panda_og_pnp": [
-        ("mg_panda_og_pnp", 1.0),
-    ],
-    "mg_panda_og_flip_mug": [
-        ("mg_panda_og_flip_mug", 1.0),
-    ],
-    "mg_panda_og_turn_on_sink": [
-        ("mg_panda_og_turn_on_sink", 1.0),
-    ],
-
-    "panda_og+mg_panda_og_pnp": [
-        ("panda_og_pnp", 1.0),
-        ("mg_panda_og_pnp", 0.05),
-    ],
-    "panda_og+mg_panda_og_flip_mug": [
-        ("panda_og_flip_mug", 1.0),
-        ("mg_panda_og_flip_mug", 0.05),
-    ],
-    "panda_og+mg_panda_og_turn_on_sink": [
-        ("panda_og_turn_on_sink", 1.0),
-        ("mg_panda_og_turn_on_sink", 0.05),
-    ],
-
-    "mg_jaco_pnp": [
-        ("mg_jaco_pnp", 1.0),
-    ],
-    "mg_jaco_flip_mug": [
-        ("mg_jaco_flip_mug", 1.0),
-    ],
-    "mg_jaco_turn_on_sink": [
-        ("mg_jaco_turn_on_sink", 1.0),
-    ],
-
-    "mg_jaco_pnp_single_cam": [
-        ("mg_jaco_pnp_single_cam", 1.0),
-    ],
-
-    "jaco+mg_jaco_pnp_single_cam": [
-        ("jaco_pnp", 1.0),
-        ("mg_jaco_pnp_single_cam", 0.05),
-    ],
-
-    "jaco+mg_jaco_pnp": [
-        ("jaco_pnp", 1.0),
-        ("mg_jaco_pnp", 0.05),
-    ],
-    "jaco+mg_jaco_flip_mug": [
-        ("jaco_flip_mug", 1.0),
-        ("mg_jaco_flip_mug", 0.05),
-    ],
-    "jaco+mg_jaco_turn_on_sink": [
-        ("jaco_turn_on_sink", 1.0),
-        ("mg_jaco_turn_on_sink", 0.05),
-    ],
-
     # === RoboCasa-X Release Mixtures ===
     "robocasa-x-xp3k-pnp": [
         ("robocasa_x_xp3k_pnp", 1.0),
@@ -467,7 +213,6 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
     "robocasa-x-xp900-flip-mug-upright": [
         ("robocasa_x_xp900_flip_mug_upright", 1.0),
     ],
-
     "robocasa-x-target-panda-pnp": [
         ("robocasa_x_target_panda_pnp", 1.0),
     ],
@@ -495,7 +240,6 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
     "robocasa-x-target-jaco-flip-mug-upright": [
         ("robocasa_x_target_jaco_flip_mug_upright", 1.0),
     ],
-
     "robocasa-x-xp3k-panda-pnp-mix": [
         ("robocasa_x_xp3k_pnp", 0.01),
         ("robocasa_x_target_panda_pnp", 1.0),
@@ -520,7 +264,6 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("robocasa_x_xp900_pnp", 0.05),
         ("robocasa_x_target_jaco_pnp", 1.0),
     ],
-
     "robocasa-x-xp3k-panda-turn-on-sink-faucet-mix": [
         ("robocasa_x_xp3k_turn_on_sink_faucet", 0.01),
         ("robocasa_x_target_panda_turn_on_sink_faucet", 1.0),
@@ -545,7 +288,6 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("robocasa_x_xp900_turn_on_sink_faucet", 0.05),
         ("robocasa_x_target_jaco_turn_on_sink_faucet", 1.0),
     ],
-
     "robocasa-x-xp3k-panda-flip-mug-upright-mix": [
         ("robocasa_x_xp3k_flip_mug_upright", 0.01),
         ("robocasa_x_target_panda_flip_mug_upright", 1.0),
@@ -570,7 +312,6 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("robocasa_x_xp900_flip_mug_upright", 0.05),
         ("robocasa_x_target_jaco_flip_mug_upright", 1.0),
     ],
-
     "robocasa-x-sp900-panda-pnp": [
         ("robocasa_x_sp900_panda_pnp", 1.0),
     ],
@@ -598,7 +339,6 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
     "robocasa-x-sp900-jaco-flip-mug-upright": [
         ("robocasa_x_sp900_jaco_flip_mug_upright", 1.0),
     ],
-
     "robocasa-x-sp900-panda-pnp-mix": [
         ("robocasa_x_target_panda_pnp", 1.0),
         ("robocasa_x_sp900_panda_pnp", 0.05),
@@ -635,12 +375,72 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("robocasa_x_target_jaco_flip_mug_upright", 1.0),
         ("robocasa_x_sp900_jaco_flip_mug_upright", 0.05),
     ],
+
+    # === Supplemental Internal RoboCasa Datasets ===
+    "mg_kinova_pnp": [
+        ("mg_kinova_pnp", 1.0),
+    ],
+    "mg_kinova_pnp_lite": [
+        ("mg_kinova_pnp_lite", 1.0),
+    ],
+    "mg_ur5e_pnp": [
+        ("mg_ur5e_pnp", 1.0),
+    ],
+    "mg_ur5e_pnp_lite": [
+        ("mg_ur5e_pnp_lite", 1.0),
+    ],
+    "mg_iiwa_pnp": [
+        ("mg_iiwa_pnp", 1.0),
+    ],
+    "mg_iiwa_pnp_lite": [
+        ("mg_iiwa_pnp_lite", 1.0),
+    ],
+    "panda_real": [
+        ("franka_pnpcountertosink_aux", 1.0),
+        ("franka_pnpsinktocounter_aux", 1.0)
+    ],
+    "panda_real_vary": [
+        ("franka_pnpcountertosink_vary_aux", 1.0),
+        ("franka_pnpsinktocounter_aux", 1.0)
+    ],
+    "viper_real": [
+        ("viper_pnpcountertosink_aux", 1.0),
+        ("viper_pnpsinktocounter_aux", 1.0)
+    ],
+    "viper_real_vary": [
+        ("viper_pnpcountertosink_vary_aux", 1.0),
+        ("viper_pnpsinktocounter_aux", 1.0)
+    ],
+    "panda_viper_real_mg": [
+        ("franka_pnpcountertosink_aux", 1.0),
+        ("franka_pnpsinktocounter_aux", 1.0),
+        ("viper_pnpcountertosink_aux", 1.0),
+        ("viper_pnpsinktocounter_aux", 1.0),
+        ("robocasa_x_xp3k_pnp", 0.01)  # 0.002 for tokenizer
+    ],
+    "panda_viper_real_vary_mg": [
+        ("franka_pnpcountertosink_vary_aux", 1.0),
+        ("franka_pnpsinktocounter_aux", 1.0),
+        ("viper_pnpcountertosink_vary_aux", 1.0),
+        ("viper_pnpsinktocounter_aux", 1.0),
+        ("robocasa_x_xp3k_pnp", 0.01)  # 0.002 for tokenizer
+    ],
+
+    # Supplemental internal single-camera datasets
+    "mg_panda_pnp_single_cam": [
+        ("mg_panda_pnp_single_cam", 1.0),
+    ],
+    "panda+mg_panda_pnp_single_cam": [
+        ("robocasa_x_target_panda_pnp", 1.0),
+        ("mg_panda_pnp_single_cam", 0.05),
+    ],
+    "mg_jaco_pnp_single_cam": [
+        ("mg_jaco_pnp_single_cam", 1.0),
+    ],
+    "jaco+mg_jaco_pnp_single_cam": [
+        ("robocasa_x_target_jaco_pnp", 1.0),
+        ("mg_jaco_pnp_single_cam", 0.05),
+    ],
     # TODO (ajaysri): add partial held-out mixture
 }
 # fmt: on
-
-
-# Backwards-compatible BARX CLI aliases for the released RoboCasa-X mixture names.
-for mixture_name in list(OXE_NAMED_MIXTURES.keys()):
-    if mixture_name.startswith("robocasa-x-"):
-        OXE_NAMED_MIXTURES.setdefault(mixture_name.replace("robocasa-x-", "barx-", 1), OXE_NAMED_MIXTURES[mixture_name])

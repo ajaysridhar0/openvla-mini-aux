@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple, Optional
 
 from prismatic.overwatch import initialize_overwatch
-from prismatic.vla.robocasa_x_aliases import ROBOCASA_X_RELEASED_TFDS_DATASET_ALIASES
 from prismatic.vla.datasets.rlds.oxe.configs import OXE_DATASET_CONFIGS, ActionEncoding
 from prismatic.vla.datasets.rlds.oxe.transforms import OXE_STANDARDIZATION_TRANSFORMS
 from prismatic.vla.datasets.rlds.utils.data_utils import NormalizationType
@@ -30,7 +29,7 @@ def make_oxe_dataset_kwargs(
     action_proprio_normalization_type: NormalizationType = NormalizationType.NORMAL,
 ) -> Dict[str, Any]:
     """Generates config (kwargs) for given dataset from Open-X Embodiment."""
-    config_dataset_name = ROBOCASA_X_RELEASED_TFDS_DATASET_ALIASES.get(dataset_name, dataset_name)
+    config_dataset_name = dataset_name
     dataset_kwargs = deepcopy(OXE_DATASET_CONFIGS[config_dataset_name])
     if dataset_kwargs["action_encoding"] not in [ActionEncoding.EEF_POS, ActionEncoding.EEF_R6]:
         raise ValueError(f"Cannot load `{dataset_name}`; only EEF_POS & EEF_R6 actions supported!")

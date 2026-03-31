@@ -5,6 +5,7 @@ Utility classes defining a Metrics container and multiple Trackers to enable mod
 endpoints (e.g., JSONL local logs, Weights & Biases).
 """
 
+import os
 import time
 from collections import defaultdict, deque
 from pathlib import Path
@@ -92,6 +93,9 @@ class WeightsBiasesTracker:
     def finalize() -> None:
         if overwatch.is_rank_zero():
             wandb.finish()
+
+        if os.environ.get("WANDB_MODE", "").lower() == "disabled":
+            return
 
         # A job gets 210 seconds to get its affairs in order
         time.sleep(210)

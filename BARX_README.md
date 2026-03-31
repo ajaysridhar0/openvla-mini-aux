@@ -104,7 +104,17 @@ BARX also uses VQ-backed action tokenizers. Install the VQ-Bet dependency by fol
 
 - https://github.com/jayLEE0301/vq_bet_official
 
-The training code expects the BARX VQ assets to live under `vq/` relative to this repository.
+One working setup is:
+
+```bash
+git clone https://github.com/jayLEE0301/vq_bet_official.git
+cd vq_bet_official
+pip install -r requirements.txt
+pip install -e .
+cd ..
+```
+
+The training code expects RoboCasa-X VQ tokenizer assets under `vq/` relative to this repository.
 
 Training also expects a Hugging Face token (see [Environment Variables](#environment-variables) for setup).
 
@@ -141,10 +151,8 @@ Released paper datasets live in the Hugging Face RoboCasa-X collection:
 
 - https://huggingface.co/collections/ajaysri/robocasa-x
 
-The collection uses the released RoboCasa-X dataset names. The codebase also adds RoboCasa-X aliases for
-`--vla.data_mix`, `--vla.action_tokenizer`, `--dataset_statistics_map`, and `--non_action_datasets`.
-This README uses those aliases throughout. Historical `barx-*` and `mg_*` names remain supported for backwards
-compatibility.
+This README uses the released RoboCasa-X names directly for `--vla.data_mix`, `--vla.action_tokenizer`,
+`--dataset_statistics_map`, and `--non_action_datasets`.
 
 Released dataset repo names follow this scheme:
 
@@ -185,60 +193,58 @@ Examples:
 | Same-emb finetune from SP-900 prior | `robocasa-x-sp900-panda-pnp-mix` | `robocasa-x-sp900-panda-pnp-vq-extra-action-tokenizer` |
 | Target-only baseline | `robocasa-x-target-panda-pnp` | `robocasa-x-target-panda-pnp-vq-extra-action-tokenizer` |
 
-The public RoboCasa-X tokenizer names above are the names to pass to `--vla.action_tokenizer`. Internally, the
-current code still loads those tokenizers from the historical local directory names under `vq/`, so download each
-tokenizer repo into the matching local directory.
+Download each tokenizer repo into the matching local RoboCasa-X directory under `vq/`.
+The local directory name is the tokenizer's dataset slug with hyphens replaced by underscores.
 
-Common download mappings:
+Examples:
 
 | Hugging Face tokenizer repo | Local directory expected by the code |
 | --- | --- |
-| `ajaysri/robocasa-x-xp3k-pnp-vq-extra-action-tokenizer` | `vq/mg_pnp` |
-| `ajaysri/robocasa-x-xp900-pnp-vq-extra-action-tokenizer` | `vq/mg_pnp_lite` |
-| `ajaysri/robocasa-x-sp900-panda-pnp-vq-extra-action-tokenizer` | `vq/mg_panda_pnp` |
-| `ajaysri/robocasa-x-target-panda-pnp-vq-extra-action-tokenizer` | `vq/panda_pnp` |
+| `ajaysri/robocasa-x-xp3k-pnp-vq-extra-action-tokenizer` | `vq/robocasa_x_xp3k_pnp` |
+| `ajaysri/robocasa-x-xp900-pnp-vq-extra-action-tokenizer` | `vq/robocasa_x_xp900_pnp` |
+| `ajaysri/robocasa-x-sp900-panda-pnp-vq-extra-action-tokenizer` | `vq/robocasa_x_sp900_panda_pnp` |
+| `ajaysri/robocasa-x-target-panda-pnp-vq-extra-action-tokenizer` | `vq/robocasa_x_target_panda_pnp` |
 
 For example:
 
 ```bash
 huggingface-cli download ajaysri/robocasa-x-xp900-pnp-vq-extra-action-tokenizer \
     --repo-type model \
-    --local-dir vq/mg_pnp_lite
+    --local-dir vq/robocasa_x_xp900_pnp
 ```
 
 At minimum, BARX training expects these prior-tokenizer directories under `vq/`:
 
-- `vq/mg_pnp`, `vq/mg_pnp_lite`
-- `vq/mg_turn_on_sink`, `vq/mg_turn_on_sink_lite`
-- `vq/mg_flip_mug`, `vq/mg_flip_mug_lite`
+- `vq/robocasa_x_xp3k_pnp`, `vq/robocasa_x_xp900_pnp`
+- `vq/robocasa_x_xp3k_turn_on_sink_faucet`, `vq/robocasa_x_xp900_turn_on_sink_faucet`
+- `vq/robocasa_x_xp3k_flip_mug_upright`, `vq/robocasa_x_xp900_flip_mug_upright`
 
 Depending on which runs you reproduce, you may also need the target-only and same-embodiment directories:
 
-- `vq/panda_pnp`, `vq/panda_og_pnp`, `vq/jaco_pnp`
-- `vq/panda_turn_on_sink`, `vq/panda_og_turn_on_sink`, `vq/jaco_turn_on_sink`
-- `vq/panda_flip_mug`, `vq/panda_og_flip_mug`, `vq/jaco_flip_mug`
-- `vq/mg_panda_*`, `vq/mg_panda_og_*`, `vq/mg_jaco_*`
+- `vq/robocasa_x_target_<robot>_pnp`
+- `vq/robocasa_x_target_<robot>_turn_on_sink_faucet`
+- `vq/robocasa_x_target_<robot>_flip_mug_upright`
+- `vq/robocasa_x_sp900_<robot>_pnp`
+- `vq/robocasa_x_sp900_<robot>_turn_on_sink_faucet`
+- `vq/robocasa_x_sp900_<robot>_flip_mug_upright`
 
 ## Environment Variables
 
 ```bash
 export BARX_DATA_ROOT=/path/to/rlds_datasets
 export BARX_BASE_VLM=/path/to/prism-qwen25-extra-dinosiglip-224px+0_5b+stage-finetune+x7
+export HF_TOKEN=hf_...
 export WANDB_ENTITY=your_wandb_entity
 
-# Option A: default path used by train.py
-echo "hf_..." > .hf_token
-chmod 600 .hf_token
-
-# Option B: environment variable
-export HF_TOKEN=hf_...
+# Useful for fresh-user smoke tests.
+export WANDB_MODE=disabled
 
 # Set to the number of GPUs available on your machine.
 # Adjust global_batch_size in the training commands accordingly.
 export NUM_GPUS=8
 ```
 
-If you use `HF_TOKEN` instead of `.hf_token`, add `--hf_token HF_TOKEN` to the training command.
+All commands below assume `--hf_token HF_TOKEN`.
 
 ## BARX Training Setup
 
@@ -357,6 +363,41 @@ The action tokenizer follows the same `<data_mix>-vq-extra-action-tokenizer` pat
 | Turn On Sink Faucet | `robocasa-x-target-<robot>-turn-on-sink-faucet` | 2000 | 500 |
 | Flip Mug Upright | `robocasa-x-target-<robot>-flip-mug-upright` | 2000 | 500 |
 
+## Fresh-User Smoke Test
+
+The fastest clean bootstrap test is a target-only Panda PnP run on one GPU with freshly downloaded assets.
+
+```bash
+export NUM_GPUS=1
+export TARGET_DATA_MIX=robocasa-x-target-panda-pnp
+export ACTION_TOKENIZER=robocasa-x-target-panda-pnp-vq-extra-action-tokenizer
+export RUN_ID=base
+export RUN_NOTE=robocasa-x-target-panda-pnp-smoke
+
+torchrun --standalone --nnodes 1 --nproc-per-node "$NUM_GPUS" vla-scripts/train.py \
+    --vla.type prism-qwen25-dinosiglip-224px+0_5b+mx-xembod-robocasa-full \
+    --vla.base_vlm "$BARX_BASE_VLM" \
+    --vla.data_mix "$TARGET_DATA_MIX" \
+    --data_root_dir "$BARX_DATA_ROOT" \
+    --vla.action_tokenizer "$ACTION_TOKENIZER" \
+    --vla.expected_world_size 1 \
+    --vla.global_batch_size 1 \
+    --vla.per_device_batch_size 1 \
+    --vla.lr_scheduler_type constant \
+    --vla.max_steps 1 \
+    --vla.use_wrist_image False \
+    --vla.image_sequence_len 1 \
+    --run_id_note "$RUN_NOTE" \
+    --run_id "$RUN_ID" \
+    --is_resume False \
+    --vla.transform_types action \
+    --hf_token HF_TOKEN \
+    --save_interval 1
+```
+
+This smoke test should create a run directory, write dataset statistics, and save a step-1 checkpoint without relying
+on any preexisting local BARX assets.
+
 ## Prior Training Command
 
 The example below trains a Joint Reps (`aux`) prior on `XP-900 PnP`. Swap the first block of
@@ -389,6 +430,7 @@ torchrun --standalone --nnodes 1 --nproc-per-node "$NUM_GPUS" vla-scripts/train.
     --run_id "$RUN_ID" \
     --vla.transform_types "$TRANSFORM_TYPES" \
     --is_resume False \
+    --hf_token HF_TOKEN \
     --save_interval "$SAVE_INTERVAL"
 ```
 
@@ -432,6 +474,7 @@ torchrun --standalone --nnodes 1 --nproc-per-node "$NUM_GPUS" vla-scripts/train.
     --dataset_statistics_map "$DATASET_STATS_JSON" \
     --vla.transform_types "$TRANSFORM_TYPES" \
     --vla.warmup_ratio 0.02 \
+    --hf_token HF_TOKEN \
     --save_interval "$SAVE_INTERVAL"
 ```
 
