@@ -276,10 +276,6 @@ def _hardlink_or_copy(source_path: Path, destination_path: Path) -> None:
         shutil.copy2(source_path, destination_path)
 
 
-def released_local_vq_dir(tokenizer_id: str) -> str:
-    return tokenizer_id.replace("-vq-extra-action-tokenizer", "").replace("-", "_")
-
-
 def build_readme(release: Dict[str, str]) -> str:
     return "\n".join(
         [
@@ -296,7 +292,7 @@ def build_readme(release: Dict[str, str]) -> str:
             f"- CLI tokenizer id: `{release['tokenizer_id']}`",
             f"- Task: `{release['task']}`",
             f"- Robots: `{release['robots']}`",
-            f"- Expected local directory for current code: `vq/{released_local_vq_dir(release['tokenizer_id'])}`",
+            f"- Expected local directory for current code: `vq/{release['source_dir']}`",
             "",
         ]
     )
