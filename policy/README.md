@@ -10,7 +10,6 @@ root `barx` compatibility package. Stored RLDS field names remain unchanged.
 
 - Training implementation: `vla-scripts/train.py`
 - RoboCasa-X evaluator: `experiments/robot/robocasa_x/evaluate.py`
-- Original OpenVLA documentation: `UPSTREAM_README.md`
 - Paper workflow: `../docs/experiments.md`
 
 VQ configuration files are included, but their `checkpoints/model.pt` files

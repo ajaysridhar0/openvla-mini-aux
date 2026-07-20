@@ -43,8 +43,8 @@ include = ["barx*"]
 
 [tool.uv.sources]
 openvla = {path = "policy", editable = true}
-robocasa = {path = "simulator/robocasa_x", editable = true}
-robosuite = {path = "simulator/robosuite", editable = true}
+robocasa = {path = "robocasa_x", editable = true}
+robosuite = {git = "https://github.com/ARISE-Initiative/robosuite.git", rev = "2ebb2a0249f7a271a3ade56725d12e32d7da8898"}
 vq-bet = {git = "https://github.com/jayLEE0301/vq_bet_official.git", rev = "09d4851288ca5deaaa1ab367a208e520f8ee9a84"}
 torch = {index = "pytorch-cu121"}
 torchvision = {index = "pytorch-cu121"}

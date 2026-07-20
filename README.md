@@ -11,8 +11,7 @@ Official simulation-only code and data release for **BARX** and the
 This repository contains:
 
 - MiniVLA policy training and RoboCasa-X evaluation code;
-- the modified RoboCasa-X benchmark and an unmodified, pinned robosuite
-  1.5.1 source snapshot;
+- the modified RoboCasa-X benchmark and an exact robosuite 1.5.1 Git pin;
 - one action layout shared by every simulator embodiment and the RLDS
   converter;
 - a manifest for the 283.13 GiB simulation-data release; and
@@ -29,8 +28,7 @@ The simulation HDF5 files are distributed separately from Git; see
 | --- | --- |
 | `barx/` | lightweight naming and normalized action-space API |
 | `policy/` | BARX policy training and RoboCasa-X evaluation |
-| `simulator/robocasa_x/` | modified RoboCasa benchmark |
-| `simulator/robosuite/` | unmodified robosuite dependency at pinned upstream commit |
+| `robocasa_x/` | modified RoboCasa benchmark runtime |
 | `dataset/rlds/` | unified HDF5-to-RLDS converter |
 | `configs/experiments.toml` | paper protocol and compatibility identifiers |
 | `scripts/` | release-data and experiment entry points |
@@ -57,7 +55,7 @@ bundle (about 5.8 GiB, excluded from Git by its upstream license/distribution
 workflow):
 
 ```bash
-uv run --locked python simulator/robocasa_x/robocasa/scripts/download_kitchen_assets.py
+uv run --locked python robocasa_x/robocasa/scripts/download_kitchen_assets.py
 ```
 
 For training with FlashAttention and a CUDA development toolkit:

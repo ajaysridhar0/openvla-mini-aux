@@ -6,8 +6,8 @@ original copyright notices and licenses.
 | Component | Location/source | Version | License |
 | --- | --- | --- | --- |
 | OpenVLA / MiniVLA-derived policy code | `policy/` | imported snapshot `b15f06e` | MIT (`policy/LICENSE`) |
-| RoboCasa | `simulator/robocasa_x/` | modified 0.2.0 snapshot `9338b1a` | MIT (`simulator/robocasa_x/LICENSE`) |
-| robosuite | `simulator/robosuite/` | unmodified 1.5.1 snapshot `2ebb2a0` | MIT (`simulator/robosuite/LICENSE`) |
+| RoboCasa | `robocasa_x/` | modified 0.2.0 snapshot `9338b1a` | MIT (`robocasa_x/LICENSE`) |
+| robosuite | [official upstream](https://github.com/ARISE-Initiative/robosuite) | commit `2ebb2a0` (1.5.1) | MIT |
 | dlimp | uv Git dependency | commit `040105d` | upstream terms |
 | VQ-BeT | uv Git dependency | commit `09d4851` | MIT |
 | robosuite-models | locked package dependency | 1.0.0 | upstream terms |
