@@ -285,3 +285,53 @@ def load_bundle(
             raise ValueError(f"Corrupt metadata for episode {expected_episode} in {json_path}")
 
     return payload, states, model_xmls
+
+
+def restore_frozen_condition(
+    env: Any,
+    entry: dict[str, Any],
+    state: np.ndarray,
+    model_xml: str,
+) -> tuple[Any, dict[str, Any]]:
+    """Restore and verify one condition in an initialized RoboCasa environment."""
+
+    import robocasa
+    import robosuite
+
+    package_roots = {
+        "robocasa": Path(robocasa.__path__[0]),
+        "robosuite": Path(robosuite.__path__[0]),
+    }
+    ep_meta = materialize_ep_meta(entry["ep_meta"], package_roots)
+    env.env.set_ep_meta(ep_meta)
+    env.reset(unset_ep_meta=False)
+
+    model_xml = materialize_model_xml(model_xml, package_roots)
+    actual_model_hash = model_sha256(model_xml)
+    if actual_model_hash != entry["model_sha256"]:
+        raise RuntimeError(
+            f"Model mismatch for condition {entry['condition_id']}: "
+            f"expected {entry['model_sha256']}, received {actual_model_hash}"
+        )
+
+    # Frozen XML has already passed through robosuite's XML processors and
+    # must be loaded verbatim.
+    xml_processors = env.env._xml_processors
+    env.env._xml_processors = []
+    try:
+        env.env.reset_from_xml_string(model_xml)
+    finally:
+        env.env._xml_processors = xml_processors
+
+    env.env.sim.set_state_from_flattened(state)
+    env.env.sim.forward()
+    restored_state = np.asarray(env.env.sim.get_state().flatten(), dtype=np.float64)
+    if state_sha256(restored_state) != entry["state_sha256"]:
+        raise RuntimeError(f"State mismatch for condition {entry['condition_id']}")
+
+    restored_meta = env.env.get_ep_meta()
+    if canonical_json(stable_replay_metadata(restored_meta)) != canonical_json(
+        stable_replay_metadata(entry["ep_meta"])
+    ):
+        raise RuntimeError(f"Metadata mismatch for condition {entry['condition_id']}")
+    return env.get_observation(), restored_meta

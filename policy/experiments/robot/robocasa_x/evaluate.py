@@ -24,17 +24,10 @@ sys.path.insert(0, str(REPOSITORY_ROOT))
 sys.path.insert(0, str(POLICY_ROOT))
 
 # Core imports needed
-import robocasa
-import robosuite
 from barx.benchmark import EMBODIMENTS, TASK_BY_ENVIRONMENT
 from barx.evaluation_conditions import (
-    canonical_json,
     load_bundle,
-    materialize_ep_meta,
-    materialize_model_xml,
-    model_sha256,
-    stable_replay_metadata,
-    state_sha256,
+    restore_frozen_condition,
 )
 from barx.evaluation_logging import (
     EvaluationRun,
@@ -250,52 +243,6 @@ def get_env_config(cfg):
         cfg.embodiment,
         use_wrist_image=cfg.use_wrist_image,
     )
-
-
-def restore_frozen_condition(env, entry, state, model_xml):
-    """Reconstruct and verify one policy-start simulator condition."""
-
-    ep_meta = materialize_ep_meta(
-        entry["ep_meta"],
-        {
-            "robocasa": Path(robocasa.__path__[0]),
-            "robosuite": Path(robosuite.__path__[0]),
-        },
-    )
-    env.env.set_ep_meta(ep_meta)
-    env.reset(unset_ep_meta=False)
-    model_xml = materialize_model_xml(
-        model_xml,
-        {
-            "robocasa": Path(robocasa.__path__[0]),
-            "robosuite": Path(robosuite.__path__[0]),
-        },
-    )
-    actual_model_hash = model_sha256(model_xml)
-    if actual_model_hash != entry["model_sha256"]:
-        raise RuntimeError(
-            f"Model mismatch for condition {entry['condition_id']}: "
-            f"expected {entry['model_sha256']}, received {actual_model_hash}"
-        )
-    # robosuite normally reprocesses supplied XML. Frozen XML has already
-    # passed through those processors and must be loaded verbatim.
-    xml_processors = env.env._xml_processors
-    env.env._xml_processors = []
-    try:
-        env.env.reset_from_xml_string(model_xml)
-    finally:
-        env.env._xml_processors = xml_processors
-
-    env.env.sim.set_state_from_flattened(state)
-    env.env.sim.forward()
-    restored_state = np.asarray(env.env.sim.get_state().flatten(), dtype=np.float64)
-    if state_sha256(restored_state) != entry["state_sha256"]:
-        raise RuntimeError(f"State mismatch for condition {entry['condition_id']}")
-
-    ep_meta = env.env.get_ep_meta()
-    if canonical_json(stable_replay_metadata(ep_meta)) != canonical_json(stable_replay_metadata(entry["ep_meta"])):
-        raise RuntimeError(f"Metadata mismatch for condition {entry['condition_id']}")
-    return env.get_observation(), ep_meta
 
 
 def robocasa_img_transform(img):

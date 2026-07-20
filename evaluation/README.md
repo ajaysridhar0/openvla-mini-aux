@@ -34,6 +34,14 @@ fails before model inference if a bundle is absent, corrupt, or incompatible
 with the current simulator. This prevents different methods from silently
 receiving different sampled objects, layouts, styles, or initial poses.
 
+Restore and hash-check every condition in one generated bundle with:
+
+```bash
+uv run --locked python scripts/verify_eval_conditions.py \
+  --task pnp_counter_to_sink \
+  --embodiment panda
+```
+
 See [historical validation](HISTORICAL_VALIDATION.md) for the video-based spot
 check against the retained paper rollouts and its limitations. If those private
 rollouts are available, the check can be repeated with
