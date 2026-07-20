@@ -9,40 +9,40 @@ import subprocess
 import sys
 from pathlib import Path
 
+from barx.benchmark import (
+    ACTION_HORIZON,
+    EMBODIMENTS,
+    EVALUATION_EPISODES,
+    EVALUATION_START_SEED,
+    TASKS,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 EVALUATOR = ROOT / "policy" / "experiments" / "robot" / "robocasa_x" / "evaluate.py"
-TARGETS = {
-    "panda": ("PandaOmron", "Robotiq85Gripper"),
-    "panda_og": ("PandaOmron", "PandaGripper"),
-    "jaco": ("JacoOmron", "default"),
-    "iiwa": ("IIWAOmron", "default"),
-    "kinova3": ("Kinova3Omron", "default"),
-    "ur5e": ("UR5eOmron", "default"),
-}
-TASKS = {
-    "pnp_counter_to_sink": ("PnPCounterToSink", 600),
-    "pnp_sink_to_counter": ("PnPSinkToCounter", 650),
-    "turn_on_sink_faucet": ("TurnOnSinkFaucet", 500),
-    "flip_mug_upright": ("FlipMugUpright", 500),
-}
 
 
 def command(args: argparse.Namespace) -> list[str]:
-    robot, gripper = TARGETS[args.embodiment]
-    task, default_steps = TASKS[args.task]
-    rollout_dir = args.rollout_dir or ROOT / "rollouts" / task / args.embodiment / "STEP"
+    embodiment = EMBODIMENTS[args.embodiment]
+    task = TASKS[args.task]
+    rollout_dir = (
+        args.rollout_dir
+        or ROOT / "rollouts" / args.task / args.embodiment / "STEP"
+    )
     result = [
         sys.executable,
         str(EVALUATOR),
         "--pretrained_checkpoint",
         str(args.checkpoint),
+        "--embodiment",
+        args.embodiment,
         "--robot",
-        robot,
+        embodiment.robot,
         "--gripper_types",
-        gripper,
+        embodiment.gripper,
+        "--camera",
+        embodiment.camera,
         "--task",
-        task,
+        task.environment,
         "--unnorm_key",
         args.unnorm_key,
         "--num_trials_per_task",
@@ -50,9 +50,9 @@ def command(args: argparse.Namespace) -> list[str]:
         "--start_seed",
         str(args.start_seed),
         "--max_steps",
-        str(args.max_steps or default_steps),
+        str(args.max_steps or task.max_steps),
         "--act_horizon",
-        "8",
+        str(ACTION_HORIZON),
         "--rollout_dir",
         str(rollout_dir),
     ]
@@ -66,7 +66,7 @@ def command(args: argparse.Namespace) -> list[str]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--checkpoint", type=Path, required=True)
-    parser.add_argument("--embodiment", choices=TARGETS, required=True)
+    parser.add_argument("--embodiment", choices=EMBODIMENTS, required=True)
     parser.add_argument("--task", choices=TASKS, required=True)
     parser.add_argument(
         "--inference-representation",
@@ -75,8 +75,8 @@ def main() -> None:
         help="Optional representation to predict before actions; paper main results use none",
     )
     parser.add_argument("--unnorm-key", required=True, help="Prior dataset normalization key stored in the model")
-    parser.add_argument("--episodes", type=int, default=100)
-    parser.add_argument("--start-seed", type=int, default=1000)
+    parser.add_argument("--episodes", type=int, default=EVALUATION_EPISODES)
+    parser.add_argument("--start-seed", type=int, default=EVALUATION_START_SEED)
     parser.add_argument("--max-steps", type=int)
     parser.add_argument("--rollout-dir", type=Path)
     parser.add_argument("--use-wandb", action="store_true")

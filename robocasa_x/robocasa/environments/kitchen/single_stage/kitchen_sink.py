@@ -14,15 +14,7 @@ class ManipulateSinkFaucet(Kitchen):
 
         assert behavior in ["turn_on", "turn_off"]
         self.behavior = behavior
-        super().__init__(
-            robot_pos_offsets={
-                "IIWAOmron": [0.4, -0.1, 0], # final
-                "UR5eOmron": [0.4, -0.1, 0.2], # final
-                "PandaOmron": [0.4, -0.06, 0.2], # final
-                "Kinova3Omron": [0.4, 0, 0.1], # final
-                "JacoOmron": [0.4, 0, 0.2], # final
-            },
-            *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _setup_kitchen_references(self):
         """

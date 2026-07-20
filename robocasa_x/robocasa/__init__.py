@@ -287,7 +287,12 @@ from robocasa.environments.kitchen.single_stage.kitchen_stove import (
     TurnOnStove,
 )
 
-from robocasa.environments.kitchen.single_stage.kitchen_mug import FlipMugUpright
+from robocasa.environments.kitchen.barx_tasks import (
+    BARXFlipMugUpright,
+    BARXPnPCounterToSink,
+    BARXPnPSinkToCounter,
+    BARXTurnOnSinkFaucet,
+)
 
 try:
     import mimicgen

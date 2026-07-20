@@ -2,6 +2,7 @@ import argparse
 import unittest
 from pathlib import Path
 
+from barx.benchmark import EMBODIMENTS, evaluation_scene_config
 from scripts import build_rlds, evaluate, train
 
 
@@ -73,9 +74,28 @@ class EvaluationLauncherTest(unittest.TestCase):
         )
         command = evaluate.command(args)
         self.assertIn("PandaGripper", command)
+        self.assertIn("barx_panda_agentview", command)
+        self.assertIn("BARXPnPSinkToCounter", command)
         self.assertIn("650", command)
         self.assertIn("8", command)
         self.assertIn("end_effector_trace", command)
+
+    def test_every_embodiment_has_an_automatic_camera_pairing(self):
+        self.assertEqual(
+            set(EMBODIMENTS),
+            {"iiwa", "kinova3", "ur5e", "panda", "panda_og", "jaco"},
+        )
+        for name, spec in EMBODIMENTS.items():
+            with self.subTest(name=name):
+                self.assertEqual(spec.camera, f"barx_{'panda' if name == 'panda_og' else name}_agentview")
+
+    def test_paper_scene_filters_are_frozen(self):
+        standard = evaluation_scene_config("pnp_counter_to_sink", "panda")
+        panda_og_sink = evaluation_scene_config("pnp_sink_to_counter", "panda_og")
+        self.assertEqual(len(standard["layout_and_style_ids"]), 32)
+        self.assertEqual(len(panda_og_sink["layout_and_style_ids"]), 29)
+        self.assertNotIn((8, 3), standard["layout_and_style_ids"])
+        self.assertFalse(any(style == 4 for _, style in panda_og_sink["layout_and_style_ids"]))
 
 
 if __name__ == "__main__":

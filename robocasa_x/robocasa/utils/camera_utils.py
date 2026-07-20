@@ -44,140 +44,33 @@ DEFAULT_LAYOUT_CAM = {
     "elevation": -18.02177994296577,
 }
 
-
 CAM_CONFIGS = dict(
     robot0_agentview_center=dict(
-        pos=[-0.6, 0.0, 0.95],
+        pos=[-0.6, 0.0, 1.15],
         quat=[
             0.636945903301239,
             0.3325185477733612,
             -0.3199238181114197,
             -0.6175596117973328,
         ],
-        parent_body="mobilebase0_support",
-    ),
-    robot0_agentview_wide=dict(
-        pos=[-0.6, 0, 0.95],
-        quat=[
-            0.636945903301239,
-            0.3325185477733612,
-            -0.3199238181114197,
-            -0.6175596117973328,
-        ],
-        camera_attribs=dict(fovy="60"),
-        parent_body="mobilebase0_support",
-    ),
-    robot0_agentview_wide_75=dict(
-        pos=[-0.6, 0, 0.95],
-        quat=[
-            0.636945903301239,
-            0.3325185477733612,
-            -0.3199238181114197,
-            -0.6175596117973328,
-        ],
-        camera_attribs=dict(fovy="75"),
-        parent_body="mobilebase0_support",
-    ),
-    robot0_agentview_wide_90=dict(
-        pos=[-0.6, 0, 0.95],
-        quat=[
-            0.636945903301239,
-            0.3325185477733612,
-            -0.3199238181114197,
-            -0.6175596117973328,
-        ],
-        camera_attribs=dict(fovy="90"),
-        parent_body="mobilebase0_support",
-    ),
-    old_robot0_agentview_left=dict(
-        # pos=[-0.5, 0.35, 1.05],
-        # pos=[-0.4, 0.90, 1.00], good
-        pos=[-0.4, 0.85, 0.8],
-        #quat=[0.55623853, 0.29935253, -0.37678665, -0.6775092],
-        quat=[ 0.36193285,  0.19163277, -0.44142606, -0.79838871], # rotate z -30
-        # quat=[ 0.32676315, 0.17219564, -0.44936483, -0.81341611], #rotate z -35
-        # quat=[ 0.29097143,  0.15243073, -0.4564482,  -0.82689512], #rotate z -40
-        camera_attribs=dict(fovy="30"),
         parent_body="mobilebase0_support",
     ),
     robot0_agentview_left=dict(
-        # pos=[-0.35, 0.40, 0.60], from ajay
-        # pos=[-0.23,  0.4,  0.64], original panda position
-        pos=[-0.17,  0.4,  0.64],
-        quat=[ 0.48874131,  0.26186095, -0.40374364, -0.72770313],
-        # quat=[0.55623853, 0.29935253, -0.37678665, -0.6775092], original
-        #quat=[ 0.4630471,  0.24761098, -0.41263651, -0.74431666],# rotate z -15
-        camera_attribs=dict(fovy="45"),
-        parent_body="mobilebase0_support",
-    ),
-    panda_agentview_left=dict(
-        pos=[-0.17,  0.4,  0.64],
-        quat=[ 0.48874131,  0.26186095, -0.40374364, -0.72770313],
-        camera_attribs=dict(fovy="45"),
-        parent_body="mobilebase0_support",
-    ),
-    jaco_agentview_left=dict(
-        pos=[-0.23, 0.4, 0.64],
-        quat=[ 0.48874131,  0.26186095, -0.40374364, -0.72770313],
-        camera_attribs=dict(fovy="45"),
-        parent_body="mobilebase0_support",
-    ),
-    kinova_agentview_left=dict(
-        pos=[-0.23, 0.4, 0.74],
-        quat=[ 0.48874131,  0.26186095, -0.40374364, -0.72770313],
-        camera_attribs=dict(fovy="45"),
-        parent_body="mobilebase0_support",
-    ),
-    ur5e_agentview_left=dict(
-        pos=[-0.13, 0.4, 0.64],
-        quat=[ 0.48874131,  0.26186095, -0.40374364, -0.72770313],
-        camera_attribs=dict(fovy="45"),
-        parent_body="mobilebase0_support",
-    ),
-    iiwa_agentview_left=dict(
-        pos=[-0.13, 0.4, 0.84],
-        quat=[ 0.48874131,  0.26186095, -0.40374364, -0.72770313],
-        camera_attribs=dict(fovy="45"),
-        parent_body="mobilebase0_support",
-    ),
-    debug_left=dict(
-        pos=[0.1, 1.2, 0.2],
-        # quat=[-0.00939108, -0.01287645, -0.48105538, -0.87654533],
-        quat=[-0.01240376, -0.01000711, -0.69153044, -0.72217148],
+        pos=[-0.5, 0.35, 1.05],
+        quat=[0.55623853, 0.29935253, -0.37678665, -0.6775092],
         camera_attribs=dict(fovy="60"),
         parent_body="mobilebase0_support",
     ),
     robot0_agentview_right=dict(
-        # pos=[-0.5, -0.35, 1.05],
-        pos=[-0.5, -0.75, 1.05],
-        # quat=[
-        #     0.6775091886520386,
-        #     0.3767866790294647,
-        #     -0.2993525564670563,
-        #     -0.55623859167099,
-        # ],
-        quat=[ 0.79838867,  0.44142608, -0.19163278, -0.3619329 ],
+        pos=[-0.5, -0.35, 1.05],
+        quat=[
+            0.6775091886520386,
+            0.3767866790294647,
+            -0.2993525564670563,
+            -0.55623859167099,
+        ],
         camera_attribs=dict(fovy="60"),
         parent_body="mobilebase0_support",
-    ),
-    fixed_sink=dict(
-        # pos=[ 1.14999147, -2.19999871,  1.5       ], #original from ajay
-        # pos=[ 1.0, -2.2,  1.5],
-        pos=[ 1.03, -2.2,  1.54],
-        # pos=[ 1.14999147, -2.19999871,  1.55       ],
-        # quat=[-0.67750813, -0.37678607, -0.2993532 , -0.55623974], # original
-        # quat=[-0.72340949634489, -0.401442636648453, -0.2653750015103631, -0.4950743566901294], # rotate z -10
-        quat=[-0.7277022350759109, -0.4037431553139996, -0.2618616934241865, -0.48874264712590476], # rotate z -11
-        # quat=[-0.7319395564643171, -0.40601292737511396, -0.2583284435562168, -0.4823737179168574], # rotate z -12
-        # quat=[-0.7259449040520018, -0.41684159170790175, -0.269033738976401, -0.47630655149360535], # rotate y 2, z -12
-        # quat=[-0.7443158109379011, -0.412636047198726, -0.2476117414382804, -0.4630484765572257], # rotate z -15
-        # quat=[-0.6488396580005492, -0.4238317738947667, -0.357262795794145, -0.5212840112494309], # rotate y 10
-        # quat=[-0.6918035223947313, -0.45335647036032967, -0.3189639299417053, -0.4627502658895065], # rotate y 10, z -10
-        # quat=[-0.6997742630867096, -0.45885411011818833, -0.31100318880853794, -0.45060615053505315], # rotate y 10, z -12
-        # quat=[-0.708280635592756, -0.4278067307178245, -0.29244781124120656, -0.479368563943315], # rotate y 5, z -10
-        # quat=[-0.7285162724512191, -0.4401559478670662, -0.27350879822135543, -0.4480175438825311], # rotate y 5, z -15
-        # quat=[-0.7165388960325166, -0.43284549174408327, -0.28493701308195873, -0.4669343522651304], # rotate y 5, z -12
-        camera_attribs=dict(fovy="45"),
     ),
     robot0_frontview=dict(
         pos=[-0.50, 0, 0.95],
@@ -196,3 +89,61 @@ CAM_CONFIGS = dict(
         parent_body="robot0_right_hand",
     ),
 )
+
+
+# Fixed base-camera calibrations used by BARX. These names are intentionally
+# separate from RoboCasa's standard cameras so upstream tasks retain their
+# original views and each BARX embodiment is paired automatically.
+_BARX_AGENTVIEW_QUAT = [
+    0.48874131,
+    0.26186095,
+    -0.40374364,
+    -0.72770313,
+]
+
+BARX_CAMERA_CONFIGS = {
+    "barx_panda_agentview": {
+        "pos": [-0.17, 0.4, 0.64],
+        "quat": _BARX_AGENTVIEW_QUAT,
+        "camera_attribs": {"fovy": "45"},
+        "parent_body": "mobilebase0_support",
+    },
+    "barx_jaco_agentview": {
+        "pos": [-0.23, 0.4, 0.64],
+        "quat": _BARX_AGENTVIEW_QUAT,
+        "camera_attribs": {"fovy": "45"},
+        "parent_body": "mobilebase0_support",
+    },
+    "barx_kinova3_agentview": {
+        "pos": [-0.23, 0.4, 0.74],
+        "quat": _BARX_AGENTVIEW_QUAT,
+        "camera_attribs": {"fovy": "45"},
+        "parent_body": "mobilebase0_support",
+    },
+    "barx_ur5e_agentview": {
+        "pos": [-0.13, 0.4, 0.64],
+        "quat": _BARX_AGENTVIEW_QUAT,
+        "camera_attribs": {"fovy": "45"},
+        "parent_body": "mobilebase0_support",
+    },
+    "barx_iiwa_agentview": {
+        "pos": [-0.13, 0.4, 0.84],
+        "quat": _BARX_AGENTVIEW_QUAT,
+        "camera_attribs": {"fovy": "45"},
+        "parent_body": "mobilebase0_support",
+    },
+}
+
+CAM_CONFIGS.update(BARX_CAMERA_CONFIGS)
+
+# Non-public aliases allow old dataset metadata and commands to be inspected.
+# New evaluation code only emits the consistent BARX names above.
+LEGACY_BARX_CAMERA_ALIASES = {
+    "panda_agentview_left": "barx_panda_agentview",
+    "jaco_agentview_left": "barx_jaco_agentview",
+    "kinova_agentview_left": "barx_kinova3_agentview",
+    "ur5e_agentview_left": "barx_ur5e_agentview",
+    "iiwa_agentview_left": "barx_iiwa_agentview",
+}
+for legacy_name, canonical_name in LEGACY_BARX_CAMERA_ALIASES.items():
+    CAM_CONFIGS[legacy_name] = CAM_CONFIGS[canonical_name]

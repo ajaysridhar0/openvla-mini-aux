@@ -156,6 +156,7 @@ for (name, kwargs) in OBJ_CATEGORIES.items():
 def sample_kitchen_object(
     groups,
     exclude_groups=None,
+    exclude_instances=None,
     graspable=None,
     washable=None,
     microwavable=None,
@@ -174,6 +175,8 @@ def sample_kitchen_object(
         groups (list or str): groups to sample from or the exact xml path of the object to spawn
 
         exclude_groups (str or list): groups to exclude
+
+        exclude_instances (str or list): object model directory names to exclude
 
         graspable (bool): whether the sampled object must be graspable
 
@@ -208,6 +211,7 @@ def sample_kitchen_object(
         mjcf_kwargs, info = sample_kitchen_object_helper(
             groups=groups,
             exclude_groups=exclude_groups,
+            exclude_instances=exclude_instances,
             graspable=graspable,
             washable=washable,
             microwavable=microwavable,
@@ -256,6 +260,7 @@ def sample_kitchen_object(
 def sample_kitchen_object_helper(
     groups,
     exclude_groups=None,
+    exclude_instances=None,
     graspable=None,
     washable=None,
     microwavable=None,
@@ -273,6 +278,8 @@ def sample_kitchen_object_helper(
         groups (list or str): groups to sample from or the exact xml path of the object to spawn
 
         exclude_groups (str or list): groups to exclude
+
+        exclude_instances (str or list): object model directory names to exclude
 
         graspable (bool): whether the sampled object must be graspable
 
@@ -387,6 +394,18 @@ def sample_kitchen_object_helper(
                 choices[reg] = []
                 continue
             reg_choices = deepcopy(OBJ_CATEGORIES[cat][reg].mjcf_paths)
+
+            if exclude_instances is not None:
+                excluded = (
+                    {exclude_instances}
+                    if isinstance(exclude_instances, str)
+                    else set(exclude_instances)
+                )
+                reg_choices = [
+                    path
+                    for path in reg_choices
+                    if os.path.basename(os.path.dirname(path)) not in excluded
+                ]
 
             # exclude out objects based on split
             if split is not None:

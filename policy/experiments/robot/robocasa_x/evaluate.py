@@ -30,6 +30,12 @@ from barx.names import (
     internal_representation_name,
     representations_for_method,
 )
+from barx.benchmark import (
+    EMBODIMENTS,
+    OBJECT_INSTANCE_SPLIT,
+    TASK_BY_ENVIRONMENT,
+    evaluation_scene_config,
+)
 from experiments.robot.robocasa_x.utils import (
     get_robocasa_dummy_action, 
     pad_action_robocasa,
@@ -81,7 +87,9 @@ class GenerateConfig:
     # ROBOCASA environment-specific parameters
     #################################################################################################################
     robot: str = None                              
+    embodiment: str = None
     task: str = None
+    camera: str = None
     num_steps_wait: int = 10                         # Number of steps to wait for objects to stabilize in sim
     num_trials_per_task: int = 100                   # Number of rollouts per task
     max_steps: int = 600
@@ -263,6 +271,16 @@ def draw_motion_text_on_image(img, motion_text):
     return img_with_text
 
 def get_env_config(cfg):
+    embodiment = EMBODIMENTS[cfg.embodiment]
+    expected = (embodiment.robot, embodiment.gripper, embodiment.camera)
+    actual = (cfg.robot, cfg.gripper_types, cfg.camera)
+    if actual != expected:
+        raise ValueError(
+            f"BARX embodiment {cfg.embodiment!r} requires robot, gripper, and "
+            f"camera {expected}, received {actual}. Use scripts/evaluate.py to "
+            "select them automatically."
+        )
+
     controller_config = load_robocasa_controller_config(
         controller=cfg.controller,
         robot=cfg.robot,
@@ -295,22 +313,8 @@ def get_env_config(cfg):
     if cfg.generative_textures is True:
         config["generative_textures"] = "100p"
 
-    # Mirror actions if using a kitchen environment
-    mirror_actions = True
-
-    if "PnP" in cfg.task or "Mug" in cfg.task:
-        layout = [4, 7, 8]  # only layouts where object spawns on right
-        if "Panda" in cfg.robot and "Panda" in cfg.gripper_types and cfg.task == "PnPSinkToCounter":
-            style = [0, 1, 2, 3, 5, 6, 7, 8, 9, 10]  # remove style 4 because object unreachable with this gripper
-        else:
-            style = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-        bad_combos = [(8, 3), (8, 5), (8, 6), (8, 9)]  # object sometimes spawns on left
-        config["layout_and_style_ids"] = [(l, s) for l in layout for s in style if (l, s) not in bad_combos]
-    elif cfg.task == "TurnOnSinkFaucet":
-        config["layout_ids"] = -1
-        config["style_ids"] = [0, 1, 2, 3, 4, 7, 8, 10, 11]
-    else:
-        raise NotImplementedError
+    task_name = TASK_BY_ENVIRONMENT[cfg.task]
+    config.update(evaluation_scene_config(task_name, cfg.embodiment))
 
     ### update config for kitchen envs ###
     if "pnp" in cfg.task.lower() and cfg.obj_groups is not None:
@@ -319,7 +323,7 @@ def get_env_config(cfg):
     config["translucent_robot"] = False
 
     # by default use obj instance split A
-    config["obj_instance_split"] = "A"
+    config["obj_instance_split"] = OBJECT_INSTANCE_SPLIT
 
     return config
 
@@ -612,17 +616,6 @@ def eval_robocasa(cfg: GenerateConfig) -> None:
         
     # Set random seed
     set_seed_everywhere(cfg.seed)
-
-    if "kinova" in cfg.robot.lower():
-        cfg.camera = "kinova_agentview_left"
-    elif "ur5e" in cfg.robot.lower():
-        cfg.camera = "ur5e_agentview_left"
-    elif "iiwa" in cfg.robot.lower():
-        cfg.camera = "iiwa_agentview_left"
-    elif "jaco" in cfg.robot.lower():
-        cfg.camera = "jaco_agentview_left"
-    else:
-        cfg.camera = "robot0_agentview_left"
 
     ObsUtils.OBS_KEYS_TO_MODALITIES = {
         f"{cfg.camera}_image": 'rgb', 

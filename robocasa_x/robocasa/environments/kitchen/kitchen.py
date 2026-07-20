@@ -44,7 +44,6 @@ from robocasa.utils.texture_swap import (
 )
 from robocasa.utils.config_utils import refactor_composite_controller_config
 from robocasa.utils.controller_utils import load_robocasa_controller_config
-from string import digits
 
 
 REGISTERED_KITCHEN_ENVS = {}
@@ -304,12 +303,6 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
                 robots[i] = "PandaOmron"
         assert len(robots) == 1
 
-        # RoboCasa-X's paper-facing Panda embodiment uses the Robotiq gripper.
-        # Keep robosuite's general Panda model unchanged and allow Panda-OG to
-        # opt into PandaGripper explicitly through this environment argument.
-        if robots[0] == "PandaOmron" and gripper_types == "default":
-            gripper_types = "Robotiq85Gripper"
-
         # set up currently unused variables (used in robosuite)
         self.use_object_obs = use_object_obs
         self.reward_scale = reward_scale
@@ -368,24 +361,15 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
             if self.robot_init_qpos is not None and robot.robot_model.__class__.__name__ in self.robot_init_qpos:
                 robot.init_qpos = self.robot_init_qpos[robot.robot_model.__class__.__name__]
             elif isinstance(robot.robot_model, PandaOmron):
-                # robot.init_qpos = (0.09, -0.20, -0.02, -2.47, -0.01, 2.30, 0.85)  # from co-train paper
-                robot.init_qpos = [-0.0322107, -0.87780094, 0.04876096, -2.59347324, 0.0378028, 1.71482307, 0.77941175]
-                robot.init_torso_qpos = np.array([0.0])
-            elif isinstance(robot.robot_model, IIWAOmron):
-                robot.init_qpos = (0.01115337, -0.08399538, 0.01529279, -1.22063772, 0.00151392, 2.00516437, 0.02812827)
-                robot.init_torso_qpos = np.array([0.0])
-            elif isinstance(robot.robot_model, Kinova3Omron):
-                # robot.init_qpos = (-0.05266657, -0.2009739, -0.06975192, 1.81015238, -0.01462751, 1.53393016, -1.69258007)
-                robot.init_qpos = (-0.05554795, -0.17629911, -0.0708673, 1.4654714, -0.01258805, 1.8501173, -1.69937106)
-                robot.init_torso_qpos = np.array([0.0])
-            elif isinstance(robot.robot_model, UR5eOmron):
-                robot.init_qpos = (-0.38866802, -2.02017087,  1.83610264, -1.38660839, -1.57096943, -1.95933365)
-                robot.init_torso_qpos = np.array([0.0])
-            elif isinstance(robot.robot_model, SawyerOmron):
-                robot.init_qpos = (-0.08429812, -1.6291641, -0.4312483, 2.20450107, -0.02849383,  0.98969552, -1.89593991)
-                robot.init_torso_qpos = np.array([0.0])
-            elif isinstance(robot.robot_model, JacoOmron):
-                robot.init_qpos = (3.1776479, 2.95208179, -0.02913301, 1.20341971, -0.0055724, 4.53421693, 3.14988761)
+                robot.init_qpos = (
+                    -0.01612974,
+                    -1.03446714,
+                    -0.02397936,
+                    -2.27550888,
+                    0.03932365,
+                    1.51639493,
+                    0.69615947,
+                )
                 robot.init_torso_qpos = np.array([0.0])
 
         # determine sample layout and style
@@ -592,6 +576,7 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
         Helper function for creating objects.
         Called by _create_objects()
         """
+        exclude_obj_instances = None
         if "info" in cfg:
             """
             if cfg has "info" key in it, that means it is storing meta data already
@@ -607,9 +592,11 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
         else:
             obj_groups = cfg.get("obj_groups", "all")
             exclude_obj_groups = cfg.get("exclude_obj_groups", None)
+            exclude_obj_instances = cfg.get("exclude_obj_instances", None)
         object_kwargs, object_info = self.sample_object(
             obj_groups,
             exclude_groups=exclude_obj_groups,
+            exclude_instances=exclude_obj_instances,
             graspable=cfg.get("graspable", None),
             washable=cfg.get("washable", None),
             microwavable=cfg.get("microwavable", None),
@@ -1447,6 +1434,7 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
         self,
         groups,
         exclude_groups=None,
+        exclude_instances=None,
         graspable=None,
         microwavable=None,
         washable=None,
@@ -1464,6 +1452,8 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
             groups (list or str): groups to sample from or the exact xml path of the object to spawn
 
             exclude_groups (str or list): groups to exclude
+
+            exclude_instances (str or list): object model directory names to exclude
 
             graspable (bool): whether the sampled object must be graspable
 
@@ -1496,6 +1486,7 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
         return sample_kitchen_object(
             groups,
             exclude_groups=exclude_groups,
+            exclude_instances=exclude_instances,
             graspable=graspable,
             washable=washable,
             microwavable=microwavable,
@@ -1629,8 +1620,6 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
                 obj_cfg = cfg
                 break
         lang = obj_cfg["info"]["cat"].replace("_", " ")
-
-        lang = lang.translate({ord(k): None for k in digits}).strip()
 
         if not get_preposition:
             return lang

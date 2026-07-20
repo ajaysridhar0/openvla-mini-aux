@@ -837,15 +837,7 @@ OBJ_CATEGORIES = dict(
         aigen=dict(
             scale=1.3,
         ),
-        objaverse=dict(
-            exclude=[
-                # not good for mug flip task, sometimes spawns wrong when rotated
-                "mug_0",  
-                "mug_7",
-                "mug_10",
-                "mug_12"
-            ]
-        ),
+        objaverse=dict(),
     ),
     mushroom=dict(
         types=("vegetable"),
@@ -2095,6 +2087,18 @@ OBJ_GROUPS["container"] = ["plate"]  # , "bowl"]
 OBJ_GROUPS["kettle"] = ["kettle_electric", "kettle_non_electric"]
 OBJ_GROUPS["cookware"] = ["pan", "pot", "kettle_non_electric"]
 OBJ_GROUPS["pots_and_pans"] = ["pan", "pot"]
+OBJ_GROUPS["food_set1"] = [
+    "apple",
+    "baguette",
+    "banana",
+    "carrot",
+    "cheese",
+    "cucumber",
+    "egg",
+    "lemon",
+    "orange",
+    "potato",
+]
 OBJ_GROUPS["obj_set1"] = [
     "apple",
     "banana",
@@ -2103,14 +2107,7 @@ OBJ_GROUPS["obj_set1"] = [
     "can",
     "lemon",
     "orange",
-    "sponge"
+    "sponge",
 ]
-# OBJ_GROUPS["food_set1"] = [
-#     "apple",
-#     "banana",
-#     "carrot",
-#     "cucumber",
-#     "orange"
-# ]
 OBJ_GROUPS["group1"] = ["apple", "carrot", "banana", "bowl", "can"]
 OBJ_GROUPS["container_set2"] = ["plate", "bowl"]
