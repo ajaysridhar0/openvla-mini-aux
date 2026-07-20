@@ -4,7 +4,7 @@
   "episodes": 100,
   "generative_textures": "100p",
   "image_size": [320, 180],
-  "condition_format": 2,
+  "condition_format": 3,
   "condition_contents": ["episode_metadata", "processed_mujoco_xml", "post_settling_state"],
   "object_group": "obj_set1",
   "object_instance_split": "A",

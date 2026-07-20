@@ -12,7 +12,7 @@ from typing import Any
 import numpy as np
 
 
-FORMAT_VERSION = 2
+FORMAT_VERSION = 3
 PACKAGE_MARKERS = ("robocasa", "robosuite")
 
 
@@ -147,6 +147,7 @@ def make_entry(
         "metadata_sha256": metadata_hash,
         "model_sha256": model_sha256(model_xml),
         "state_sha256": state_hash,
+        "state_size": int(np.asarray(policy_start_state).size),
         "ep_meta": ep_meta,
     }
 
@@ -173,9 +174,18 @@ def write_bundle(
     if not entries:
         raise ValueError("Cannot write an empty condition bundle")
 
-    state_matrix = np.stack([np.asarray(state, dtype=np.float64) for state in states])
+    normalized_states = [
+        np.asarray(state, dtype=np.float64).reshape(-1) for state in states
+    ]
+    state_offsets = np.zeros(len(normalized_states) + 1, dtype=np.int64)
+    state_offsets[1:] = np.cumsum(
+        [state.size for state in normalized_states], dtype=np.int64
+    )
+    state_values = np.concatenate(normalized_states)
     portable_xmls = [portable_model_xml(xml) for xml in model_xmls]
-    for entry, state, xml in zip(entries, state_matrix, portable_xmls):
+    for entry, state, xml in zip(entries, normalized_states, portable_xmls):
+        if entry["state_size"] != state.size:
+            raise ValueError(f"State size mismatch for episode {entry['episode']}")
         if entry["state_sha256"] != state_sha256(state):
             raise ValueError(f"State hash mismatch for episode {entry['episode']}")
         if entry["model_sha256"] != model_sha256(xml):
@@ -199,7 +209,8 @@ def write_bundle(
     with state_tmp.open("wb") as output:
         np.savez_compressed(
             output,
-            policy_start_states=state_matrix,
+            policy_start_state_values=state_values,
+            policy_start_state_offsets=state_offsets,
             model_xmls=np.asarray(portable_xmls, dtype=np.str_),
         )
 
@@ -213,7 +224,7 @@ def load_bundle(
     *,
     task: str,
     embodiment: str,
-) -> tuple[dict[str, Any], np.ndarray, list[str]]:
+) -> tuple[dict[str, Any], list[np.ndarray], list[str]]:
     """Load and fully validate one frozen condition bundle."""
 
     json_path, state_path = bundle_paths(root, task, embodiment)
@@ -225,10 +236,28 @@ def load_bundle(
     if payload.get("state_file") != state_path.name:
         raise ValueError(f"Condition state filename mismatch in {json_path}")
 
-    with np.load(state_path, allow_pickle=False) as archive:
-        states = np.asarray(archive["policy_start_states"], dtype=np.float64)
-        model_xmls = archive["model_xmls"].tolist()
     entries = payload["episodes"]
+    with np.load(state_path, allow_pickle=False) as archive:
+        state_values = np.asarray(
+            archive["policy_start_state_values"], dtype=np.float64
+        )
+        state_offsets = np.asarray(
+            archive["policy_start_state_offsets"], dtype=np.int64
+        )
+        model_xmls = archive["model_xmls"].tolist()
+    if (
+        state_values.ndim != 1
+        or state_offsets.ndim != 1
+        or len(state_offsets) != len(entries) + 1
+        or state_offsets[0] != 0
+        or np.any(np.diff(state_offsets) < 0)
+        or state_offsets[-1] != len(state_values)
+    ):
+        raise ValueError(f"Corrupt state index in {state_path}")
+    states = [
+        state_values[state_offsets[index] : state_offsets[index + 1]].copy()
+        for index in range(len(entries))
+    ]
     if (
         len(entries) != len(states)
         or len(entries) != len(model_xmls)
@@ -241,6 +270,10 @@ def load_bundle(
     ):
         if entry["episode"] != expected_episode:
             raise ValueError(f"Non-contiguous episode index in {json_path}")
+        if entry["state_size"] != state.size:
+            raise ValueError(
+                f"State size mismatch for episode {expected_episode} in {state_path}"
+            )
         if entry["state_sha256"] != state_sha256(state):
             raise ValueError(f"Corrupt state for episode {expected_episode} in {state_path}")
         if entry["model_sha256"] != model_sha256(xml):

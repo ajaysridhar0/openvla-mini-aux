@@ -79,8 +79,42 @@ class EvaluationConditionTest(unittest.TestCase):
                 embodiment="panda",
             )
         self.assertEqual(payload["episode_count"], 2)
-        np.testing.assert_array_equal(loaded_states, np.stack(states))
+        self.assertEqual(len(loaded_states), len(states))
+        for loaded, expected in zip(loaded_states, states):
+            np.testing.assert_array_equal(loaded, expected)
         self.assertEqual(loaded_models, [portable_model_xml(model) for model in models])
+
+    def test_round_trip_supports_variable_length_simulator_states(self):
+        states = [
+            np.arange(3, dtype=np.float64),
+            np.arange(7, dtype=np.float64),
+        ]
+        entries = [
+            self.entry(index, 1000 + index, state)
+            for index, state in enumerate(states)
+        ]
+        models = [
+            '<mujoco><mesh file="/machine/robocasa/assets/a.stl"/></mujoco>'
+        ] * 2
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_bundle(
+                root,
+                task="pnp_sink_to_counter",
+                embodiment="panda_og",
+                entries=entries,
+                states=states,
+                model_xmls=models,
+                provenance={"source": "test"},
+            )
+            _, loaded_states, _ = load_bundle(
+                root,
+                task="pnp_sink_to_counter",
+                embodiment="panda_og",
+            )
+        self.assertEqual([len(state) for state in loaded_states], [3, 7])
+        for loaded, expected in zip(loaded_states, states):
+            np.testing.assert_array_equal(loaded, expected)
 
     def test_corrupt_metadata_is_rejected(self):
         state = np.arange(3, dtype=np.float64)
