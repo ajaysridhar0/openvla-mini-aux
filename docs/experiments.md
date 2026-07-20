@@ -87,7 +87,10 @@ starting a distributed job.
 Use `scripts/evaluate.py` for paper-facing task and embodiment names. Each
 task/embodiment setting uses 100 fixed held-out seeds, starting from seed 1000
 in the release evaluator, and executes all 8 predicted actions before
-replanning.
+replanning. The launcher loads a frozen condition bundle by default, including
+the exact processed MuJoCo model and post-settling simulator state. Robot,
+gripper, and calibrated agent camera are selected together from the embodiment;
+they are not independent command-line choices.
 
 | Task | Maximum steps |
 | --- | ---: |

@@ -24,6 +24,10 @@ EVALUATOR = ROOT / "policy" / "experiments" / "robot" / "robocasa_x" / "evaluate
 def command(args: argparse.Namespace) -> list[str]:
     embodiment = EMBODIMENTS[args.embodiment]
     task = TASKS[args.task]
+    conditions_dir = (
+        getattr(args, "conditions_dir", None)
+        or ROOT / "evaluation" / "conditions"
+    )
     rollout_dir = (
         args.rollout_dir
         or ROOT / "rollouts" / args.task / args.embodiment / "STEP"
@@ -49,6 +53,8 @@ def command(args: argparse.Namespace) -> list[str]:
         str(args.episodes),
         "--start_seed",
         str(args.start_seed),
+        "--conditions_dir",
+        str(conditions_dir),
         "--max_steps",
         str(args.max_steps or task.max_steps),
         "--act_horizon",
@@ -79,6 +85,7 @@ def main() -> None:
     parser.add_argument("--start-seed", type=int, default=EVALUATION_START_SEED)
     parser.add_argument("--max-steps", type=int)
     parser.add_argument("--rollout-dir", type=Path)
+    parser.add_argument("--conditions-dir", type=Path)
     parser.add_argument("--use-wandb", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()

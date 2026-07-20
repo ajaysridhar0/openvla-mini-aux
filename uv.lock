@@ -179,9 +179,9 @@ requires-dist = [
     { name = "numpy", specifier = "==1.23.5" },
     { name = "opencv-python", specifier = "==4.11.0.86" },
     { name = "openvla", editable = "policy" },
-    { name = "robocasa", editable = "simulator/robocasa_x" },
+    { name = "robocasa", editable = "robocasa_x" },
     { name = "robomimic", specifier = "==0.3.0" },
-    { name = "robosuite", editable = "simulator/robosuite" },
+    { name = "robosuite", git = "https://github.com/ARISE-Initiative/robosuite.git?rev=2ebb2a0249f7a271a3ade56725d12e32d7da8898" },
     { name = "robosuite-models", specifier = "==1.0.0" },
     { name = "scipy", specifier = "==1.13.1" },
     { name = "tensorflow", specifier = "==2.15.0" },
@@ -1433,7 +1433,7 @@ wheels = [
 [[package]]
 name = "robocasa"
 version = "0.2.0"
-source = { editable = "simulator/robocasa_x" }
+source = { editable = "robocasa_x" }
 dependencies = [
     { name = "h5py", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "hidapi", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
@@ -1497,7 +1497,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/8e/f2/21769478588f72482
 [[package]]
 name = "robosuite"
 version = "1.5.1"
-source = { editable = "simulator/robosuite" }
+source = { git = "https://github.com/ARISE-Initiative/robosuite.git?rev=2ebb2a0249f7a271a3ade56725d12e32d7da8898#2ebb2a0249f7a271a3ade56725d12e32d7da8898" }
 dependencies = [
     { name = "mujoco", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "numba", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
@@ -1509,20 +1509,6 @@ dependencies = [
     { name = "scipy", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "termcolor", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "tqdm", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "mujoco", specifier = "==3.1.1" },
-    { name = "numba", specifier = ">=0.49.1" },
-    { name = "numpy", specifier = ">=1.13.3" },
-    { name = "opencv-python" },
-    { name = "pillow" },
-    { name = "pynput" },
-    { name = "pytest" },
-    { name = "scipy", specifier = ">=1.2.3" },
-    { name = "termcolor" },
-    { name = "tqdm" },
 ]
 
 [[package]]

@@ -30,12 +30,17 @@ from barx.names import (
     internal_representation_name,
     representations_for_method,
 )
-from barx.benchmark import (
-    EMBODIMENTS,
-    OBJECT_INSTANCE_SPLIT,
-    TASK_BY_ENVIRONMENT,
-    evaluation_scene_config,
+from barx.benchmark import EMBODIMENTS, TASK_BY_ENVIRONMENT
+from barx.evaluation_conditions import (
+    canonical_json,
+    load_bundle,
+    materialize_ep_meta,
+    materialize_model_xml,
+    model_sha256,
+    stable_replay_metadata,
+    state_sha256,
 )
+from barx.simulation import build_environment_config, initialize_observation_utils
 from experiments.robot.robocasa_x.utils import (
     get_robocasa_dummy_action, 
     pad_action_robocasa,
@@ -57,8 +62,6 @@ from experiments.robot.robot_utils import (
 # Core imports needed
 import robocasa
 from robocasa.utils.robomimic.robomimic_env_utils import create_env
-import robocasa.utils.robomimic.robomimic_obs_utils as ObsUtils
-from robocasa.utils.controller_utils import load_robocasa_controller_config
 import robosuite
 import h5py
 import json
@@ -124,6 +127,8 @@ class GenerateConfig:
     rollout_dir: str = None
     camera_width: int = 320
     camera_height: int = 180
+    conditions_dir: Path = REPOSITORY_ROOT / "evaluation" / "conditions"
+    use_frozen_conditions: bool = True
     # fmt: on
 
 
@@ -281,51 +286,60 @@ def get_env_config(cfg):
             "select them automatically."
         )
 
-    controller_config = load_robocasa_controller_config(
-        controller=cfg.controller,
-        robot=cfg.robot,
+    task_name = TASK_BY_ENVIRONMENT[cfg.task]
+    return build_environment_config(
+        task_name,
+        cfg.embodiment,
+        use_wrist_image=cfg.use_wrist_image,
     )
 
-    if cfg.obj_xinit_range and cfg.obj_yinit_range:
-        obj_init_range = [cfg.obj_xinit_range, cfg.obj_yinit_range]
-    else:
-        obj_init_range = None
 
-    camera_names = [cfg.camera]
-    if cfg.use_wrist_image:
-        camera_names.append("robot0_eye_in_hand")
+def restore_frozen_condition(env, entry, state, model_xml):
+    """Reconstruct and verify one policy-start simulator condition."""
 
+    ep_meta = materialize_ep_meta(
+        entry["ep_meta"],
+        {
+            "robocasa": Path(robocasa.__path__[0]),
+            "robosuite": Path(robosuite.__path__[0]),
+        },
+    )
+    env.env.set_ep_meta(ep_meta)
+    env.reset(unset_ep_meta=False)
+    model_xml = materialize_model_xml(
+        model_xml,
+        {
+            "robocasa": Path(robocasa.__path__[0]),
+            "robosuite": Path(robosuite.__path__[0]),
+        },
+    )
+    actual_model_hash = model_sha256(model_xml)
+    if actual_model_hash != entry["model_sha256"]:
+        raise RuntimeError(
+            f"Model mismatch for condition {entry['condition_id']}: "
+            f"expected {entry['model_sha256']}, received {actual_model_hash}"
+        )
+    # robosuite normally reprocesses supplied XML. Frozen XML has already
+    # passed through those processors and must be loaded verbatim.
+    xml_processors = env.env._xml_processors
+    env.env._xml_processors = []
+    try:
+        env.env.reset_from_xml_string(model_xml)
+    finally:
+        env.env._xml_processors = xml_processors
 
-    # Create argument configuration
-    config = {
-        "env_name": cfg.task,
-        "robots": [cfg.robot],
-        "controller_configs": controller_config,
-        "use_distractors": cfg.use_distractors,
-        "render_camera": cfg.camera,
-        "camera_names": camera_names,
-        "obj_init_range": obj_init_range,
-        "camera_widths": cfg.camera_width,
-        "camera_heights": cfg.camera_height,
-        "gripper_types": cfg.gripper_types,
-    }
+    env.env.sim.set_state_from_flattened(state)
+    env.env.sim.forward()
+    restored_state = np.asarray(env.env.sim.get_state().flatten(), dtype=np.float64)
+    if state_sha256(restored_state) != entry["state_sha256"]:
+        raise RuntimeError(f"State mismatch for condition {entry['condition_id']}")
 
-    if cfg.generative_textures is True:
-        config["generative_textures"] = "100p"
-
-    task_name = TASK_BY_ENVIRONMENT[cfg.task]
-    config.update(evaluation_scene_config(task_name, cfg.embodiment))
-
-    ### update config for kitchen envs ###
-    if "pnp" in cfg.task.lower() and cfg.obj_groups is not None:
-        config.update({"obj_groups": cfg.obj_groups})
-
-    config["translucent_robot"] = False
-
-    # by default use obj instance split A
-    config["obj_instance_split"] = OBJECT_INSTANCE_SPLIT
-
-    return config
+    ep_meta = env.env.get_ep_meta()
+    if canonical_json(stable_replay_metadata(ep_meta)) != canonical_json(
+        stable_replay_metadata(entry["ep_meta"])
+    ):
+        raise RuntimeError(f"Metadata mismatch for condition {entry['condition_id']}")
+    return env.get_observation(), ep_meta
 
 def robocasa_img_transform(img):
     img = np.transpose(img, (1, 2, 0))
@@ -348,6 +362,7 @@ def eval_single_task(cfg: GenerateConfig, model, log_file) -> None:
 
     # Initialize environment
     env_config = get_env_config(cfg)
+    initialize_observation_utils(env_config)
 
     env = create_env(
         **env_config,
@@ -358,6 +373,27 @@ def eval_single_task(cfg: GenerateConfig, model, log_file) -> None:
         use_camera_obs=False,
         rng=np.random.default_rng(cfg.start_seed),
     )
+
+    condition_payload = None
+    condition_states = None
+    condition_models = None
+    if cfg.use_frozen_conditions:
+        task_name = TASK_BY_ENVIRONMENT[cfg.task]
+        condition_payload, condition_states, condition_models = load_bundle(
+            Path(cfg.conditions_dir),
+            task=task_name,
+            embodiment=cfg.embodiment,
+        )
+        entries = condition_payload["episodes"]
+        requested_seeds = list(
+            range(cfg.start_seed, cfg.start_seed + cfg.num_trials_per_task)
+        )
+        bundle_seeds = [entry["seed"] for entry in entries[: cfg.num_trials_per_task]]
+        if bundle_seeds != requested_seeds:
+            raise ValueError(
+                "Frozen condition seeds do not match the requested evaluation range: "
+                f"expected {requested_seeds[0]}..{requested_seeds[-1]}"
+            )
 
     # env = create_env(env_config, cfg.start_seed)
 
@@ -376,12 +412,23 @@ def eval_single_task(cfg: GenerateConfig, model, log_file) -> None:
         print(f"\nTrial {trial_idx + 1}/{cfg.num_trials_per_task}")
         log_file.write(f"\nTrial {trial_idx + 1}/{cfg.num_trials_per_task}\n")
 
-        # Reset environment
-        env.env.rng = np.random.default_rng(current_seed)
-        env.reset()
-
-        
-        ep_meta = env.env.get_ep_meta()
+        # Reuse the exact settled policy-start state across every method. The
+        # seed-only branch preserves the historical path for diagnostics and
+        # condition generation, but the public launcher uses frozen states.
+        if cfg.use_frozen_conditions:
+            entry = condition_payload["episodes"][trial_idx]
+            obs, ep_meta = restore_frozen_condition(
+                env,
+                entry,
+                condition_states[trial_idx],
+                condition_models[trial_idx],
+            )
+            t = cfg.num_steps_wait
+        else:
+            env.env.rng = np.random.default_rng(current_seed)
+            env.reset()
+            ep_meta = env.env.get_ep_meta()
+            t = 0
         lang = ep_meta.get("lang", None)
         if lang is not None:
             print(colored(f"Instruction: {lang}", "green"))
@@ -391,7 +438,6 @@ def eval_single_task(cfg: GenerateConfig, model, log_file) -> None:
         print(colored(f"Layout ID: {ep_meta['layout_id']}", "blue"))
 
         # Setup
-        t = 0
         replay_images = []
         replay_images_with_bbox = []  # Separate list for bbox images
         replay_wrist_images = []  # Add list for wrist images
@@ -404,7 +450,11 @@ def eval_single_task(cfg: GenerateConfig, model, log_file) -> None:
         log_file.write(f"Starting episode {total_episodes+1}...\n")
         
         # Create progress bar for steps
-        pbar = tqdm.tqdm(total=cfg.max_steps + cfg.num_steps_wait, desc='Environment steps')
+        pbar = tqdm.tqdm(
+            total=cfg.max_steps + cfg.num_steps_wait,
+            initial=t,
+            desc='Environment steps',
+        )
 
         action_buffer = []
         
@@ -616,14 +666,6 @@ def eval_robocasa(cfg: GenerateConfig) -> None:
         
     # Set random seed
     set_seed_everywhere(cfg.seed)
-
-    ObsUtils.OBS_KEYS_TO_MODALITIES = {
-        f"{cfg.camera}_image": 'rgb', 
-        'robot0_eye_in_hand_image': 'rgb', 
-        'mean': 'low_dim', 
-        'scale': 'low_dim', 
-        'logits': 'low_dim'
-    }
 
     specified_inference_options = sum(
         option is not None for option in (cfg.inference_representation, cfg.method, cfg.aux_task_types)

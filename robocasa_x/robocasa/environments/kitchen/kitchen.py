@@ -1176,9 +1176,12 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
         if (self.generative_textures is not None) and (
             self.generative_textures is not False
         ):
-            # sample textures
+            # Reuse recorded textures when replaying episode metadata. Normal
+            # resets still sample exactly as before.
             assert self.generative_textures == "100p"
-            self._curr_gen_fixtures = get_random_textures(self.rng)
+            self._curr_gen_fixtures = deepcopy(
+                self._ep_meta.get("gen_textures") or get_random_textures(self.rng)
+            )
 
             cab_tex = self._curr_gen_fixtures["cab_tex"]
             counter_tex = self._curr_gen_fixtures["counter_tex"]
@@ -1198,6 +1201,9 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
                 self.rng, result, new_floor_texture_file=floor_tex
             )
 
+        # Condition generation records the exact XML that was handed to
+        # MuJoCo, including sampled fixture variants and rendered textures.
+        self._last_model_xml = result
         return result
 
     def _setup_references(self):
