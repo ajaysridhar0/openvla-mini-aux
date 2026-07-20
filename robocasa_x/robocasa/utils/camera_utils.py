@@ -91,9 +91,9 @@ CAM_CONFIGS = dict(
 )
 
 
-# Fixed base-camera calibrations used by BARX. These names are intentionally
-# separate from RoboCasa's standard cameras so upstream tasks retain their
-# original views and each BARX embodiment is paired automatically.
+# Fixed base-camera calibrations used by the paper evaluator. X task classes
+# install these overrides locally so ordinary RoboCasa tasks retain their
+# standard camera set and behavior.
 _BARX_AGENTVIEW_QUAT = [
     0.48874131,
     0.26186095,
@@ -133,17 +133,3 @@ BARX_CAMERA_CONFIGS = {
         "parent_body": "mobilebase0_support",
     },
 }
-
-CAM_CONFIGS.update(BARX_CAMERA_CONFIGS)
-
-# Non-public aliases allow old dataset metadata and commands to be inspected.
-# New evaluation code only emits the consistent BARX names above.
-LEGACY_BARX_CAMERA_ALIASES = {
-    "panda_agentview_left": "barx_panda_agentview",
-    "jaco_agentview_left": "barx_jaco_agentview",
-    "kinova_agentview_left": "barx_kinova3_agentview",
-    "ur5e_agentview_left": "barx_ur5e_agentview",
-    "iiwa_agentview_left": "barx_iiwa_agentview",
-}
-for legacy_name, canonical_name in LEGACY_BARX_CAMERA_ALIASES.items():
-    CAM_CONFIGS[legacy_name] = CAM_CONFIGS[canonical_name]

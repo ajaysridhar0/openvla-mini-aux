@@ -342,14 +342,12 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
             camera_depths=camera_depths,
             renderer=renderer,
             renderer_config=renderer_config,
-            seed=seed,
+            # NumPy returns an existing Generator unchanged from
+            # ``default_rng``. Passing it through robosuite's public seed
+            # argument therefore preserves the paper evaluator's RNG stream
+            # without carrying the historical robosuite ``rng`` patch.
+            seed=rng if rng is not None else seed,
         )
-        if rng is not None:
-            # Upstream robosuite accepts a seed but not a Generator. Repeating
-            # the hard reset here makes the returned environment use the
-            # caller's Generator exactly as the paper code did.
-            self.rng = rng
-            self.reset()
 
     def _load_model(self):
         """

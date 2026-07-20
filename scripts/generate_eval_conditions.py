@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import random
 import subprocess
 from pathlib import Path
 
@@ -13,6 +14,7 @@ from barx.action_space import robocasa_noop_action
 from barx.benchmark import (
     EMBODIMENTS,
     EVALUATION_EPISODES,
+    EVALUATION_GLOBAL_SEED,
     EVALUATION_START_SEED,
     SETTLE_STEPS,
     TASKS,
@@ -36,6 +38,12 @@ def git_revision() -> str:
 
 def generate(args: argparse.Namespace) -> tuple[Path, Path]:
     from robocasa.utils.robomimic.robomimic_env_utils import create_env
+
+    # Robosuite uses the legacy global NumPy RNG for arm initialization
+    # noise. This is separate from RoboCasa's per-episode Generator and was
+    # seeded to 7 by the paper evaluator before environment construction.
+    random.seed(EVALUATION_GLOBAL_SEED)
+    np.random.seed(EVALUATION_GLOBAL_SEED)
 
     config = build_environment_config(args.task, args.embodiment)
     initialize_observation_utils(config)
@@ -92,6 +100,7 @@ def generate(args: argparse.Namespace) -> tuple[Path, Path]:
             "description": "Regenerated from the frozen BARX paper code and seed protocol",
             "repository_revision": git_revision(),
             "start_seed": args.start_seed,
+            "global_seed": EVALUATION_GLOBAL_SEED,
             "settle_steps": SETTLE_STEPS,
         },
     )

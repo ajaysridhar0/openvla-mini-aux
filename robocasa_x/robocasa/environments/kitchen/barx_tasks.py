@@ -21,6 +21,7 @@ from robocasa.environments.kitchen.single_stage.kitchen_pnp import (
 from robocasa.environments.kitchen.single_stage.kitchen_sink import (
     ManipulateSinkFaucet,
 )
+from robocasa.utils import camera_utils as CamUtils
 
 
 # Values used by the released data generation and paper evaluation code.
@@ -115,6 +116,21 @@ class BARXTaskMixin:
 
         language = super().get_obj_lang(*args, **kwargs)
         return language.translate({ord(char): None for char in digits}).strip()
+
+    def _load_model(self):
+        """Apply the paper's zero-height Omron torso initialization."""
+
+        super()._load_model()
+        for robot in self.robots:
+            robot_name = robot.robot_model.__class__.__name__
+            if robot_name in BARX_ROBOT_INITIAL_QPOS:
+                robot.init_torso_qpos = np.array([0.0])
+
+    def set_cameras(self):
+        """Install canonical paper cameras only for X task variants."""
+
+        super().set_cameras()
+        self._cam_configs.update(CamUtils.BARX_CAMERA_CONFIGS)
 
 
 class XPnPCounterToSink(BARXTaskMixin, PnPCounterToSink):

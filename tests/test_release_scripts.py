@@ -2,7 +2,12 @@ import argparse
 import unittest
 from pathlib import Path
 
-from barx.benchmark import EMBODIMENTS, evaluation_scene_config
+from barx.benchmark import (
+    EMBODIMENTS,
+    EVALUATION_GLOBAL_SEED,
+    EVALUATION_START_SEED,
+    evaluation_scene_config,
+)
 from scripts import build_rlds, evaluate, train
 
 
@@ -60,6 +65,8 @@ class TrainingLauncherTest(unittest.TestCase):
 
 class EvaluationLauncherTest(unittest.TestCase):
     def test_paper_protocol_defaults(self):
+        self.assertEqual(EVALUATION_GLOBAL_SEED, 7)
+        self.assertEqual(EVALUATION_START_SEED, 1000)
         args = argparse.Namespace(
             checkpoint=Path("/models/model.pt"),
             embodiment="panda_og",

@@ -15,6 +15,12 @@ RoboCasa mutates resolved object-placement dictionaries while loading a scene;
 those redundant fields are excluded from the post-load metadata comparison,
 while object identity and placement remain covered by the XML and state hashes.
 
+Generation is sequential: episode 1 uses seed 1000, episode 2 uses seed 1001,
+and so on. Do not construct a later paper episode directly from its seed.
+RoboCasa retains some sampled Python-side scene state across hard resets, so a
+later condition is reproduced only by replaying all preceding resets in the
+same environment. The generator does this automatically.
+
 Generate one bundle after installing the RoboCasa assets:
 
 ```bash
@@ -27,3 +33,8 @@ The public `scripts/evaluate.py` launcher loads these bundles by default and
 fails before model inference if a bundle is absent, corrupt, or incompatible
 with the current simulator. This prevents different methods from silently
 receiving different sampled objects, layouts, styles, or initial poses.
+
+See [historical validation](HISTORICAL_VALIDATION.md) for the video-based spot
+check against the retained paper rollouts and its limitations. If those private
+rollouts are available, the check can be repeated with
+`scripts/audit_historical_rollouts.py`.
