@@ -34,5 +34,8 @@
             "type": "JOINT_VELOCITY",
             "interpolation": "null"
         }
+    },
+    "composite_controller_specific_configs": {
+        "body_part_ordering": ["right", "right_gripper", "base", "torso"]
     }
 }

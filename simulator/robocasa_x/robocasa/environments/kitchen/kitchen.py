@@ -43,6 +43,7 @@ from robocasa.utils.texture_swap import (
     replace_wall_texture,
 )
 from robocasa.utils.config_utils import refactor_composite_controller_config
+from robocasa.utils.controller_utils import load_robocasa_controller_config
 from string import digits
 
 
@@ -303,6 +304,12 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
                 robots[i] = "PandaOmron"
         assert len(robots) == 1
 
+        # RoboCasa-X's paper-facing Panda embodiment uses the Robotiq gripper.
+        # Keep robosuite's general Panda model unchanged and allow Panda-OG to
+        # opt into PandaGripper explicitly through this environment argument.
+        if robots[0] == "PandaOmron" and gripper_types == "default":
+            gripper_types = "Robotiq85Gripper"
+
         # set up currently unused variables (used in robosuite)
         self.use_object_obs = use_object_obs
         self.reward_scale = reward_scale
@@ -310,76 +317,46 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
 
         self.robot_init_qpos = robot_init_qpos
 
-        if controller_configs is not None:
-            # detect if using stale controller configs (before robosuite v1.5.1) and update to new convention
-            arms = REGISTERED_ROBOTS[robots[0]].arms
-            controller_configs = refactor_composite_controller_config(
-                controller_configs, robots[0], arms
-            )
-            if robots[0] == "PandaOmron":
-                if "composite_controller_specific_configs" not in controller_configs:
-                    controller_configs["composite_controller_specific_configs"] = {}
-                controller_configs["composite_controller_specific_configs"][
-                    "body_part_ordering"
-                ] = ["right", "right_gripper", "base", "torso"]
-
-        try:
-            super().__init__(
-                robots=robots,
-                env_configuration=env_configuration,
-                controller_configs=controller_configs,
-                base_types=base_types,
-                gripper_types=gripper_types,
-                initialization_noise=initialization_noise,
-                use_camera_obs=use_camera_obs,
-                has_renderer=has_renderer,
-                has_offscreen_renderer=has_offscreen_renderer,
-                render_camera=render_camera,
-                render_collision_mesh=render_collision_mesh,
-                render_visual_mesh=render_visual_mesh,
-                render_gpu_device_id=render_gpu_device_id,
-                control_freq=control_freq,
-                lite_physics=True,
-                horizon=horizon,
-                ignore_done=ignore_done,
-                hard_reset=hard_reset,
-                camera_names=camera_names,
-                camera_heights=camera_heights,
-                camera_widths=camera_widths,
-                camera_depths=camera_depths,
-                renderer=renderer,
-                renderer_config=renderer_config,
-                seed=seed,
-                rng=rng,
-            )
-        except TypeError as e:
-            super().__init__(
-                robots=robots,
-                env_configuration=env_configuration,
-                controller_configs=controller_configs,
-                base_types=base_types,
-                gripper_types=gripper_types,
-                initialization_noise=initialization_noise,
-                use_camera_obs=use_camera_obs,
-                has_renderer=has_renderer,
-                has_offscreen_renderer=has_offscreen_renderer,
-                render_camera=render_camera,
-                render_collision_mesh=render_collision_mesh,
-                render_visual_mesh=render_visual_mesh,
-                render_gpu_device_id=render_gpu_device_id,
-                control_freq=control_freq,
-                lite_physics=True,
-                horizon=horizon,
-                ignore_done=ignore_done,
-                hard_reset=hard_reset,
-                camera_names=camera_names,
-                camera_heights=camera_heights,
-                camera_widths=camera_widths,
-                camera_depths=camera_depths,
-                renderer=renderer,
-                renderer_config=renderer_config,
-                seed=seed,
-            )
+        if controller_configs is None:
+            controller_configs = load_robocasa_controller_config(robot=robots[0])
+        # detect if using stale controller configs (before robosuite v1.5.1) and update to new convention
+        arms = REGISTERED_ROBOTS[robots[0]].arms
+        controller_configs = refactor_composite_controller_config(
+            controller_configs, robots[0], arms
+        )
+        super().__init__(
+            robots=robots,
+            env_configuration=env_configuration,
+            controller_configs=controller_configs,
+            base_types=base_types,
+            gripper_types=gripper_types,
+            initialization_noise=initialization_noise,
+            use_camera_obs=use_camera_obs,
+            has_renderer=has_renderer,
+            has_offscreen_renderer=has_offscreen_renderer,
+            render_camera=render_camera,
+            render_collision_mesh=render_collision_mesh,
+            render_visual_mesh=render_visual_mesh,
+            render_gpu_device_id=render_gpu_device_id,
+            control_freq=control_freq,
+            lite_physics=True,
+            horizon=horizon,
+            ignore_done=ignore_done,
+            hard_reset=hard_reset,
+            camera_names=camera_names,
+            camera_heights=camera_heights,
+            camera_widths=camera_widths,
+            camera_depths=camera_depths,
+            renderer=renderer,
+            renderer_config=renderer_config,
+            seed=seed,
+        )
+        if rng is not None:
+            # Upstream robosuite accepts a seed but not a Generator. Repeating
+            # the hard reset here makes the returned environment use the
+            # caller's Generator exactly as the paper code did.
+            self.rng = rng
+            self.reset()
 
     def _load_model(self):
         """
@@ -1191,6 +1168,19 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
                 old_joint = elem.get("joint")
                 new_joint = "mobilebase0_" + old_joint[6:]
                 elem.set("joint", new_joint)
+
+        # BARX keeps the Omron base stationary. This belongs to the benchmark
+        # scene policy, not the general-purpose robosuite base asset.
+        locked_omron_joints = (
+            "joint_torso_height",
+            "joint_mobile_forward",
+            "joint_mobile_side",
+            "joint_mobile_yaw",
+        )
+        for joint in find_elements(root=worldbody, tags="joint", return_first=False):
+            name = joint.get("name", "")
+            if any(name.endswith(suffix) for suffix in locked_omron_joints):
+                joint.set("frictionloss", "999999999")
 
         # result = ET.tostring(root, encoding="utf8").decode("utf8")
         result = ET.tostring(root).decode("utf8")

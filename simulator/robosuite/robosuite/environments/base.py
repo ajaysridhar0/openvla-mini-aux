@@ -105,7 +105,6 @@ class MujocoEnv(metaclass=EnvMeta):
         renderer="mjviewer",
         renderer_config=None,
         seed=None,
-        rng=None,
     ):
         # Rendering-specific attributes
         self.has_renderer = has_renderer
@@ -138,12 +137,9 @@ class MujocoEnv(metaclass=EnvMeta):
 
         self.renderer = renderer
         self.renderer_config = renderer_config
-        
+
         self.seed = seed
-        if rng is not None:
-            self.rng = rng
-        else:
-            self.rng = np.random.default_rng(seed)
+        self.rng = np.random.default_rng(seed)
 
         self._ep_meta = {}
 

@@ -15,11 +15,11 @@ setup(
     name="robosuite",
     packages=[package for package in find_packages() if package.startswith("robosuite")],
     install_requires=[
-        "numpy==1.23.5",
-        "numba==0.56.4",
+        "numpy>=1.13.3",
+        "numba>=0.49.1",
         "scipy>=1.2.3",
-        # RoboCasa-X asserts this exact version at import time.
-        "mujoco==3.1.1",
+        "mujoco>=3.2.3",
+        "mink>=0.0.5",
         "Pillow",
         "opencv-python",
         "pynput",

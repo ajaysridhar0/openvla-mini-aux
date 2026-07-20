@@ -11,9 +11,10 @@ Official simulation-only code and data release for **BARX** and the
 This repository contains:
 
 - MiniVLA policy training and RoboCasa-X evaluation code;
-- the exact modified RoboCasa and robosuite simulator sources;
-- a unified converter from all RoboCasa-X embodiments to a canonical 7-D
-  RLDS action space;
+- the modified RoboCasa-X benchmark and an unmodified, pinned robosuite
+  1.5.1 source snapshot;
+- one action layout shared by every simulator embodiment and the RLDS
+  converter;
 - a manifest for the 283.13 GiB simulation-data release; and
 - paper-aligned experiment names, configuration, and protocols.
 
@@ -26,10 +27,10 @@ The simulation HDF5 files are distributed separately from Git; see
 
 | Path | Purpose |
 | --- | --- |
-| `barx/` | lightweight naming and action-space compatibility API |
+| `barx/` | lightweight naming and normalized action-space API |
 | `policy/` | BARX policy training and RoboCasa-X evaluation |
 | `simulator/robocasa_x/` | modified RoboCasa benchmark |
-| `simulator/robosuite/` | modified robosuite dependency |
+| `simulator/robosuite/` | unmodified robosuite dependency at pinned upstream commit |
 | `dataset/rlds/` | unified HDF5-to-RLDS converter |
 | `configs/experiments.toml` | paper protocol and compatibility identifiers |
 | `scripts/` | release-data and experiment entry points |
@@ -49,6 +50,14 @@ Install [uv](https://docs.astral.sh/uv/), then run:
 ```bash
 uv sync --locked --no-dev
 uv run --locked python -m unittest discover -s tests -v
+```
+
+Before simulation or evaluation, download the upstream RoboCasa kitchen asset
+bundle (about 5.8 GiB, excluded from Git by its upstream license/distribution
+workflow):
+
+```bash
+uv run --locked python simulator/robocasa_x/robocasa/scripts/download_kitchen_assets.py
 ```
 
 For training with FlashAttention and a CUDA development toolkit:

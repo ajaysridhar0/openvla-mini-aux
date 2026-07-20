@@ -12,7 +12,7 @@ from termcolor import colored
 from tianshou.env import SubprocVectorEnv
 
 import robosuite as suite
-from robosuite.controllers import load_composite_controller_config
+from robocasa.utils.controller_utils import load_robocasa_controller_config
 from robocasa import ALL_KITCHEN_ENVIRONMENTS
 import robocasa
 
@@ -127,7 +127,7 @@ if __name__ == "__main__":
     def create_env():
         # Get controller config
         # controller_config = load_controller_config(default_controller=args.controller)
-        controller_config = load_composite_controller_config(
+        controller_config = load_robocasa_controller_config(
             controller=args.controller,
             robot=args.robots,
         )

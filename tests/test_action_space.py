@@ -4,38 +4,24 @@ from barx.action_space import canonicalize_action, robocasa_action, robocasa_noo
 
 
 class ActionSpaceTest(unittest.TestCase):
-    def test_panda_conversion_matches_original_converter(self):
+    def test_normalized_simulator_action_uses_first_seven_values(self):
         raw = list(range(12))
-        self.assertEqual(canonicalize_action(raw, "Panda"), raw[:7])
-        self.assertEqual(canonicalize_action(raw, "Panda-OG"), raw[:7])
-        self.assertEqual(canonicalize_action(raw, "PandaOGGripperOmron"), raw[:7])
-        self.assertEqual(canonicalize_action(raw, "PandaOGOmron"), raw[:7])
-        self.assertEqual(canonicalize_action(raw, "PandaOmron"), raw[:7])
-
-    def test_non_panda_conversion_matches_original_converter(self):
-        raw = list(range(12))
-        self.assertEqual(canonicalize_action(raw, "Jaco"), raw[:6] + raw[-2:-1])
-        self.assertEqual(canonicalize_action(raw, "IIWAOmron"), raw[:6] + raw[-2:-1])
-
-    def test_legacy_eleven_dimensional_action(self):
-        raw = list(range(11))
-        self.assertEqual(canonicalize_action(raw, "UR5e"), raw[:6] + raw[-1:])
+        self.assertEqual(canonicalize_action(raw), raw[:7])
 
     def test_canonical_actions_pass_through(self):
         canonical = list(range(7))
-        self.assertEqual(canonicalize_action(canonical, "Kinova 3"), canonical)
+        self.assertEqual(canonicalize_action(canonical), canonical)
 
-    def test_evaluation_expansion_matches_original_branches(self):
+    def test_evaluation_expansion_uses_normalized_layout(self):
         canonical = list(range(7))
-        self.assertEqual(robocasa_action(canonical, "Panda"), canonical + [0.0] * 4 + [-1.0])
-        self.assertEqual(
-            robocasa_action(canonical, "Jaco"),
-            canonical[:6] + [0.0] * 4 + canonical[6:] + [-1.0],
-        )
+        self.assertEqual(robocasa_action(canonical), canonical + [0.0] * 4 + [-1.0])
 
-    def test_noop_matches_original_branches(self):
-        self.assertEqual(robocasa_noop_action("Panda"), [0.0] * 6 + [-1.0] + [0.0] * 4 + [-1.0])
-        self.assertEqual(robocasa_noop_action("Jaco"), [0.0] * 10 + [-1.0, -1.0])
+    def test_noop_uses_normalized_layout(self):
+        self.assertEqual(robocasa_noop_action(), [0.0] * 6 + [-1.0] + [0.0] * 4 + [-1.0])
+
+    def test_legacy_shapes_are_rejected(self):
+        with self.assertRaises(ValueError):
+            canonicalize_action(list(range(11)))
 
 
 if __name__ == "__main__":

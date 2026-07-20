@@ -106,5 +106,25 @@ name = "flash-attn"
 version = "2.5.5"
 requires-dist = ["torch", "einops"]
 
+# The vendored robosuite tree is byte-for-byte upstream 1.5.1. Its published
+# metadata requires newer MuJoCo and Mink, while the BARX experiments used
+# MuJoCo 3.1.1 and do not exercise robosuite's optional Mink example. Keep
+# release-environment policy here instead of patching third-party source.
+[[tool.uv.dependency-metadata]]
+name = "robosuite"
+version = "1.5.1"
+requires-dist = [
+    "numpy>=1.13.3",
+    "numba>=0.49.1",
+    "scipy>=1.2.3",
+    "mujoco==3.1.1",
+    "Pillow",
+    "opencv-python",
+    "pynput",
+    "termcolor",
+    "pytest",
+    "tqdm",
+]
+
 [dependency-groups]
 dev = ["pytest==8.3.5", "ruff==0.9.10"]

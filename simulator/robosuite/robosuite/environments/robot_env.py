@@ -148,7 +148,6 @@ class RobotEnv(MujocoEnv):
         renderer="mjviewer",
         renderer_config=None,
         seed=None,
-        rng=None,
     ):
         # First, verify that correct number of robots are being inputted
         self.env_configuration = env_configuration
@@ -234,7 +233,6 @@ class RobotEnv(MujocoEnv):
             renderer=renderer,
             renderer_config=renderer_config,
             seed=seed,
-            rng=rng,
         )
 
     def visualize(self, vis_settings):

@@ -52,7 +52,7 @@ from experiments.robot.robot_utils import (
 import robocasa
 from robocasa.utils.robomimic.robomimic_env_utils import create_env
 import robocasa.utils.robomimic.robomimic_obs_utils as ObsUtils
-from robosuite.controllers import load_composite_controller_config
+from robocasa.utils.controller_utils import load_robocasa_controller_config
 import robosuite
 import h5py
 import json
@@ -263,7 +263,7 @@ def draw_motion_text_on_image(img, motion_text):
     return img_with_text
 
 def get_env_config(cfg):
-    controller_config = load_composite_controller_config(
+    controller_config = load_robocasa_controller_config(
         controller=cfg.controller,
         robot=cfg.robot,
     )
@@ -408,7 +408,7 @@ def eval_single_task(cfg: GenerateConfig, model, log_file) -> None:
             # IMPORTANT: Do nothing for the first few timesteps because the simulator drops objects
             # and we need to wait for them to fall
             if t < cfg.num_steps_wait:
-                obs, reward, done, info = env.step(get_robocasa_dummy_action(cfg.robot))
+                obs, reward, done, info = env.step(get_robocasa_dummy_action())
                 t += 1
                 pbar.update(1)
                 continue
@@ -518,7 +518,7 @@ def eval_single_task(cfg: GenerateConfig, model, log_file) -> None:
                 if "faucet" not in cfg.task.lower():
                     action = invert_gripper_action(action)
             # Execute action in environment
-            env_action = pad_action_robocasa(action.tolist(), cfg.robot)
+            env_action = pad_action_robocasa(action.tolist())
             obs, reward, done, info = env.step(env_action)
             if info["is_success"]["task"]:
                 done = True

@@ -6,19 +6,13 @@ import os
 import imageio
 import numpy as np
 import tensorflow as tf
-# from libero.libero import get_libero_path
-# try:
-#     from libero.libero.envs import OffScreenRenderEnv
-# except ImportError:
-#     print("could not import libero.libero.envs.OffScreenRenderEnv since you are probably using robosuite version != 1.4.1")
-
-from PIL import Image
 from barx.action_space import robocasa_action, robocasa_noop_action
+from PIL import Image
+
 from experiments.robot.robot_utils import (
     DATE,
     DATE_TIME,
 )
-
 
 # def get_libero_env(task, model_family, resolution=256):
 #     """Initializes and returns the LIBERO environment, along with the task description."""
@@ -35,14 +29,14 @@ def get_libero_dummy_action(model_family: str):
     return [0, 0, 0, 0, 0, 0, -1]
 
 
-def get_robocasa_dummy_action(robot_name: str):
-    """Backward-compatible alias for the unified RoboCasa-X no-op adapter."""
-    return robocasa_noop_action(robot_name)
-    
+def get_robocasa_dummy_action():
+    """Return the unified RoboCasa-X no-op action."""
+    return robocasa_noop_action()
 
-def pad_action_robocasa(action: list, robot_type: str):
-    """Backward-compatible alias for the unified RoboCasa-X action adapter."""
-    return robocasa_action(action, robot_type)
+
+def pad_action_robocasa(action: list):
+    """Expand a policy action into the unified RoboCasa-X action layout."""
+    return robocasa_action(action)
 
 
 def resize_image(img, resize_size):

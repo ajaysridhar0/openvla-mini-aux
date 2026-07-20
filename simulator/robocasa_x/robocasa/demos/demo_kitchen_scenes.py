@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 import numpy as np
 import robosuite
-from robosuite.controllers import load_composite_controller_config
+from robocasa.utils.controller_utils import load_robocasa_controller_config
 from robosuite.wrappers import VisualizationWrapper
 from termcolor import colored
 
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     config = {
         "env_name": args.task,
         "robots": args.robot,
-        "controller_configs": load_composite_controller_config(robot=args.robot),
+        "controller_configs": load_robocasa_controller_config(robot=args.robot),
         "translucent_robot": False,
     }
 

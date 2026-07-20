@@ -14,7 +14,7 @@ from termcolor import colored
 import robocasa
 
 from robosuite.utils.camera_utils import CameraMover
-from robosuite.controllers import load_composite_controller_config
+from robocasa.utils.controller_utils import load_robocasa_controller_config
 
 
 def playback_trajectory_with_env(
@@ -361,7 +361,7 @@ def playback_dataset(args):
         if args.robot is not None:
             env_kwargs['robots'] = [args.robot]
 
-            controller_config = load_composite_controller_config(
+            controller_config = load_robocasa_controller_config(
                 controller=None,
                 robot=args.robot
             )

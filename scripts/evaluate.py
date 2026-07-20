@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 EVALUATOR = ROOT / "policy" / "experiments" / "robot" / "robocasa_x" / "evaluate.py"
 TARGETS = {
-    "panda": ("PandaOmron", "default"),
+    "panda": ("PandaOmron", "Robotiq85Gripper"),
     "panda_og": ("PandaOmron", "PandaGripper"),
     "jaco": ("JacoOmron", "default"),
     "iiwa": ("IIWAOmron", "default"),

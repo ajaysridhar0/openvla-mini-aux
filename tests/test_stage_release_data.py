@@ -1,0 +1,84 @@
+import json
+import tempfile
+import unittest
+from pathlib import Path
+
+import h5py
+import numpy as np
+
+from scripts.stage_release_data import (
+    BODY_PART_ORDER,
+    LAYOUT_ATTRIBUTE,
+    NORMALIZED_LAYOUT,
+    normalize_hdf5,
+    stage_file,
+)
+
+
+class StageReleaseDataTest(unittest.TestCase):
+    def make_file(self, path: Path, actions: np.ndarray) -> None:
+        env_args = {
+            "env_kwargs": {
+                "controller_configs": {
+                    "type": "HYBRID_MOBILE_BASE",
+                    "composite_controller_specific_configs": {},
+                }
+            }
+        }
+        with h5py.File(path, "w") as output:
+            data = output.create_group("data")
+            data.attrs["env_args"] = json.dumps(env_args)
+            demo = data.create_group("demo_0")
+            demo.create_dataset("actions", data=actions)
+
+    def test_non_panda_actions_are_losslessly_permuted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "jaco.hdf5"
+            original = np.arange(24, dtype=np.float32).reshape(2, 12)
+            self.make_file(path, original)
+
+            self.assertEqual(normalize_hdf5(path, "JacoOmron"), 1)
+
+            with h5py.File(path, "r") as staged:
+                data = staged["data"]
+                actions = data["demo_0/actions"][...]
+                expected = original[..., [0, 1, 2, 3, 4, 5, 10, 6, 7, 8, 9, 11]]
+                np.testing.assert_array_equal(actions, expected)
+                self.assertEqual(data.attrs[LAYOUT_ATTRIBUTE], NORMALIZED_LAYOUT)
+                env_args = json.loads(data.attrs["env_args"])
+                ordering = env_args["env_kwargs"]["controller_configs"][
+                    "composite_controller_specific_configs"
+                ]["body_part_ordering"]
+                self.assertEqual(ordering, BODY_PART_ORDER)
+
+    def test_panda_actions_stay_unchanged_and_gripper_is_explicit(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "panda.hdf5"
+            original = np.arange(12, dtype=np.float32).reshape(1, 12)
+            self.make_file(path, original)
+
+            normalize_hdf5(path, "PandaOmron")
+
+            with h5py.File(path, "r") as staged:
+                np.testing.assert_array_equal(staged["data/demo_0/actions"][...], original)
+                env_args = json.loads(staged["data"].attrs["env_args"])
+                self.assertEqual(env_args["env_kwargs"]["gripper_types"], "Robotiq85Gripper")
+
+    def test_staging_never_modifies_the_source_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "source.hdf5"
+            destination = root / "release" / "data.hdf5"
+            original = np.arange(12, dtype=np.float32).reshape(1, 12)
+            self.make_file(source, original)
+
+            stage_file(source, destination, "JacoOmron", expected_demos=1)
+
+            with h5py.File(source, "r") as archival, h5py.File(destination, "r") as staged:
+                np.testing.assert_array_equal(archival["data/demo_0/actions"][...], original)
+                self.assertNotIn(LAYOUT_ATTRIBUTE, archival["data"].attrs)
+                self.assertEqual(staged["data"].attrs[LAYOUT_ATTRIBUTE], NORMALIZED_LAYOUT)
+
+
+if __name__ == "__main__":
+    unittest.main()

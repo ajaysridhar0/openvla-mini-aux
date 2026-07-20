@@ -22,6 +22,19 @@ uv installs `policy`, `simulator/robocasa_x`, and `simulator/robosuite`
 editably from this repository. It also pins dlimp and VQ-BeT to Git commit
 hashes in `uv.lock`.
 
+RoboCasa's Objaverse models and high-resolution kitchen textures are excluded
+from Git by the upstream project. Download the static upstream asset archives
+before constructing an environment:
+
+```bash
+uv run --locked python simulator/robocasa_x/robocasa/scripts/download_kitchen_assets.py
+```
+
+The download is about 5.8 GiB. The script places assets under the editable
+`simulator/robocasa_x/robocasa/models/assets/` tree, where the simulator
+expects them. A missing bundle causes task construction to fail before an
+episode begins; dependency-only tests do not require it.
+
 For training, install the optional FlashAttention build:
 
 ```bash
@@ -43,10 +56,11 @@ remains recorded for archival reruns. The original environment used Protobuf 3.2
 despite an outdated `<3.20` constraint in Tianshou 0.4.10, so the uv project
 records an explicit Protobuf 3.20.3 override.
 
-robosuite 1.5.1 listed Mink as a mandatory dependency even though it is used
-only by an example controller and requires a newer MuJoCo. BARX removes Mink
-from mandatory dependencies and retains MuJoCo 3.1.1, which RoboCasa-X asserts
-at import time and which was used in the experiments.
+The vendored robosuite tree is an unmodified snapshot of upstream commit
+`2ebb2a0249f7a271a3ade56725d12e32d7da8898`. Upstream 1.5.1 package metadata
+lists Mink and MuJoCo 3.2.3+, but BARX does not use the Mink example controller
+and the experiments used MuJoCo 3.1.1. The root uv project records that
+release-environment override without changing third-party source.
 
 ## Reproducible operation
 

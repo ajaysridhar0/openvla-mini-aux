@@ -1,10 +1,10 @@
 # BARX simulation dataset
 
-The HDF5 files are distributed separately because the selected release is
-283.13 GiB. `manifest.csv` lists every selected file, its size, embodiment,
-task, demonstration count, seed, relative path, and paper dataset membership.
-The checksum column is intentionally empty until files are staged on the final
-data host.
+The source HDF5 selection is 283.13 GiB, so the normalized files are
+distributed separately. `manifest.csv` lists every selected file, its size,
+embodiment, task, demonstration count, seed, relative path, and paper dataset
+membership. Until final staging is complete, its byte sizes describe the
+archival inputs and its checksum column is intentionally empty.
 
 ## Contents
 
@@ -23,23 +23,33 @@ Only final annotated files are selected. Raw `demo.hdf5`, `demo_failed.hdf5`,
 unannotated renders, held-out scratch files, checkpoints, and real-robot data
 are excluded.
 
-## Verify or regenerate the manifest
+## Stage and finalize the release
+
+Do not edit the archival source tree in place. Create normalized copies:
 
 ```bash
-uv run --locked python scripts/build_data_manifest.py /path/to/robocasa_x/data \
-  --output dataset/manifest.csv
+uv run --locked python scripts/stage_release_data.py \
+  /path/to/original-data /path/to/barx-release-data
 ```
 
-Add `--sha256` when staging the public archive. Hashing the full release reads
-all 283.13 GiB and is therefore not part of the fast test suite.
+All output actions then use
+`[arm(6), gripper(1), base(3), torso(1), mode(1)]`, independent of
+embodiment. Once all files have been staged, regenerate the checked release
+manifest from the output tree:
+
+```bash
+uv run --locked python scripts/build_data_manifest.py /path/to/barx-release-data \
+  --output dataset/manifest.csv --sha256
+```
+
+Hashing the full release reads roughly 283 GiB and is therefore not part of
+the fast test suite.
 
 ## RLDS conversion
 
-The original experiments used separate `robocasa` and `robocasa_panda`
-converters. `rlds/robocasa_x_dataset_builder.py` replaces both. The release
-launcher reads the manifest, infers each embodiment, and produces the same
-canonical action values while retaining historical TFDS directory names
-required by training statistics and future checkpoints:
+`rlds/robocasa_x_dataset_builder.py` reads the normalized layout directly for
+every embodiment. The release launcher retains historical TFDS directory
+names required by training statistics and future checkpoints:
 
 ```bash
 uv run --locked python scripts/build_rlds.py \

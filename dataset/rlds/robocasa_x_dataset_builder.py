@@ -1,8 +1,7 @@
-"""Unified RoboCasa-X HDF5 to RLDS converter used by BARX.
+"""Normalized RoboCasa-X HDF5 to RLDS converter used by BARX.
 
-The two original converters differed only in how a 12-D simulator action was
-sliced for Panda versus non-Panda robots. This builder determines the
-embodiment from each HDF5 path and delegates that exact distinction to
+All released HDF5 files use the same 12-D action order. This builder extracts
+the first seven policy-controlled values with
 ``barx.action_space.canonicalize_action``.
 
 Set ``BARX_RAW_DATA_GLOB`` to one or more ``os.pathsep``-separated HDF5 glob
@@ -17,7 +16,6 @@ from __future__ import annotations
 import glob
 import json
 import os
-from pathlib import Path
 from typing import Any, Iterator, Tuple
 
 import h5py
@@ -37,34 +35,10 @@ except ImportError:  # TFDS may load a builder file outside its package context.
 IMAGE_WIDTH = 320
 IMAGE_HEIGHT = 180
 MAX_NUM_OBJECTS_OF_INTEREST = 1
-KNOWN_EMBODIMENTS = (
-    "PandaOmron",
-    "PandaOGGripperOmron",
-    "PandaOGOmron",
-    "JacoOmron",
-    "IIWAOmron",
-    "Kinova3Omron",
-    "UR5eOmron",
-)
 LANGUAGE_MOTION_CONVERTER = LanguageMotionEpisodeConverter()
 
 
-def embodiment_from_path(path: str) -> str:
-    """Extract the RoboCasa-X embodiment directory from a dataset path."""
-    for part in Path(path).parts:
-        if part in KNOWN_EMBODIMENTS:
-            return part
-    override = os.environ.get("BARX_EMBODIMENT")
-    if override:
-        return override
-    raise ValueError(
-        f"Could not determine an embodiment from {path!r}. "
-        "Use a standard *Omron directory or set BARX_EMBODIMENT."
-    )
-
-
 def _parse_episode(episode_path: str, demo_id: str) -> Tuple[str, Any]:
-    embodiment = embodiment_from_path(episode_path)
     with h5py.File(episode_path, "r") as source:
         demo = source["data"][demo_id]
         actions = demo["actions"][()]
@@ -91,7 +65,7 @@ def _parse_episode(episode_path: str, demo_id: str) -> Tuple[str, Any]:
 
     episode = []
     for index, raw_action in enumerate(actions):
-        action = canonicalize_action(raw_action, embodiment)
+        action = canonicalize_action(raw_action)
         episode.append(
             {
                 "observation": {

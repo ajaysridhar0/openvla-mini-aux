@@ -2,7 +2,7 @@ import copy
 import os
 import pathlib
 import robosuite
-from robosuite.controllers import load_composite_controller_config
+from robocasa.utils.controller_utils import load_robocasa_controller_config
 
 
 def is_stale_controller_config(config: dict):
@@ -49,7 +49,7 @@ def refactor_composite_controller_config(controller_config, robot_type, arms):
     name = robot_type.lower()
     configs = os.listdir(config_dir)
     if f"default_{name}.json" in configs:
-        new_controller_config = load_composite_controller_config(robot=name)
+        new_controller_config = load_robocasa_controller_config(robot=name)
     else:
         new_controller_config = {}
         new_controller_config["type"] = "BASIC"
