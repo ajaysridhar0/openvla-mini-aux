@@ -1,0 +1,241 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+cross-embodiment prior,XP-3K;XP-900,IIWA,flip-mug-upright,100,20,958542209,,mg/IIWAOmron/FlipMugUpright/100demos_seed20/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,flip-mug-upright,100,21,949761414,,mg/IIWAOmron/FlipMugUpright/100demos_seed21/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,flip-mug-upright,100,22,977777776,,mg/IIWAOmron/FlipMugUpright/100demos_seed22/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,flip-mug-upright,100,23,941671627,,mg/IIWAOmron/FlipMugUpright/100demos_seed23/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,flip-mug-upright,100,24,1001928531,,mg/IIWAOmron/FlipMugUpright/100demos_seed24/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,flip-mug-upright,100,25,1005572160,,mg/IIWAOmron/FlipMugUpright/100demos_seed25/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,flip-mug-upright,100,26,1009356699,,mg/IIWAOmron/FlipMugUpright/100demos_seed26/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,flip-mug-upright,100,27,939828899,,mg/IIWAOmron/FlipMugUpright/100demos_seed27/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,flip-mug-upright,100,28,1044726073,,mg/IIWAOmron/FlipMugUpright/100demos_seed28/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,flip-mug-upright,100,29,994103789,,mg/IIWAOmron/FlipMugUpright/100demos_seed29/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,pick-and-place counter-to-sink,100,20,1417271118,,mg/IIWAOmron/PnPCounterToSink/100demos_seed20/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,pick-and-place counter-to-sink,100,21,1431260338,,mg/IIWAOmron/PnPCounterToSink/100demos_seed21/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,pick-and-place counter-to-sink,100,22,1371871296,,mg/IIWAOmron/PnPCounterToSink/100demos_seed22/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,pick-and-place counter-to-sink,100,23,1369907385,,mg/IIWAOmron/PnPCounterToSink/100demos_seed23/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,pick-and-place counter-to-sink,100,24,1438228229,,mg/IIWAOmron/PnPCounterToSink/100demos_seed24/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,pick-and-place counter-to-sink,100,25,1431527559,,mg/IIWAOmron/PnPCounterToSink/100demos_seed25/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,pick-and-place counter-to-sink,100,26,1420665977,,mg/IIWAOmron/PnPCounterToSink/100demos_seed26/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,pick-and-place counter-to-sink,100,27,1306267930,,mg/IIWAOmron/PnPCounterToSink/100demos_seed27/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,pick-and-place counter-to-sink,100,28,1314876341,,mg/IIWAOmron/PnPCounterToSink/100demos_seed28/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,pick-and-place counter-to-sink,100,29,1371925444,,mg/IIWAOmron/PnPCounterToSink/100demos_seed29/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,pick-and-place sink-to-counter,100,20,1655595129,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed20/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,pick-and-place sink-to-counter,100,21,1609813877,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed21/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,pick-and-place sink-to-counter,100,22,1669105999,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed22/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,pick-and-place sink-to-counter,100,23,1621308504,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed23/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,pick-and-place sink-to-counter,100,24,1684437119,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed24/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,pick-and-place sink-to-counter,100,25,1605279058,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed25/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,pick-and-place sink-to-counter,100,26,1593606724,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed26/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,pick-and-place sink-to-counter,100,27,1687604481,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed27/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,pick-and-place sink-to-counter,100,28,1632089819,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed28/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,pick-and-place sink-to-counter,100,29,1678704154,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed29/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,turn-on-sink-faucet,100,20,1267587636,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed20/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,turn-on-sink-faucet,100,21,1288796939,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed21/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,turn-on-sink-faucet,100,22,1282531180,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed22/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,turn-on-sink-faucet,100,23,1366425083,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed23/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,turn-on-sink-faucet,100,24,1313382161,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed24/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,turn-on-sink-faucet,100,25,1222474364,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed25/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,turn-on-sink-faucet,100,26,1249425970,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed26/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,turn-on-sink-faucet,100,27,1268950564,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed27/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,turn-on-sink-faucet,100,28,1281254402,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed28/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,turn-on-sink-faucet,100,29,1296968925,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed29/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova 3,flip-mug-upright,100,10,893506131,,mg/Kinova3Omron/FlipMugUpright/100demos_seed10/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova 3,flip-mug-upright,100,11,926021513,,mg/Kinova3Omron/FlipMugUpright/100demos_seed11/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova 3,flip-mug-upright,100,12,878810013,,mg/Kinova3Omron/FlipMugUpright/100demos_seed12/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,flip-mug-upright,100,13,907716492,,mg/Kinova3Omron/FlipMugUpright/100demos_seed13/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,flip-mug-upright,100,14,884230178,,mg/Kinova3Omron/FlipMugUpright/100demos_seed14/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,flip-mug-upright,100,15,904563837,,mg/Kinova3Omron/FlipMugUpright/100demos_seed15/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,flip-mug-upright,100,16,904011467,,mg/Kinova3Omron/FlipMugUpright/100demos_seed16/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,flip-mug-upright,100,17,883819866,,mg/Kinova3Omron/FlipMugUpright/100demos_seed17/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,flip-mug-upright,100,18,908818321,,mg/Kinova3Omron/FlipMugUpright/100demos_seed18/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,flip-mug-upright,100,19,875923390,,mg/Kinova3Omron/FlipMugUpright/100demos_seed19/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova 3,pick-and-place counter-to-sink,100,10,1260645765,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed10/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova 3,pick-and-place counter-to-sink,100,11,1229601332,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed11/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova 3,pick-and-place counter-to-sink,100,12,1185241636,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed12/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,pick-and-place counter-to-sink,100,13,1239353828,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed13/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,pick-and-place counter-to-sink,100,14,1233050805,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed14/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,pick-and-place counter-to-sink,100,15,1231228984,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed15/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,pick-and-place counter-to-sink,100,16,1213007103,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed16/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,pick-and-place counter-to-sink,100,17,1218401022,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed17/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,pick-and-place counter-to-sink,100,18,1241299237,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed18/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,pick-and-place counter-to-sink,100,19,1194323166,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed19/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova 3,pick-and-place sink-to-counter,100,10,1494926963,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed10/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova 3,pick-and-place sink-to-counter,100,11,1511951959,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed11/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova 3,pick-and-place sink-to-counter,100,12,1535587459,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed12/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,pick-and-place sink-to-counter,100,13,1554399606,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed13/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,pick-and-place sink-to-counter,100,14,1514421050,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed14/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,pick-and-place sink-to-counter,100,15,1510511226,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed15/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,pick-and-place sink-to-counter,100,16,1541091482,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed16/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,pick-and-place sink-to-counter,100,17,1551708089,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed17/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,pick-and-place sink-to-counter,100,18,1495822340,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed18/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,pick-and-place sink-to-counter,100,19,1511077666,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed19/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova 3,turn-on-sink-faucet,100,10,1431244379,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed10/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova 3,turn-on-sink-faucet,100,11,1428608216,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed11/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova 3,turn-on-sink-faucet,100,12,1402702439,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed12/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,turn-on-sink-faucet,100,13,1436262891,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed13/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,turn-on-sink-faucet,100,14,1415877737,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed14/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,turn-on-sink-faucet,100,15,1460704242,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed15/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,turn-on-sink-faucet,100,16,1417304799,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed16/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,turn-on-sink-faucet,100,17,1471421236,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed17/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,turn-on-sink-faucet,100,18,1413007925,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed18/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova 3,turn-on-sink-faucet,100,19,1450290450,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed19/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,flip-mug-upright,100,0,932143466,,mg/UR5eOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,flip-mug-upright,100,1,876208124,,mg/UR5eOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,flip-mug-upright,100,2,884823536,,mg/UR5eOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,flip-mug-upright,100,3,958062339,,mg/UR5eOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,flip-mug-upright,100,4,905616553,,mg/UR5eOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,flip-mug-upright,100,5,918606912,,mg/UR5eOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,flip-mug-upright,100,6,924397637,,mg/UR5eOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,flip-mug-upright,100,7,893169781,,mg/UR5eOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,flip-mug-upright,100,8,893269740,,mg/UR5eOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,flip-mug-upright,100,9,935230452,,mg/UR5eOmron/FlipMugUpright/100demos_seed9/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,pick-and-place counter-to-sink,100,0,1315281549,,mg/UR5eOmron/PnPCounterToSink/100demos_seed0/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,pick-and-place counter-to-sink,100,1,1321314425,,mg/UR5eOmron/PnPCounterToSink/100demos_seed1/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,pick-and-place counter-to-sink,100,2,1265309151,,mg/UR5eOmron/PnPCounterToSink/100demos_seed2/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,pick-and-place counter-to-sink,100,3,1269653379,,mg/UR5eOmron/PnPCounterToSink/100demos_seed3/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,pick-and-place counter-to-sink,100,4,1292436746,,mg/UR5eOmron/PnPCounterToSink/100demos_seed4/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,pick-and-place counter-to-sink,100,5,1274566367,,mg/UR5eOmron/PnPCounterToSink/100demos_seed5/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,pick-and-place counter-to-sink,100,6,1292901769,,mg/UR5eOmron/PnPCounterToSink/100demos_seed6/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,pick-and-place counter-to-sink,100,7,1284798756,,mg/UR5eOmron/PnPCounterToSink/100demos_seed7/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,pick-and-place counter-to-sink,100,8,1280370380,,mg/UR5eOmron/PnPCounterToSink/100demos_seed8/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,pick-and-place counter-to-sink,100,9,1280256412,,mg/UR5eOmron/PnPCounterToSink/100demos_seed9/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,pick-and-place sink-to-counter,100,0,1541711894,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed0/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,pick-and-place sink-to-counter,100,1,1509725161,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed1/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,pick-and-place sink-to-counter,100,2,1490444055,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed2/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,pick-and-place sink-to-counter,100,3,1533608792,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed3/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,pick-and-place sink-to-counter,100,4,1564888551,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed4/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,pick-and-place sink-to-counter,100,5,1504357732,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed5/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,pick-and-place sink-to-counter,100,6,1514305675,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed6/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,pick-and-place sink-to-counter,100,7,1509219180,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed7/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,pick-and-place sink-to-counter,100,8,1554558351,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed8/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,pick-and-place sink-to-counter,100,9,1550084513,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed9/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,turn-on-sink-faucet,100,0,1433396912,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,turn-on-sink-faucet,100,1,1391545551,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,turn-on-sink-faucet,100,2,1387998691,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,turn-on-sink-faucet,100,3,1389047455,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,turn-on-sink-faucet,100,4,1398597590,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,turn-on-sink-faucet,100,5,1447047505,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,turn-on-sink-faucet,100,6,1409602769,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,turn-on-sink-faucet,100,7,1363373086,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,turn-on-sink-faucet,100,8,1416961182,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,turn-on-sink-faucet,100,9,1372494372,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed9/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,flip-mug-upright,100,0,704212341,,mg/JacoOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,flip-mug-upright,100,1,701784959,,mg/JacoOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,flip-mug-upright,100,2,711290958,,mg/JacoOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,flip-mug-upright,100,3,726661465,,mg/JacoOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,flip-mug-upright,100,4,715446132,,mg/JacoOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,flip-mug-upright,100,5,741419985,,mg/JacoOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,flip-mug-upright,100,6,734360669,,mg/JacoOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,flip-mug-upright,100,7,699737021,,mg/JacoOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,flip-mug-upright,100,8,708190010,,mg/JacoOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place counter-to-sink,100,0,915311081,,mg/JacoOmron/PnPCounterToSink/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place counter-to-sink,100,1,917884908,,mg/JacoOmron/PnPCounterToSink/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place counter-to-sink,100,2,938007926,,mg/JacoOmron/PnPCounterToSink/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place counter-to-sink,100,3,908264768,,mg/JacoOmron/PnPCounterToSink/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place counter-to-sink,100,4,904041172,,mg/JacoOmron/PnPCounterToSink/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place counter-to-sink,100,5,925539874,,mg/JacoOmron/PnPCounterToSink/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place counter-to-sink,100,6,901922843,,mg/JacoOmron/PnPCounterToSink/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place counter-to-sink,100,7,922132291,,mg/JacoOmron/PnPCounterToSink/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place counter-to-sink,100,8,925897461,,mg/JacoOmron/PnPCounterToSink/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place sink-to-counter,100,0,1146982658,,mg/JacoOmron/PnPSinkToCounter/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place sink-to-counter,100,1,1102228528,,mg/JacoOmron/PnPSinkToCounter/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place sink-to-counter,100,2,1132582857,,mg/JacoOmron/PnPSinkToCounter/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place sink-to-counter,100,3,1086900639,,mg/JacoOmron/PnPSinkToCounter/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place sink-to-counter,100,4,1090496989,,mg/JacoOmron/PnPSinkToCounter/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place sink-to-counter,100,5,1153366164,,mg/JacoOmron/PnPSinkToCounter/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place sink-to-counter,100,6,1125172221,,mg/JacoOmron/PnPSinkToCounter/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place sink-to-counter,100,7,1110382077,,mg/JacoOmron/PnPSinkToCounter/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,pick-and-place sink-to-counter,100,8,1093273287,,mg/JacoOmron/PnPSinkToCounter/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,turn-on-sink-faucet,100,0,1152023316,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,turn-on-sink-faucet,100,1,1144743228,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,turn-on-sink-faucet,100,2,1151980521,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,turn-on-sink-faucet,100,3,1153510241,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,turn-on-sink-faucet,100,4,1147989279,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,turn-on-sink-faucet,100,5,1164133079,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,turn-on-sink-faucet,100,6,1165771767,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,turn-on-sink-faucet,100,7,1148094044,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,turn-on-sink-faucet,100,8,1175268908,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,flip-mug-upright,100,0,1020291273,,mg/PandaOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,flip-mug-upright,100,1,987186550,,mg/PandaOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,flip-mug-upright,100,2,1007036154,,mg/PandaOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,flip-mug-upright,100,3,1036639819,,mg/PandaOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,flip-mug-upright,100,4,968370988,,mg/PandaOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,flip-mug-upright,100,5,1011913971,,mg/PandaOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,flip-mug-upright,100,6,972233241,,mg/PandaOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,flip-mug-upright,100,7,970201646,,mg/PandaOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,flip-mug-upright,100,8,980068618,,mg/PandaOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place counter-to-sink,100,0,1396606667,,mg/PandaOmron/PnPCounterToSink/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place counter-to-sink,100,1,1454874682,,mg/PandaOmron/PnPCounterToSink/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place counter-to-sink,100,2,1424888173,,mg/PandaOmron/PnPCounterToSink/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place counter-to-sink,100,3,1429272943,,mg/PandaOmron/PnPCounterToSink/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place counter-to-sink,100,4,1401058646,,mg/PandaOmron/PnPCounterToSink/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place counter-to-sink,100,5,1401751607,,mg/PandaOmron/PnPCounterToSink/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place counter-to-sink,100,6,1423616076,,mg/PandaOmron/PnPCounterToSink/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place counter-to-sink,100,7,1418661427,,mg/PandaOmron/PnPCounterToSink/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place counter-to-sink,100,8,1418878894,,mg/PandaOmron/PnPCounterToSink/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place sink-to-counter,100,0,1759735794,,mg/PandaOmron/PnPSinkToCounter/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place sink-to-counter,100,1,1781381731,,mg/PandaOmron/PnPSinkToCounter/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place sink-to-counter,100,2,1776300403,,mg/PandaOmron/PnPSinkToCounter/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place sink-to-counter,100,3,1750165917,,mg/PandaOmron/PnPSinkToCounter/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place sink-to-counter,100,4,1796763205,,mg/PandaOmron/PnPSinkToCounter/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place sink-to-counter,100,5,1766509467,,mg/PandaOmron/PnPSinkToCounter/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place sink-to-counter,100,6,1799380106,,mg/PandaOmron/PnPSinkToCounter/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place sink-to-counter,100,7,1783250849,,mg/PandaOmron/PnPSinkToCounter/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,pick-and-place sink-to-counter,100,8,1750109818,,mg/PandaOmron/PnPSinkToCounter/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,turn-on-sink-faucet,100,0,1555590691,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,turn-on-sink-faucet,100,1,1567578488,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,turn-on-sink-faucet,100,2,1521362407,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,turn-on-sink-faucet,100,3,1581607517,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,turn-on-sink-faucet,100,4,1592253055,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,turn-on-sink-faucet,100,5,1579727876,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,turn-on-sink-faucet,100,6,1579977629,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,turn-on-sink-faucet,100,7,1602820208,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,turn-on-sink-faucet,100,8,1562222164,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,flip-mug-upright,100,0,1238461362,,mg/PandaOGOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,flip-mug-upright,100,1,1207629482,,mg/PandaOGOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,flip-mug-upright,100,2,1189788258,,mg/PandaOGOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,flip-mug-upright,100,3,1207548207,,mg/PandaOGOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,flip-mug-upright,100,4,1172715382,,mg/PandaOGOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,flip-mug-upright,100,5,1183634322,,mg/PandaOGOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,flip-mug-upright,100,6,1202470421,,mg/PandaOGOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,flip-mug-upright,100,7,1193729143,,mg/PandaOGOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,flip-mug-upright,100,8,1172056717,,mg/PandaOGOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place counter-to-sink,100,0,1502019548,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place counter-to-sink,100,1,1487221687,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place counter-to-sink,100,2,1498028618,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place counter-to-sink,100,3,1563395940,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place counter-to-sink,100,4,1544632696,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place counter-to-sink,100,5,1497246333,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place counter-to-sink,100,6,1514698985,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place counter-to-sink,100,7,1509680490,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place counter-to-sink,100,8,1528408500,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place sink-to-counter,100,0,1784729695,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place sink-to-counter,100,1,1810488719,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place sink-to-counter,100,2,1761729403,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place sink-to-counter,100,3,1802374228,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place sink-to-counter,100,4,1798397887,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place sink-to-counter,100,5,1813317080,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place sink-to-counter,100,6,1808415986,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place sink-to-counter,100,7,1855865925,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,pick-and-place sink-to-counter,100,8,1833409175,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,turn-on-sink-faucet,100,0,1702109329,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,turn-on-sink-faucet,100,1,1671746164,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,turn-on-sink-faucet,100,2,1678896937,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,turn-on-sink-faucet,100,3,1724422983,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,turn-on-sink-faucet,100,4,1685430407,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,turn-on-sink-faucet,100,5,1748832355,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,turn-on-sink-faucet,100,6,1607501132,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,turn-on-sink-faucet,100,7,1729916876,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,turn-on-sink-faucet,100,8,1699929270,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5
+target demonstrations,target-50,Jaco,flip-mug-upright,50,,291397823,,human/JacoOmron/FlipMugUpright/demo_gentex_im320.hdf5
+target demonstrations,target-50,Jaco,pick-and-place counter-to-sink,50,,287361296,,human/JacoOmron/PnPCounterToSink/demo_gentex_im320.hdf5
+target demonstrations,target-50,Jaco,pick-and-place sink-to-counter,50,,391714953,,human/JacoOmron/PnPSinkToCounter/demo_gentex_im320.hdf5
+target demonstrations,target-50,Jaco,turn-on-sink-faucet,50,,429466239,,human/JacoOmron/TurnOnSinkFaucet/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda,flip-mug-upright,50,,370724770,,human/PandaOmron/FlipMugUpright/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda,pick-and-place counter-to-sink,50,,563702352,,human/PandaOmron/PnPCounterToSink/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda,pick-and-place sink-to-counter,50,,715851875,,human/PandaOmron/PnPSinkToCounter/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda,turn-on-sink-faucet,50,,667867031,,human/PandaOmron/TurnOnSinkFaucet/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda-OG,flip-mug-upright,50,,471717784,,human/PandaOGGripperOmron/FlipMugUpright/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda-OG,pick-and-place counter-to-sink,50,,511825327,,human/PandaOGGripperOmron/PnPCounterToSink/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda-OG,pick-and-place sink-to-counter,50,,727407490,,human/PandaOGGripperOmron/PnPSinkToCounter/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda-OG,turn-on-sink-faucet,50,,658216337,,human/PandaOGGripperOmron/TurnOnSinkFaucet/demo_gentex_im320.hdf5

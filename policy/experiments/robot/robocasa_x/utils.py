@@ -1,4 +1,4 @@
-"""Utils for evaluating policies in LIBERO simulation environments."""
+"""Utilities for evaluating BARX policies in RoboCasa-X."""
 
 import math
 import os
@@ -13,6 +13,7 @@ import tensorflow as tf
 #     print("could not import libero.libero.envs.OffScreenRenderEnv since you are probably using robosuite version != 1.4.1")
 
 from PIL import Image
+from barx.action_space import robocasa_action, robocasa_noop_action
 from experiments.robot.robot_utils import (
     DATE,
     DATE_TIME,
@@ -35,21 +36,13 @@ def get_libero_dummy_action(model_family: str):
 
 
 def get_robocasa_dummy_action(robot_name: str):
-    """Get dummy/no-op action, used to roll out the simulation while the robot does nothing."""
-    if robot_name == "PandaOmron":
-        return [0] * 6 + [-1] + [0] * 4 + [-1]
-    else:
-        return [0] * 10 + [-1] + [-1]
+    """Backward-compatible alias for the unified RoboCasa-X no-op adapter."""
+    return robocasa_noop_action(robot_name)
     
 
 def pad_action_robocasa(action: list, robot_type: str):
-    if robot_type == "PandaOmron":
-        action = action + [0] * 4 + [-1]
-        assert len(action) == 12
-    else:
-        action = action[:6] + [0] * 4 + action[6:] + [-1]
-        assert len(action) == 12
-    return action
+    """Backward-compatible alias for the unified RoboCasa-X action adapter."""
+    return robocasa_action(action, robot_type)
 
 
 def resize_image(img, resize_size):

@@ -1,4 +1,4 @@
-"""Conversions to map an episode (list of dictionaries) --> language motions.
+"""Convert a canonical BARX episode into language-motion annotations.
 
 Actions are assumed to be 7-dof (single robot)
 
@@ -14,7 +14,7 @@ from typing import Dict, List
 import numpy as np
 
 
-class LiberoLanguageMotionEpisodeConverter:
+class LanguageMotionEpisodeConverter:
 
     smooth_labels = False
 
@@ -194,3 +194,8 @@ def dedup_lm(language_motions: List[str]):
             to_keep.append(language_motions[t])
 
     return to_keep
+
+
+# Compatibility for the name used when the converter was developed from the
+# LIBERO implementation. Public BARX code uses LanguageMotionEpisodeConverter.
+LiberoLanguageMotionEpisodeConverter = LanguageMotionEpisodeConverter

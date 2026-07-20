@@ -1,9 +1,7 @@
 import h5py
 import numpy as np
 import os
-import glob
-import tqdm
-import sys
+
 def filter_noop_actions(input_path, output_path, threshold=1e-2):
     """
     Filter out individual timesteps where the L1 norm of actions[:, :6] is below a threshold.
@@ -84,28 +82,15 @@ def filter_noop_actions(input_path, output_path, threshold=1e-2):
     print(f"Original file: {original_size:.1f} MB")
     print(f"Filtered file: {filtered_size:.1f} MB")
 if __name__ == "__main__":
-    import glob
-    import os
-    import sys
     import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--file_path", type=str, default="/Users/jensengao/local_docs/iliad/xembod/robocasa_xembod/data/PandaOmron/PnPCounterToSink/carrot/2025-03-27-17-22-59/demo_seed0_im224_libero.hdf5")
+
+    parser = argparse.ArgumentParser(description="Remove near-zero actions from one RoboCasa HDF5 dataset.")
+    parser.add_argument("input", help="Input HDF5 dataset")
+    parser.add_argument(
+        "--output",
+        help="Output HDF5 dataset (default: INPUT_filter_noop_simple.hdf5)",
+    )
+    parser.add_argument("--threshold", type=float, default=1e-2)
     args = parser.parse_args()
-    # Get array job ID and total number of jobs from command line arguments
-    # job_id = int(sys.argv[1])
-    # n_jobs = int(sys.argv[2])
-
-    job_id = 0
-    n_jobs = 1
-
-    data_dir =  "/iliad/u/jenseng/xembod/robocasa_xembod/datasets/v0.1/single_stage/kitchen_pnp"
-    file_paths = glob.glob(os.path.join(data_dir, "**", "demo_im224_libero.hdf5"), recursive=True)
-    # file_paths = [args.file_path]
-    # Split files among jobs
-    files_per_job = len(file_paths) // n_jobs
-    start_idx = job_id * files_per_job
-    end_idx = start_idx + files_per_job if job_id < n_jobs - 1 else len(file_paths)
-    job_file_paths = file_paths[start_idx:end_idx]
-    print(f"Job {job_id}/{n_jobs} processing {len(job_file_paths)} files")
-    for file_path in tqdm.tqdm(job_file_paths):
-        filter_noop_actions(file_path, file_path.replace(".hdf5", "_filter_noop_simple.hdf5"))
+    output = args.output or args.input.replace(".hdf5", "_filter_noop_simple.hdf5")
+    filter_noop_actions(args.input, output, threshold=args.threshold)

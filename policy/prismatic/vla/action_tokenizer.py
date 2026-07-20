@@ -354,16 +354,6 @@ class FastActionTokenizer(ActionTokenizer):
 ACTION_TOKENIZERS = {
     "action_tokenizer": ActionTokenizer,
     "extra_action_tokenizer": partial(ActionTokenizer, use_extra=True),
-    # libero
-    "libero_vq_action_tokenizer": partial(
-        VQActionTokenizer, vq_vae_path="/iliad/u/belkhale/openvla-mini/vq/pretrain_vq+mx-libero_90+fach-7+ng-7+nemb-128+nlatent-512"
-    ),
-    "libero_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer, vq_vae_path="/workspace/openvla-mini-aux/vq/pretrain_vq+mx-libero_90+fach-7+ng-7+nemb-128+nlatent-512", use_extra=True
-    ),
-    "libero_vq_h0_extra_action_tokenizer": partial(
-        VQActionTokenizer, vq_vae_path="/iliad/u/belkhale/openvla-mini/vq/pretrain_vq+mx-libero_90+fach-0+ng-7+nemb-128+nlatent-512", use_extra=True
-    ),
     # fast
     "fast_action_tokenizer": FastActionTokenizer,
     "robocasa_fast_tokenizer_noop_filter": partial(
@@ -517,42 +507,6 @@ ACTION_TOKENIZERS = {
         vq_vae_path="vq/jaco_turn_on_sink",
         use_extra=True,
     ),
-    "panda_real_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/panda_real",
-        use_extra=True,
-    ),
-    "panda_real_vary_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/panda_real_vary",
-        use_extra=True,
-    ),
-    "viper_real_vary_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/viper_real_vary",
-        use_extra=True,
-    ),
-    "panda_viper_real_mg_vary_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/panda_viper_real_mg_vary",
-        use_extra=True,
-    ),
-    "viper_real_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/viper_real",
-        use_extra=True,
-    ),
-    "panda_viper_real_mg_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/panda_viper_real_mg",
-        use_extra=True,
-    ),
-    "panda_viper_real_mg_decoder_only_vq_extra_action_tokenizer": partial(
-        VQActionTokenizer,
-        vq_vae_path="vq/panda_viper_real_mg_decoder_only",
-        use_extra=True,
-    ),
-
     "mg_panda_pnp_vq_extra_action_tokenizer": partial(
         VQActionTokenizer,
         vq_vae_path="vq/mg_panda_pnp",
@@ -607,3 +561,25 @@ ACTION_TOKENIZERS = {
         use_extra=True,
     ),
 }
+
+# Paper-facing aliases. The referenced directories retain their original names
+# so regenerated VQ tokenizers and future checkpoint releases stay compatible.
+_BARX_ACTION_TOKENIZER_ALIASES = {
+    "xp_900_pnp_action_tokenizer": "mg_pnp_lite_vq_extra_action_tokenizer",
+    "xp_900_turn_on_sink_action_tokenizer": "mg_turn_on_sink_lite_vq_extra_action_tokenizer",
+    "xp_900_flip_mug_action_tokenizer": "mg_flip_mug_lite_vq_extra_action_tokenizer",
+    "xp_3k_pnp_action_tokenizer": "mg_pnp_vq_extra_action_tokenizer",
+    "xp_3k_turn_on_sink_action_tokenizer": "mg_turn_on_sink_vq_extra_action_tokenizer",
+    "xp_3k_flip_mug_action_tokenizer": "mg_flip_mug_vq_extra_action_tokenizer",
+    "panda_sp_900_pnp_action_tokenizer": "mg_panda_pnp_vq_extra_action_tokenizer",
+    "panda_sp_900_turn_on_sink_action_tokenizer": "mg_panda_turn_on_sink_vq_extra_action_tokenizer",
+    "panda_sp_900_flip_mug_action_tokenizer": "mg_panda_flip_mug_vq_extra_action_tokenizer",
+    "panda_og_sp_900_pnp_action_tokenizer": "mg_panda_og_pnp_vq_extra_action_tokenizer",
+    "panda_og_sp_900_turn_on_sink_action_tokenizer": "mg_panda_og_turn_on_sink_vq_extra_action_tokenizer",
+    "panda_og_sp_900_flip_mug_action_tokenizer": "mg_panda_og_flip_mug_vq_extra_action_tokenizer",
+    "jaco_sp_900_pnp_action_tokenizer": "mg_jaco_pnp_vq_extra_action_tokenizer",
+    "jaco_sp_900_turn_on_sink_action_tokenizer": "mg_jaco_turn_on_sink_vq_extra_action_tokenizer",
+    "jaco_sp_900_flip_mug_action_tokenizer": "mg_jaco_flip_mug_vq_extra_action_tokenizer",
+}
+for paper_name, original_name in _BARX_ACTION_TOKENIZER_ALIASES.items():
+    ACTION_TOKENIZERS[paper_name] = ACTION_TOKENIZERS[original_name]

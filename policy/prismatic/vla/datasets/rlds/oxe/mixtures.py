@@ -507,37 +507,6 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
         ("mg_pnp_lite", 0.05),
         ("jaco_pnp", 1.0)
     ],
-    "panda_real": [
-        ("franka_pnpcountertosink_aux", 1.0),
-        ("franka_pnpsinktocounter_aux", 1.0)
-    ],
-    "panda_real_vary": [
-        ("franka_pnpcountertosink_vary_aux", 1.0),
-        ("franka_pnpsinktocounter_aux", 1.0)
-    ],
-    "viper_real": [
-        ("viper_pnpcountertosink_aux", 1.0),
-        ("viper_pnpsinktocounter_aux", 1.0)
-    ],
-    "viper_real_vary": [
-        ("viper_pnpcountertosink_vary_aux", 1.0),
-        ("viper_pnpsinktocounter_aux", 1.0)
-    ],
-    "panda_viper_real_mg": [
-        ("franka_pnpcountertosink_aux", 1.0),
-        ("franka_pnpsinktocounter_aux", 1.0),
-        ("viper_pnpcountertosink_aux", 1.0),
-        ("viper_pnpsinktocounter_aux", 1.0),
-        ("mg_pnp", 0.01)  # 0.002 for tokenizer
-    ],
-    "panda_viper_real_vary_mg": [
-        ("franka_pnpcountertosink_vary_aux", 1.0),
-        ("franka_pnpsinktocounter_aux", 1.0),
-        ("viper_pnpcountertosink_vary_aux", 1.0),
-        ("viper_pnpsinktocounter_aux", 1.0),
-        ("mg_pnp", 0.01)  # 0.002 for tokenizer
-    ],
-
     # mg target datasets
     "mg_panda_pnp": [
         ("mg_panda_pnp", 1.0),
@@ -627,4 +596,47 @@ OXE_NAMED_MIXTURES: Dict[str, List[Tuple[str, float]]] = {
     ],
     # TODO (ajaysri): add partial held-out mixture
 }
+
+# Paper-facing names. Values intentionally reference the original RLDS dataset
+# directories so existing converted data and experiment artifacts remain valid.
+_BARX_MIXTURE_ALIASES = {
+    # Cross-embodiment source priors.
+    "xp_3k_pnp": "mg_pnp",
+    "xp_3k_turn_on_sink": "mg_turn_on_sink",
+    "xp_3k_flip_mug": "mg_flip_mug",
+    "xp_900_pnp": "mg_pnp_lite",
+    "xp_900_turn_on_sink": "mg_turn_on_sink_lite",
+    "xp_900_flip_mug": "mg_flip_mug_lite",
+    # Target co-finetuning with XP-3K / XP-900.
+    "panda_xp_3k_pnp": "panda+mg",
+    "panda_og_xp_3k_pnp": "panda_og+mg",
+    "jaco_xp_3k_pnp": "jaco+mg",
+    "panda_xp_900_pnp": "panda+mg_lite",
+    "panda_og_xp_900_pnp": "panda_og+mg_lite",
+    "jaco_xp_900_pnp": "jaco+mg_lite",
+    "panda_xp_3k_turn_on_sink": "panda+mg_turn_on_sink",
+    "panda_og_xp_3k_turn_on_sink": "panda_og+mg_turn_on_sink",
+    "jaco_xp_3k_turn_on_sink": "jaco+mg_turn_on_sink",
+    "panda_xp_900_turn_on_sink": "panda+mg_turn_on_sink_lite",
+    "panda_og_xp_900_turn_on_sink": "panda_og+mg_turn_on_sink_lite",
+    "jaco_xp_900_turn_on_sink": "jaco+mg_turn_on_sink_lite",
+    "panda_xp_3k_flip_mug": "panda+mg_flip_mug",
+    "panda_og_xp_3k_flip_mug": "panda_og+mg_flip_mug",
+    "jaco_xp_3k_flip_mug": "jaco+mg_flip_mug",
+    "panda_xp_900_flip_mug": "panda+mg_flip_mug_lite",
+    "panda_og_xp_900_flip_mug": "panda_og+mg_flip_mug_lite",
+    "jaco_xp_900_flip_mug": "jaco+mg_flip_mug_lite",
+    # Same-embodiment synthesized prior (SP-900).
+    "panda_sp_900_pnp": "panda+mg_panda_pnp",
+    "panda_og_sp_900_pnp": "panda_og+mg_panda_og_pnp",
+    "jaco_sp_900_pnp": "jaco+mg_jaco_pnp",
+    "panda_sp_900_turn_on_sink": "panda+mg_panda_turn_on_sink",
+    "panda_og_sp_900_turn_on_sink": "panda_og+mg_panda_og_turn_on_sink",
+    "jaco_sp_900_turn_on_sink": "jaco+mg_jaco_turn_on_sink",
+    "panda_sp_900_flip_mug": "panda+mg_panda_flip_mug",
+    "panda_og_sp_900_flip_mug": "panda_og+mg_panda_og_flip_mug",
+    "jaco_sp_900_flip_mug": "jaco+mg_jaco_flip_mug",
+}
+for paper_name, original_name in _BARX_MIXTURE_ALIASES.items():
+    OXE_NAMED_MIXTURES[paper_name] = OXE_NAMED_MIXTURES[original_name]
 # fmt: on

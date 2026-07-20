@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use BARX or RoboCasa-X, please cite this paper."
+title: "Cross-Embodiment Transfer via Behavior-Aligned Representations"
+type: conference-paper
+authors:
+  - family-names: Sridhar
+    given-names: Ajay
+  - family-names: Gao
+    given-names: Jensen
+  - family-names: Yang
+    given-names: Jonathan
+  - family-names: Mercat
+    given-names: Jean
+  - family-names: Belkhale
+    given-names: Suneel
+  - family-names: Sadigh
+    given-names: Dorsa
+conference:
+  name: "IEEE International Conference on Robotics and Automation"
+  alias: ICRA
+year: 2026
+url: "https://ajaysridhar.com/barx/"

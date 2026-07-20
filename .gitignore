@@ -1,0 +1,26 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.uv-cache/
+.coverage
+dist/
+build/
+
+# Local data, model artifacts, and experiment outputs are never committed.
+data/
+checkpoints/
+runs/
+rollouts/
+slurm_logs/
+wandb/
+*.hdf5
+*.h5
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+.hf_token
+.env

@@ -60,7 +60,7 @@ Once all dependecies for Isaac rendering have been installed, users can run the 
 Here is an example command to render an video of a demonstration using ray tracing with the RGB and normal modality.
 
 ```bash
-$ python robosuite/scripts/render_dataset_with_omniverse.py --dataset /home/abhishek/Documents/research/rpl/robosuite/robosuite/models/assets/demonstrations_private/1734107564_9898326/demo.hdf5 --ds_format robosuite --episode 1 --camera agentview frontview --width 1920 --height 1080 --renderer RayTracedLighting --save_video --hide_sites --rgb --normals
+$ python robosuite/scripts/render_dataset_with_omniverse.py --dataset /path/to/demo.hdf5 --ds_format robosuite --episode 1 --camera agentview frontview --width 1920 --height 1080 --renderer RayTracedLighting --save_video --hide_sites --rgb --normals
 ```
 
 ### Rendering Speed

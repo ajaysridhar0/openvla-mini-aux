@@ -323,10 +323,6 @@ def collect_human_trajectory(
             if diff > 0:
                 time.sleep(diff)
 
-        # with open("/home/soroushn/tmp/model.xml", "w") as f:
-        #     f.write(env.model.get_xml())
-        # exit()
-
         # # Print robot qpos for each robot
         # for i, robot in enumerate(env.robots):
         #     print(f"Robot {i} qpos:", robot._joint_positions)

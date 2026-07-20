@@ -1,21 +1,4 @@
-"""
-run_libero_eval.py
-
-Runs a model in a LIBERO simulation environment.
-
-Usage:
-    # OpenVLA:
-    # IMPORTANT: Set `center_crop=True` if model is fine-tuned with augmentations
-    python experiments/robot/libero/run_libero_eval.py \
-        --model_family openvla \
-        --pretrained_checkpoint <CHECKPOINT_PATH> \
-        --task_suite_name [ libero_spatial | libero_object | libero_goal | libero_10 | libero_90 ] \
-        --center_crop [ True | False ] \
-        --run_id_note <OPTIONAL TAG TO INSERT INTO RUN ID FOR LOGGING> \
-        --use_wandb [ True | False ] \
-        --wandb_project <PROJECT> \
-        --wandb_entity <ENTITY>
-"""
+"""Evaluate a BARX policy in a RoboCasa-X simulation environment."""
 
 import os
 import sys
@@ -35,9 +18,19 @@ from matplotlib import colors
 import random
 
 
-# Append current directory so that interpreter can find experiments.robot
-sys.path.append("../..")
-from experiments.robot.libero.libero_utils import (
+# Make both the root ``barx`` package and ``policy/experiments`` importable
+# when this file is invoked directly.
+REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
+POLICY_ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPOSITORY_ROOT))
+sys.path.insert(0, str(POLICY_ROOT))
+
+from barx.names import (
+    canonicalize_prediction_keys,
+    internal_representation_name,
+    representations_for_method,
+)
+from experiments.robot.robocasa_x.utils import (
     get_robocasa_dummy_action, 
     pad_action_robocasa,
     quat2axisangle,
@@ -114,6 +107,8 @@ class GenerateConfig:
     start_seed: int = 1000
 
     aux_task_types: Optional[str] = None     # Auxiliary task types to query before action prediction
+    inference_representation: Optional[str] = None  # Optional paper-named representation predicted before actions
+    method: Optional[str] = None             # Deprecated compatibility option for older evaluation commands
     aux_context_freq: int = 1
     obj_xinit_range: float = None
     obj_yinit_range: float = None
@@ -460,14 +455,14 @@ def eval_single_task(cfg: GenerateConfig, model, log_file) -> None:
 
             if len(action_buffer) == 0:
                 # Query model to get action
-                output = get_action(
+                output = canonicalize_prediction_keys(get_action(
                     cfg,
                     model,
                     observation,
                     lang,
                     aux_task_types=cfg.aux_task_types,
                     processor=processor,
-                )
+                ))
 
                 actions = output['action']
                 if len(actions.shape) == 1:
@@ -485,31 +480,31 @@ def eval_single_task(cfg: GenerateConfig, model, log_file) -> None:
             current_img = img.copy()
             
             # Draw bounding boxes if available
-            if 'bbox' in output:
+            if 'bounding_box' in output:
                 has_bbox_predictions = True
                 try:
-                    current_img = draw_bbox_on_image(current_img, output['bbox'], bbox_color_map)
+                    current_img = draw_bbox_on_image(current_img, output['bounding_box'], bbox_color_map)
                 except Exception as e:
                     print(f"Error drawing bounding boxes: {e}")
-                    print(f"Output: {output['bbox']}")
+                    print(f"Output: {output['bounding_box']}")
             
             # Draw trajectory if available
-            if 'ee_pose_2D' in output:
+            if 'end_effector_trace' in output:
                 has_ee_pose_predictions = True
                 try:
-                    current_img = draw_trajectory_on_image(current_img, output['ee_pose_2D'])
+                    current_img = draw_trajectory_on_image(current_img, output['end_effector_trace'])
                 except Exception as e:
                     print(f"Error drawing trajectory: {e}")
-                    print(f"Output: {output['ee_pose_2D']}")
+                    print(f"Output: {output['end_effector_trace']}")
             
             # Draw motion text if available
-            if 'low_level_motion' in output:
+            if 'language_motion' in output:
                 has_motion_predictions = True
                 try:
-                    current_img = draw_motion_text_on_image(current_img, output['low_level_motion'])
+                    current_img = draw_motion_text_on_image(current_img, output['language_motion'])
                 except Exception as e:
                     print(f"Error drawing motion text: {e}")
-                    print(f"Output: {output['low_level_motion']}")
+                    print(f"Output: {output['language_motion']}")
             
             replay_images_with_bbox.append(current_img)
 
@@ -637,9 +632,23 @@ def eval_robocasa(cfg: GenerateConfig) -> None:
         'logits': 'low_dim'
     }
 
-     # Split aux_task_types by "->"
-    if cfg.aux_task_types is not None:
-        cfg.aux_task_types = cfg.aux_task_types.split("->")
+    specified_inference_options = sum(
+        option is not None for option in (cfg.inference_representation, cfg.method, cfg.aux_task_types)
+    )
+    if specified_inference_options > 1:
+        raise ValueError(
+            "Specify only one of --inference_representation, --method, or --aux_task_types."
+        )
+    if cfg.inference_representation is not None:
+        cfg.aux_task_types = [internal_representation_name(cfg.inference_representation)]
+    if cfg.method is not None:
+        cfg.aux_task_types = representations_for_method(cfg.method)
+    elif cfg.aux_task_types is not None:
+        cfg.aux_task_types = [
+            internal_representation_name(name)
+            for name in cfg.aux_task_types.split("->")
+            if name
+        ]
 
     # Load model
     model = get_model(cfg)

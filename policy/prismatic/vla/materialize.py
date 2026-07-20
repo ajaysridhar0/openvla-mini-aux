@@ -22,6 +22,7 @@ from prismatic.vla.datasets.datasets import (
     RLDSAuxTransform,
     ChainedTransform,
 )
+from barx.names import resolve_transform_spec
 
 
 def get_vla_dataset_and_collator(
@@ -84,8 +85,9 @@ def get_vla_dataset_and_collator(
 
     batch_transforms = []
     non_action_transforms = []
-    # remove whitespace
-    transform_types = transform_types.replace(" ", "")
+    # Accept paper-facing method / representation names while preserving the
+    # exact transform identifiers used by the original experiments.
+    transform_types = resolve_transform_spec(transform_types)
     transform_types = transform_types.split(",")
 
     if transform_weights is not None:

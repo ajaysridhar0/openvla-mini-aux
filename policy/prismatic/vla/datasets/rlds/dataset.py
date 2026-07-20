@@ -8,6 +8,7 @@ import copy
 import inspect
 import json
 from functools import partial
+from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import dlimp as dl
@@ -208,7 +209,15 @@ def make_dataset_from_rlds(
 
         return traj
 
-    builder = tfds.builder(name, data_dir=data_dir)
+    # Custom BARX datasets are distributed as self-describing TFDS directories.
+    # Loading from dataset_info.json avoids requiring one generated Python
+    # builder module per embodiment/task while retaining the original dataset
+    # names used by normalization statistics and checkpoints.
+    prepared_infos = sorted((Path(data_dir) / name).glob("*/dataset_info.json"))
+    if prepared_infos:
+        builder = tfds.builder_from_directory(str(prepared_infos[-1].parent))
+    else:
+        builder = tfds.builder(name, data_dir=data_dir)
 
     # load or compute dataset statistics
     if isinstance(dataset_statistics, str):

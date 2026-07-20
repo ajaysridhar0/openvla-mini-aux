@@ -1,10 +1,11 @@
 import os
 import re
 import subprocess
+import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from pathlib import Path
 
-# Path to the script you want to run
-SCRIPT_PATH = "/iliad/u/jenseng/xembod/robocasa_xembod/robocasa/scripts/libero_dataset_states_to_obs_single.py"
+SCRIPT_PATH = Path(__file__).with_name("libero_dataset_states_to_obs_single.py")
 
 # Regex pattern to match chunked HDF5 files
 CHUNK_FILE_PATTERN = re.compile(r"demo.hdf5")
@@ -26,8 +27,8 @@ def find_chunk_files(root_dir, rand_cams=False):
 
 def run_script_on_file(hdf5_file, camera):
     cmd = [
-        "python", "-u",
-        SCRIPT_PATH,
+        sys.executable, "-u",
+        str(SCRIPT_PATH),
         "--dataset", hdf5_file,
         "--generative_textures",
         # "--randomize_cameras",
@@ -60,7 +61,6 @@ def main(root_dir, camera, max_workers=10):
             print(future.result(), flush=True)
 
 if __name__ == "__main__":
-    import sys
     if len(sys.argv) != 3:
         print("Usage: python batch_convert.py <root_directory> <camera>")
     else:
