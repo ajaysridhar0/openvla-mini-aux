@@ -1,0 +1,653 @@
+"""
+Script to extract observations from low-dimensional simulation states in a robocasa dataset.
+Adapted from robomimic's dataset_states_to_obs.py script.
+"""
+import os
+import json
+import h5py
+import argparse
+import numpy as np
+from copy import deepcopy
+from tqdm import tqdm
+import time
+import traceback
+import re
+
+import robocasa.utils.robomimic.robomimic_tensor_utils as TensorUtils
+import robocasa.utils.robomimic.robomimic_env_utils as EnvUtils
+import robocasa.utils.robomimic.robomimic_dataset_utils as DatasetUtils
+from robosuite.utils.camera_utils import get_camera_transform_matrix, project_points_from_world_to_camera
+from notebooks.utils import get_aabbs_for_body, get_corners, extra_image_transform_robocasa
+from functools import partial
+import transforms3d
+
+# from robomimic.utils.log_utils import log_warning
+
+MAX_SEED = 1_000_000_000
+SEEDS = np.arange(MAX_SEED)
+
+def extract_trajectory(
+    env,
+    initial_state,
+    states,
+    actions,
+    done_mode,
+    camera_names,
+    add_datagen_info=False,
+    add_aux_info=True,
+):
+    """
+    Helper function to extract observations, rewards, and dones along a trajectory using
+    the simulator environment.
+
+    Args:
+        env (instance of EnvBase): environment
+        initial_state (dict): initial simulation state to load
+        states (np.array): array of simulation states to load to extract information
+        actions (np.array): array of actions
+        done_mode (int): how to write done signal. If 0, done is 1 whenever s' is a
+            success state. If 1, done is 1 at the end of each trajectory.
+            If 2, do both.
+    """
+    assert states.shape[0] == actions.shape[0]
+
+    # load the initial state
+    env.reset()
+    obs = env.reset_to(initial_state)
+
+    ep_meta = json.loads(initial_state["ep_meta"])
+    # hack: add the cam configs in, since it's been modified
+    ep_meta["cam_configs"] = deepcopy(env.env._cam_configs)
+    initial_state["ep_meta"] = json.dumps(ep_meta, indent=4)
+
+    # Get the object name from env metadata
+    # env_meta = env.serialize()
+    # obj_name = env_meta['env_kwargs']['obj_groups'][0]  # assuming single object for now
+
+    env_name = env.name.lower()
+    if "pnp" in env_name or "flip" in env_name:
+        obj_name = env.env.get_obj_lang()
+        body_name = "obj_main"
+    elif "faucet" in env_name:
+        obj_name = "handle"
+        body_names = env.env.sim.model.body_names
+        pattern = re.compile(r'^sink_(.+?)_group_handle$')
+        body_name = None
+        for possible_name in body_names:
+            if pattern.match(possible_name):
+                body_name = possible_name
+                break
+        assert body_name is not None
+    else:
+        raise Exception
+
+    traj = dict(
+        obs={},
+        rewards=[],
+        dones=[],
+        actions=np.array(actions),
+        states=np.array(states),
+        initial_state_dict=initial_state,
+        datagen_info=[],
+        aux_info={},
+    )
+
+    # Initialize aux_info structure
+    traj['aux_info'] = {
+        'bboxes_2d': {},
+        'eef_normalized_image_pts': []
+    }
+
+    # extra_transform = partial(
+    #     extra_image_transform_robocasa,
+    #     width=env.env.camera_widths[0],
+    #     height=env.env.camera_heights[0],
+    # )
+
+    traj_len = states.shape[0]
+    # iteration variable @t is over "next obs" indices
+    for t in range(traj_len):
+        obs = deepcopy(env.reset_to({"states": states[t]}))
+
+        # TODO: add aux info here
+        world_to_camera_transform = get_camera_transform_matrix(
+            env.env.sim,
+            camera_names[0],  # assume first camera is third person view
+            env.env.camera_heights[0],
+            env.env.camera_widths[0],
+        )
+
+        project_to_camera_space = partial(
+            project_points_from_world_to_camera, 
+            world_to_camera_transform=world_to_camera_transform,
+            camera_height=env.env.camera_heights[0],
+            camera_width=env.env.camera_widths[0]
+        )
+
+        # Reorganize observations to match LIBERO format
+        # hacky
+        traj["obs"].setdefault("agentview_rgb", []).append(
+            # obs['robot0_agentview_right_image']
+            obs[camera_names[0] + "_image"]
+        )
+        # traj["obs"].setdefault("eye_in_hand_rgb", []).append(
+        #     obs['robot0_eye_in_hand_image']
+        # )
+        traj["obs"].setdefault("ee_pos", []).append(obs['robot0_eef_pos'])
+        
+        # Convert quaternion to euler angles using transforms3d.euler instead of quaternions
+        quat = obs['robot0_eef_quat'] 
+        euler = transforms3d.euler.quat2euler(quat, axes='sxyz')
+        traj["obs"].setdefault("ee_ori", []).append(euler)
+        
+        traj["obs"].setdefault("ee_states", []).append(
+            np.concatenate([obs['robot0_eef_pos'], euler])
+        )
+        traj["obs"].setdefault("gripper_states", []).append(obs['robot0_gripper_qpos'][:2])
+        traj["obs"].setdefault("joint_states", []).append(obs['robot0_joint_vel'])
+
+        # extract datagen info
+        if add_datagen_info:
+            datagen_info = env.base_env.get_datagen_info(action=actions[t])
+        else:
+            datagen_info = {}
+
+        # infer reward signal
+        # note: our tasks use reward r(s'), reward AFTER transition, so this is
+        #       the reward for the current timestep
+        r = env.get_reward()
+
+        # infer done signal
+        done = False
+        if (done_mode == 1) or (done_mode == 2):
+            # done = 1 at end of trajectory
+            done = done or (t == traj_len)
+        if (done_mode == 0) or (done_mode == 2):
+            # done = 1 when s' is task success state
+            done = done or env.is_success()["task"]
+        done = np.uint8(done)
+
+        # collect transition
+        traj["rewards"].append(r)
+        traj["dones"].append(done)
+        traj["datagen_info"].append(datagen_info)
+
+        if add_aux_info:
+            width = env.env.camera_widths[0]
+            height = env.env.camera_heights[0]
+            # Store EEF trace in LIBERO format, normalized between [0,1]
+            eef_2d = project_to_camera_space(obs['robot0_eef_pos'])
+            eef_2d = [eef_2d[1], eef_2d[0]]
+            #eef_2d = extra_transform(project_to_camera_space(obs['robot0_eef_pos']))
+            normalized_eef_2d = [eef_2d[0] / width, eef_2d[1] / height]  # Normalize between [0,1]
+            traj['aux_info']['eef_normalized_image_pts'].append(normalized_eef_2d)
+            
+            # Store bbox in LIBERO format using just the object name
+            try:
+                bbox_coords = get_aabbs_for_body(env.env, body_name)[body_name]
+                corners = get_corners(bbox_coords[None])[0]
+                bbox_2d_corners = project_to_camera_space(corners)
+                bbox_2d_min = np.min(bbox_2d_corners, axis=0)
+                bbox_2d_min = [bbox_2d_min[1], bbox_2d_min[0]]
+                bbox_2d_max = np.max(bbox_2d_corners, axis=0)
+                bbox_2d_max = [bbox_2d_max[1], bbox_2d_max[0]]
+                # Normalize bbox coords between [0,1]
+                bbox_2d = [bbox_2d_min[0] / width, bbox_2d_min[1] / height, bbox_2d_max[0] / width, bbox_2d_max[1] / height]
+                # Use just the object name as the key
+                traj['aux_info']['bboxes_2d'].setdefault(obj_name, []).append(bbox_2d)
+            except:
+                pass
+
+    # Convert lists to numpy arrays
+    traj["obs"] = {k: np.array(v) for k, v in traj["obs"].items()}
+    traj["aux_info"]["eef_normalized_image_pts"] = np.array(
+        traj["aux_info"]["eef_normalized_image_pts"]
+    )
+    traj["aux_info"]["bboxes_2d"] = {
+        k: np.array(v) for k, v in traj["aux_info"]["bboxes_2d"].items()
+    }
+    traj["datagen_info"] = TensorUtils.list_of_flat_dict_to_dict_of_list(
+        traj["datagen_info"]
+    )
+
+    # list to numpy array
+    for k in traj:
+        if k in ["initial_state_dict", "aux_info"]:
+            continue
+        if isinstance(traj[k], dict):
+            for kp in traj[k]:
+                traj[k][kp] = np.array(traj[k][kp])
+        else:
+            traj[k] = np.array(traj[k])
+
+    # if process_num == 0:
+    #     import remote_pdb; remote_pdb.set_trace(host='0.0.0.0', port=4444)
+
+    return traj
+
+
+""" The process that writes over the generated files to memory """
+
+
+def write_traj_to_file(
+    args, output_path, demos, processed
+):
+    f = h5py.File(args.dataset, "r")
+    f_out = h5py.File(output_path, "w")
+    data_grp = f_out.create_group("data")
+    start_time = time.time()
+    num_processed = 0
+    total_samples = 0
+
+    try:
+        for ep, traj in zip(demos, processed):
+            num_processed = num_processed + 1
+            try:
+                ep_data_grp = data_grp.create_group(ep)
+                
+                # Write main datasets
+                ep_data_grp.create_dataset("actions", data=np.array(traj["actions"]))
+                ep_data_grp.create_dataset("states", data=np.array(traj["states"]))
+                ep_data_grp.create_dataset("rewards", data=np.array(traj["rewards"]))
+                ep_data_grp.create_dataset("dones", data=np.array(traj["dones"], dtype=np.uint8))
+                
+                # Write observations
+                obs_grp = ep_data_grp.create_group("obs")
+                if isinstance(traj["obs"], dict):
+                    for k, v in traj["obs"].items():
+                        if args.no_compress:
+                            obs_grp.create_dataset(k, data=np.array(v))
+                        else:
+                            obs_grp.create_dataset(k, data=np.array(v), compression="gzip")
+                else:
+                    if args.no_compress:
+                        obs_grp.create_dataset("obs", data=np.array(traj["obs"]))
+                    else:
+                        obs_grp.create_dataset("obs", data=np.array(traj["obs"]), compression="gzip")
+                
+                # Write aux_info
+                aux_grp = ep_data_grp.create_group("aux_info")
+                
+                # Write bboxes
+                bbox_grp = aux_grp.create_group("bboxes_2d")
+                for k, v in traj["aux_info"]["bboxes_2d"].items():
+                    bbox_grp.create_dataset(k, data=np.array(v, dtype=np.float32))
+                
+                # Write EEF points
+                aux_grp.create_dataset(
+                    "eef_normalized_image_pts",
+                    data=np.array(traj["aux_info"]["eef_normalized_image_pts"], dtype=np.float32)
+                )
+
+                # copy action dict (if applicable) 
+                if "data/{}/action_dict".format(ep) in f:
+                    action_dict = f["data/{}/action_dict".format(ep)]
+                    for k in action_dict:
+                        ep_data_grp.create_dataset(
+                            "action_dict/{}".format(k),
+                            data=np.array(action_dict[k][()], dtype=np.float32),
+                        )
+
+                # episode metadata
+                ep_data_grp.attrs["model_file"] = traj["initial_state_dict"][
+                    "model"
+                ]  # model xml for this episode
+                ep_data_grp.attrs["ep_meta"] = traj["initial_state_dict"][
+                    "ep_meta"
+                ]  # ep meta data for this episode
+                # if "ep_meta" in f["data/{}".format(ep)].attrs:
+                #     ep_data_grp.attrs["ep_meta"] = f["data/{}".format(ep)].attrs["ep_meta"]
+                ep_data_grp.attrs["num_samples"] = traj["actions"].shape[
+                    0
+                ]  # number of transitions in this episode
+
+                total_samples += traj["actions"].shape[0]
+            except Exception as e:
+                raise Exception("Write out to file has failed")
+            print(
+                "ep {}: wrote {} transitions to group {} finished. Datagen rate: {:.2f} sec/demo".format(
+                    num_processed,
+                    ep_data_grp.attrs["num_samples"],
+                    ep,
+                    (time.time() - start_time) / num_processed,
+                )
+            )
+    except KeyboardInterrupt:
+        print("Control C pressed. Closing File and ending \n\n\n\n\n\n\n")
+
+    if "mask" in f:
+        f.copy("mask", f_out)
+
+    # global metadata
+    data_grp.attrs["total"] = total_samples
+    env_meta = DatasetUtils.get_env_metadata_from_dataset(dataset_path=args.dataset)
+    if args.generative_textures:
+        env_meta["env_kwargs"]["generative_textures"] = "100p"
+    if args.randomize_cameras:
+        env_meta["env_kwargs"]["randomize_cameras"] = True
+
+    if args.obj_groups is not None:
+        env_meta["env_kwargs"].update({"obj_groups": args.obj_groups})
+
+    env = EnvUtils.create_env_for_data_processing(
+        env_meta=env_meta,
+        camera_names=args.camera_names,
+        camera_height=args.camera_height,
+        camera_width=args.camera_width,
+        reward_shaping=args.shaped,
+    )
+
+    data_grp.attrs["env_args"] = json.dumps(
+        env.serialize(), indent=4
+    )  # environment info
+
+    f_out.close()
+    f.close()
+
+    DatasetUtils.extract_action_dict(dataset=output_path)
+    print("Writing has finished")
+
+    end_time = time.time()
+
+    # Calculate the elapsed time
+    elapsed_time = end_time - start_time
+
+    print(f"Time elapsed: {elapsed_time:.2f} seconds")
+    return
+
+
+def extract_multiple_trajectories_with_error(
+    args
+):
+    # create environment to use for data processing
+
+    if False and args.add_datagen_info:
+        import mimicgen.utils.file_utils as MG_FileUtils
+
+        env_meta = MG_FileUtils.get_env_metadata_from_dataset(dataset_path=args.dataset)
+    else:
+        env_meta = DatasetUtils.get_env_metadata_from_dataset(dataset_path=args.dataset)
+    if args.generative_textures:
+        env_meta["env_kwargs"]["generative_textures"] = "100p"
+    if args.randomize_cameras:
+        env_meta["env_kwargs"]["randomize_cameras"] = True
+
+    if args.obj_groups is not None:
+        env_meta["env_kwargs"].update({"obj_groups": args.obj_groups})
+
+    env = EnvUtils.create_env_for_data_processing(
+        env_meta=env_meta,
+        camera_names=args.camera_names,
+        camera_height=args.camera_height,
+        camera_width=args.camera_width,
+        reward_shaping=args.shaped,
+    )
+
+    start_time = time.time()
+
+    print("==== Using environment with the following metadata ====")
+    print(json.dumps(env.serialize(), indent=4))
+    print("")
+
+    # list of all demonstration episodes (sorted in increasing number order)
+    f = h5py.File(args.dataset, "r")
+    if args.filter_key is not None:
+        print("using filter key: {}".format(args.filter_key))
+        demos = [
+            elem.decode("utf-8")
+            for elem in np.array(f["mask/{}".format(args.filter_key)])
+        ]
+    else:
+        demos = list(f["data"].keys())
+    inds = np.argsort([int(elem[5:]) for elem in demos])
+    demos = [demos[i] for i in inds]
+
+    # maybe reduce the number of demonstrations to playback
+    if args.n is not None:
+        demos = demos[: args.n]
+
+    processed = []
+
+    for i in tqdm(range(len(demos))):
+        try:
+            # print("Running {} index".format(ind))
+            ep = demos[i]
+
+            # prepare initial state to reload from
+            states = f["data/{}/states".format(ep)][()]
+            initial_state = dict(states=states[0])
+            initial_state["model"] = f["data/{}".format(ep)].attrs["model_file"]
+            initial_state["ep_meta"] = f["data/{}".format(ep)].attrs.get(
+                "ep_meta", None
+            )
+
+            # extract obs, rewards, dones
+            actions = f["data/{}/actions".format(ep)][()]
+
+            env.env.rng = np.random.default_rng(SEEDS[i])
+
+            traj = extract_trajectory(
+                env=env,
+                initial_state=initial_state,
+                states=states,
+                actions=actions,
+                done_mode=args.done_mode,
+                camera_names=args.camera_names,
+                add_datagen_info=args.add_datagen_info,
+            )
+
+            # maybe copy reward or done signal from source file
+            if args.copy_rewards:
+                traj["rewards"] = f["data/{}/rewards".format(ep)][()]
+            if args.copy_dones:
+                traj["dones"] = f["data/{}/dones".format(ep)][()]
+
+            ep_grp = f["data/{}".format(ep)]
+
+            states = ep_grp["states"][()]
+            initial_state = dict(states=states[0])
+            initial_state["model"] = ep_grp.attrs["model_file"]
+            initial_state["ep_meta"] = ep_grp.attrs.get("ep_meta", None)
+
+            # store transitions
+            processed.append(traj)
+            
+            # IMPORTANT: keep name of group the same as source file, to make sure that filter keys are
+            #            consistent as well
+            # print("(process {}): ADD TO QUEUE index {}".format(process_num, ind))
+            # mul_queue.put([ep, traj, process_num])
+
+        except Exception as e:
+            print("_" * 50)
+            print("Error processing demo index {}: {}".format(i, e))
+            print(traceback.format_exc())
+            print("_" * 50)
+            del env
+            env = EnvUtils.create_env_for_data_processing(  # when it errors, it like blows up the environment for some reason
+                env_meta=env_meta,
+                camera_names=args.camera_names,
+                camera_height=args.camera_height,
+                camera_width=args.camera_width,
+                reward_shaping=args.shaped,
+            )
+
+    f.close()
+
+    return demos, processed
+
+
+def dataset_states_to_obs_multiprocessing(args):
+    # create environment to use for data processing
+
+    # output file in same directory as input file
+    output_name = args.output_name
+    if output_name is None:
+        if len(args.camera_names) == 0:
+            output_name = os.path.basename(args.dataset)[:-5] + "_ld.hdf5"
+        else:
+            image_suffix = str(args.camera_width)
+            image_suffix = (
+                image_suffix + "_randcams" if args.randomize_cameras else image_suffix
+            )
+            if args.generative_textures:
+                output_name = "demo_gentex_im{}.hdf5".format(image_suffix)
+            else:
+                output_name = "demo_im{}_libero.hdf5".format(
+                    image_suffix
+                )
+
+    output_path = os.path.join(os.path.dirname(args.dataset), output_name)
+
+    print("input file: {}".format(args.dataset))
+    print("output file: {}".format(output_path))
+
+    f = h5py.File(args.dataset, "r")
+    if args.filter_key is not None:
+        print("using filter key: {}".format(args.filter_key))
+        demos = [
+            elem.decode("utf-8")
+            for elem in np.array(f["mask/{}".format(args.filter_key)])
+        ]
+    else:
+        demos = list(f["data"].keys())
+    inds = np.argsort([int(elem[5:]) for elem in demos])
+    demos = [demos[i] for i in inds]
+
+    if args.n is not None:
+        demos = demos[: args.n]
+
+    num_demos = len(demos)
+    f.close()
+
+    env_meta = DatasetUtils.get_env_metadata_from_dataset(dataset_path=args.dataset)
+    demos, processed  = extract_multiple_trajectories_with_error(args)
+
+    write_traj_to_file(args, output_path, demos, processed)
+    print("Finished")
+    return
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        required=True,
+        help="path to input hdf5 dataset",
+    )
+    # name of hdf5 to write - it will be in the same directory as @dataset
+    parser.add_argument(
+        "--output_name",
+        type=str,
+        help="name of output hdf5 dataset",
+    )
+
+    parser.add_argument(
+        "--filter_key",
+        type=str,
+        help="filter key for input dataset",
+    )
+
+    # specify number of demos to process - useful for debugging conversion with a handful
+    # of trajectories
+    parser.add_argument(
+        "--n",
+        type=int,
+        default=None,
+        help="(optional) stop after n trajectories are processed",
+    )
+
+    # flag for reward shaping
+    parser.add_argument(
+        "--shaped",
+        action="store_true",
+        help="(optional) use shaped rewards",
+    )
+
+    # camera names to use for observations
+    parser.add_argument(
+        "--camera_names",
+        type=str,
+        nargs="+",
+        default=[
+            "robot0_agentview_left",
+        ],
+        help="(optional) camera name(s) to use for image observations. Leave out to not use image observations.",
+    )
+
+    parser.add_argument(
+        "--camera_height",
+        type=int,
+        default=180,
+        help="(optional) height of image observations",
+    )
+
+    parser.add_argument(
+        "--camera_width",
+        type=int,
+        default=320,
+        help="(optional) width of image observations",
+    )
+
+    # specifies how the "done" signal is written. If "0", then the "done" signal is 1 wherever
+    # the transition (s, a, s') has s' in a task completion state. If "1", the "done" signal
+    # is one at the end of every trajectory. If "2", the "done" signal is 1 at task completion
+    # states for successful trajectories and 1 at the end of all trajectories.
+    parser.add_argument(
+        "--done_mode",
+        type=int,
+        default=0,
+        help="how to write done signal. If 0, done is 1 whenever s' is a success state.\
+            If 1, done is 1 at the end of each trajectory. If 2, both.",
+    )
+
+    # flag for copying rewards from source file instead of re-writing them
+    parser.add_argument(
+        "--copy_rewards",
+        action="store_true",
+        help="(optional) copy rewards from source file instead of inferring them",
+    )
+
+    # flag for copying dones from source file instead of re-writing them
+    parser.add_argument(
+        "--copy_dones",
+        action="store_true",
+        help="(optional) copy dones from source file instead of inferring them",
+    )
+
+    # flag to include next obs in dataset
+    parser.add_argument(
+        "--include-next-obs",
+        action="store_true",
+        help="(optional) include next obs in dataset",
+    )
+
+    # flag to disable compressing observations with gzip option in hdf5
+    parser.add_argument(
+        "--no_compress",
+        action="store_true",
+        help="(optional) disable compressing observations with gzip option in hdf5",
+    )
+
+    parser.add_argument(
+        "--add_datagen_info",
+        action="store_true",
+        help="(optional) add datagen info (used for mimicgen)",
+    )
+
+    parser.add_argument("--generative_textures", action="store_true")
+
+    parser.add_argument("--randomize_cameras", action="store_true")
+
+    parser.add_argument(
+        "--obj_groups",
+        type=str,
+        nargs="+",
+        default=None,
+        help="In kitchen environments, either the name of a group to sample object from or path to an .xml file",
+    )
+
+    parser.add_argument("--debug", action="store_true", help="run with single process for debugging")
+
+    args = parser.parse_args()
+    dataset_states_to_obs_multiprocessing(args)

@@ -1,0 +1,20 @@
+torchrun --standalone --nnodes 1 --nproc-per-node 8 vla-scripts/train.py \
+    --vla.type prism-qwen25-dinosiglip-224px+0_5b+mx-xembod-robocasa-full \
+    --vla.base_vlm /workspace/openvla-mini-aux/runs/prism-qwen25-extra-dinosiglip-224px+0_5b+stage-finetune+x7/ \
+    --data_root_dir /datasets/jensen/xembod_data_human_rlds_final_filter_noop_actions/ \
+    --vla.data_mix mega_robocasa_xembod \
+    --vla.action_tokenizer extra_action_tokenizer \
+    --vla.expected_world_size 8 \
+    --vla.global_batch_size 128 \
+    --vla.per_device_batch_size 16 \
+    --vla.lr_scheduler_type=constant \
+    --image_aug True \
+    --vla.max_steps 200000 \
+    --wandb_entity=jensen_team \
+    --wandb_project=prismatic-aux \
+    --run_id_note all_mg_solid_all_human \
+    --pretrained_checkpoint /workspace/openvla-mini-aux/runs/prev_checkpoints/all_mg_solid_all_human--all_mg_solid_all_human--image_aug/checkpoints/step-022500-epoch-04-loss=2.0895.pt \
+    --is_resume True \
+    --resume_step 22500 \
+    --resume_epoch 4 \
+    --run_id=all_mg_solid_all_human 
