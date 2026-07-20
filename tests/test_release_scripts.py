@@ -75,7 +75,7 @@ class EvaluationLauncherTest(unittest.TestCase):
         command = evaluate.command(args)
         self.assertIn("PandaGripper", command)
         self.assertIn("barx_panda_agentview", command)
-        self.assertIn("BARXPnPSinkToCounter", command)
+        self.assertIn("XPnPSinkToCounter", command)
         self.assertIn("650", command)
         self.assertIn("8", command)
         self.assertIn("end_effector_trace", command)

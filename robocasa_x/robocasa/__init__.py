@@ -288,10 +288,10 @@ from robocasa.environments.kitchen.single_stage.kitchen_stove import (
 )
 
 from robocasa.environments.kitchen.barx_tasks import (
-    BARXFlipMugUpright,
-    BARXPnPCounterToSink,
-    BARXPnPSinkToCounter,
-    BARXTurnOnSinkFaucet,
+    XFlipMugUpright,
+    XPnPCounterToSink,
+    XPnPSinkToCounter,
+    XTurnOnSinkFaucet,
 )
 
 try:

@@ -62,22 +62,22 @@ EMBODIMENTS = {
 TASKS = {
     "pnp_counter_to_sink": TaskSpec(
         paper_name="PnP Counter to Sink",
-        environment="BARXPnPCounterToSink",
+        environment="XPnPCounterToSink",
         max_steps=600,
     ),
     "pnp_sink_to_counter": TaskSpec(
         paper_name="PnP Sink to Counter",
-        environment="BARXPnPSinkToCounter",
+        environment="XPnPSinkToCounter",
         max_steps=650,
     ),
     "turn_on_sink_faucet": TaskSpec(
         paper_name="Turn On Sink Faucet",
-        environment="BARXTurnOnSinkFaucet",
+        environment="XTurnOnSinkFaucet",
         max_steps=500,
     ),
     "flip_mug_upright": TaskSpec(
         paper_name="Flip Mug Upright",
-        environment="BARXFlipMugUpright",
+        environment="XFlipMugUpright",
         max_steps=500,
     ),
 }

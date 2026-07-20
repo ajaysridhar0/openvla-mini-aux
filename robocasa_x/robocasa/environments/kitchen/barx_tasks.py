@@ -117,7 +117,7 @@ class BARXTaskMixin:
         return language.translate({ord(char): None for char in digits}).strip()
 
 
-class BARXPnPCounterToSink(BARXTaskMixin, PnPCounterToSink):
+class XPnPCounterToSink(BARXTaskMixin, PnPCounterToSink):
     """BARX variation of RoboCasa's *PnP Counter to Sink* task."""
 
     def __init__(self, *args, obj_init_range=None, **kwargs):
@@ -141,7 +141,7 @@ class BARXPnPCounterToSink(BARXTaskMixin, PnPCounterToSink):
         return obj_in_sink and gripper_obj_far
 
 
-class BARXPnPSinkToCounter(BARXTaskMixin, PnPSinkToCounter):
+class XPnPSinkToCounter(BARXTaskMixin, PnPSinkToCounter):
     """BARX variation of RoboCasa's *PnP Sink to Counter* task."""
 
     def __init__(self, *args, obj_init_range=None, **kwargs):
@@ -173,14 +173,14 @@ class BARXPnPSinkToCounter(BARXTaskMixin, PnPSinkToCounter):
         return obj_in_receptacle and receptacle_on_counter and gripper_obj_far
 
 
-class BARXTurnOnSinkFaucet(BARXTaskMixin, ManipulateSinkFaucet):
+class XTurnOnSinkFaucet(BARXTaskMixin, ManipulateSinkFaucet):
     """BARX variation of RoboCasa's *Turn On Sink Faucet* task."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(behavior="turn_on", *args, **kwargs)
 
 
-class BARXFlipMugUpright(BARXTaskMixin, Kitchen):
+class XFlipMugUpright(BARXTaskMixin, Kitchen):
     """The *Flip Mug Upright* task introduced by BARX."""
 
     def __init__(self, *args, obj_init_range=None, **kwargs):

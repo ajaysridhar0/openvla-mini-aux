@@ -6,13 +6,13 @@ do not create a separate environment here.
 
 Only the four paper tasks are public release entry points:
 
-- `BARXPnPCounterToSink` (PnP Counter to Sink)
-- `BARXPnPSinkToCounter` (PnP Sink to Counter)
-- `BARXTurnOnSinkFaucet` (Turn On Sink Faucet)
-- `BARXFlipMugUpright` (Flip Mug Upright)
+- `XPnPCounterToSink` (PnP Counter to Sink)
+- `XPnPSinkToCounter` (PnP Sink to Counter)
+- `XTurnOnSinkFaucet` (Turn On Sink Faucet)
+- `XFlipMugUpright` (Flip Mug Upright)
 
 The corresponding original RoboCasa tasks remain registered and usable. The
-`BARX` prefix makes the paper-specific object variability, robot pose, and
+`X` prefix makes the paper-specific object variability, robot pose, and
 initialization rules explicit instead of silently replacing upstream behavior.
 Public launchers select the matching robot, gripper, and calibrated camera as
 one embodiment configuration.
