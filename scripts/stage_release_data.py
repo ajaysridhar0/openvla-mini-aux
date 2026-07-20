@@ -64,7 +64,9 @@ def normalize_hdf5(path: Path, embodiment: str) -> int:
         if not isinstance(data, h5py.Group):
             raise ValueError(f"{path} does not contain a data group")
         if LAYOUT_ATTRIBUTE in data.attrs:
-            raise ValueError(f"{path} is already marked as {data.attrs[LAYOUT_ATTRIBUTE]!r}")
+            raise ValueError(
+                f"{path} is already marked as {data.attrs[LAYOUT_ATTRIBUTE]!r}"
+            )
         if "env_args" not in data.attrs:
             raise ValueError(f"{path} does not contain data.attrs['env_args']")
 
@@ -74,13 +76,17 @@ def normalize_hdf5(path: Path, embodiment: str) -> int:
                 continue
             actions = demo["actions"]
             if actions.ndim < 1 or actions.shape[-1] != 12:
-                raise ValueError(f"{path}:{demo_name}/actions has shape {actions.shape}, expected (..., 12)")
+                raise ValueError(
+                    f"{path}:{demo_name}/actions has shape {actions.shape}, expected (..., 12)"
+                )
             if embodiment in LEGACY_NON_PANDA_EMBODIMENTS:
                 original = actions[...]
                 normalized = original[..., LEGACY_TO_NORMALIZED]
                 actions[...] = normalized
                 if not np.array_equal(actions[...], normalized, equal_nan=True):
-                    raise ValueError(f"Failed to verify normalized actions in {path}:{demo_name}")
+                    raise ValueError(
+                        f"Failed to verify normalized actions in {path}:{demo_name}"
+                    )
             demo_count += 1
 
         if demo_count == 0:
@@ -94,16 +100,29 @@ def normalize_hdf5(path: Path, embodiment: str) -> int:
 def verify_hdf5(path: Path, expected_demos: int) -> None:
     with h5py.File(path, "r") as staged:
         data = staged.get("data")
-        if not isinstance(data, h5py.Group) or data.attrs.get(LAYOUT_ATTRIBUTE) != NORMALIZED_LAYOUT:
-            raise ValueError(f"{path} is not marked with the normalized BARX action layout")
-        demos = [demo for demo in data.values() if isinstance(demo, h5py.Group) and "actions" in demo]
+        if (
+            not isinstance(data, h5py.Group)
+            or data.attrs.get(LAYOUT_ATTRIBUTE) != NORMALIZED_LAYOUT
+        ):
+            raise ValueError(
+                f"{path} is not marked with the normalized BARX action layout"
+            )
+        demos = [
+            demo
+            for demo in data.values()
+            if isinstance(demo, h5py.Group) and "actions" in demo
+        ]
         if len(demos) != expected_demos:
-            raise ValueError(f"{path} contains {len(demos)} demos; expected {expected_demos}")
+            raise ValueError(
+                f"{path} contains {len(demos)} demos; expected {expected_demos}"
+            )
         if any(demo["actions"].shape[-1] != 12 for demo in demos):
             raise ValueError(f"{path} contains a non-12-D action array")
 
 
-def stage_file(source: Path, destination: Path, embodiment: str, expected_demos: int) -> None:
+def stage_file(
+    source: Path, destination: Path, embodiment: str, expected_demos: int
+) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination.exists():
         verify_hdf5(destination, expected_demos)
@@ -115,7 +134,9 @@ def stage_file(source: Path, destination: Path, embodiment: str, expected_demos:
         shutil.copy2(source, temporary)
         demo_count = normalize_hdf5(temporary, embodiment)
         if demo_count != expected_demos:
-            raise ValueError(f"{source} contains {demo_count} demos; manifest says {expected_demos}")
+            raise ValueError(
+                f"{source} contains {demo_count} demos; manifest says {expected_demos}"
+            )
         verify_hdf5(temporary, expected_demos)
         temporary.replace(destination)
     finally:
@@ -129,14 +150,13 @@ def manifest_rows(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(stream))
 
 
-def stage_manifest_row(row: dict[str, str], source_root: Path, output_root: Path) -> None:
+def stage_manifest_row(
+    row: dict[str, str], source_root: Path, output_root: Path
+) -> None:
     relative_path = Path(row["relative_path"])
     source = source_root / relative_path
     if not source.is_file():
         raise FileNotFoundError(source)
-    expected_bytes = int(row["bytes"])
-    if source.stat().st_size != expected_bytes:
-        raise ValueError(f"{source} has {source.stat().st_size} bytes; manifest says {expected_bytes}")
     stage_file(
         source,
         output_root / relative_path,
@@ -147,17 +167,32 @@ def stage_manifest_row(row: dict[str, str], source_root: Path, output_root: Path
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("source_root", type=Path, help="Original directory containing the mg/ and human/ trees")
-    parser.add_argument("output_root", type=Path, help="New directory for normalized release copies")
+    parser.add_argument(
+        "source_root",
+        type=Path,
+        help="Original directory containing the mg/ and human/ trees",
+    )
+    parser.add_argument(
+        "output_root", type=Path, help="New directory for normalized release copies"
+    )
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
-    parser.add_argument("--limit", type=int, help="Stage only the first N files for a dry run")
-    parser.add_argument("--workers", type=int, default=4, help="Files to stage concurrently (default: 4)")
+    parser.add_argument(
+        "--limit", type=int, help="Stage only the first N files for a dry run"
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=4,
+        help="Files to stage concurrently (default: 4)",
+    )
     args = parser.parse_args()
 
     source_root = args.source_root.resolve()
     output_root = args.output_root.resolve()
     if source_root == output_root:
-        parser.error("source_root and output_root must be different; source data is never modified")
+        parser.error(
+            "source_root and output_root must be different; source data is never modified"
+        )
     if args.workers < 1:
         parser.error("--workers must be at least 1")
 
@@ -165,7 +200,11 @@ def main() -> None:
     if args.limit is not None:
         rows = rows[: args.limit]
     with ThreadPoolExecutor(max_workers=args.workers) as executor:
-        list(executor.map(lambda row: stage_manifest_row(row, source_root, output_root), rows))
+        list(
+            executor.map(
+                lambda row: stage_manifest_row(row, source_root, output_root), rows
+            )
+        )
 
     print(f"Staged and verified {len(rows)} files in {output_root}")
 

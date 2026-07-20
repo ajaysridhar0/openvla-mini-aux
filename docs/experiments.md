@@ -124,3 +124,10 @@ record per trial in `episodes.jsonl`, an atomic `summary.json`, a readable
 records and write the exception to the summary before returning a nonzero exit
 status. Add `--use-wandb` to mirror metrics and first-trial videos; the local
 files remain the source of record.
+
+Aggregate any collection of complete and failed runs without parsing text logs:
+
+```bash
+uv run --locked python scripts/summarize_evaluations.py rollouts \
+  --output evaluation/results.csv
+```

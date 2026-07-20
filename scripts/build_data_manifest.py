@@ -6,7 +6,9 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import os
 import re
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 
@@ -38,9 +40,7 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def row_for_file(
-    path: Path, data_root: Path, include_sha256: bool
-) -> dict[str, object] | None:
+def row_for_file(path: Path, data_root: Path) -> dict[str, object] | None:
     relative = path.relative_to(data_root)
     parts = relative.parts
     if (
@@ -88,19 +88,17 @@ def row_for_file(
         "demonstrations": 100 if partition == "mg" else 50,
         "seed": seed,
         "bytes": path.stat().st_size,
-        "sha256": sha256(path) if include_sha256 else "",
+        "sha256": "",
         "relative_path": relative.as_posix(),
     }
 
 
-def build_manifest(data_root: Path, include_sha256: bool) -> list[dict[str, object]]:
+def build_manifest(data_root: Path) -> list[dict[str, object]]:
     candidates = list((data_root / "mg").rglob("*.hdf5")) + list(
         (data_root / "human").rglob("*.hdf5")
     )
     rows = [
-        row
-        for path in candidates
-        if (row := row_for_file(path, data_root, include_sha256)) is not None
+        row for path in candidates if (row := row_for_file(path, data_root)) is not None
     ]
     rows.sort(
         key=lambda row: (
@@ -111,6 +109,16 @@ def build_manifest(data_root: Path, include_sha256: bool) -> list[dict[str, obje
         )
     )
     return rows
+
+
+def add_hashes(rows: list[dict[str, object]], data_root: Path, workers: int) -> None:
+    """Populate hashes in manifest order using bounded parallel reads."""
+
+    paths = [data_root / str(row["relative_path"]) for row in rows]
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        for index, digest in enumerate(executor.map(sha256, paths), start=1):
+            rows[index - 1]["sha256"] = digest
+            print(f"Hashed {index}/{len(rows)}", flush=True)
 
 
 def validate(rows: list[dict[str, object]]) -> None:
@@ -149,15 +157,29 @@ def main() -> None:
         action="store_true",
         help="Hash every selected file (slow for the full release)",
     )
+    parser.add_argument(
+        "--hash-workers",
+        type=int,
+        default=4,
+        help="Parallel file readers used with --sha256 (default: 4)",
+    )
     args = parser.parse_args()
+    if args.hash_workers <= 0:
+        parser.error("--hash-workers must be positive")
 
-    rows = build_manifest(args.data_root.resolve(), args.sha256)
+    data_root = args.data_root.resolve()
+    rows = build_manifest(data_root)
     validate(rows)
+    if args.sha256:
+        add_hashes(rows, data_root, args.hash_workers)
+
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    with args.output.open("w", newline="") as stream:
+    staging = args.output.with_suffix(args.output.suffix + ".staging")
+    with staging.open("w", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=list(rows[0]), lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
+    os.replace(staging, args.output)
 
     total_bytes = sum(int(row["bytes"]) for row in rows)
     print(f"Wrote {len(rows)} files ({total_bytes / 2**30:.2f} GiB) to {args.output}")

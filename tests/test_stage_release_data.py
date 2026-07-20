@@ -12,6 +12,7 @@ from scripts.stage_release_data import (
     NORMALIZED_LAYOUT,
     normalize_hdf5,
     stage_file,
+    stage_manifest_row,
 )
 
 
@@ -60,9 +61,13 @@ class StageReleaseDataTest(unittest.TestCase):
             normalize_hdf5(path, "PandaOmron")
 
             with h5py.File(path, "r") as staged:
-                np.testing.assert_array_equal(staged["data/demo_0/actions"][...], original)
+                np.testing.assert_array_equal(
+                    staged["data/demo_0/actions"][...], original
+                )
                 env_args = json.loads(staged["data"].attrs["env_args"])
-                self.assertEqual(env_args["env_kwargs"]["gripper_types"], "Robotiq85Gripper")
+                self.assertEqual(
+                    env_args["env_kwargs"]["gripper_types"], "Robotiq85Gripper"
+                )
 
     def test_staging_never_modifies_the_source_file(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -74,10 +79,34 @@ class StageReleaseDataTest(unittest.TestCase):
 
             stage_file(source, destination, "JacoOmron", expected_demos=1)
 
-            with h5py.File(source, "r") as archival, h5py.File(destination, "r") as staged:
-                np.testing.assert_array_equal(archival["data/demo_0/actions"][...], original)
+            with (
+                h5py.File(source, "r") as archival,
+                h5py.File(destination, "r") as staged,
+            ):
+                np.testing.assert_array_equal(
+                    archival["data/demo_0/actions"][...], original
+                )
                 self.assertNotIn(LAYOUT_ATTRIBUTE, archival["data"].attrs)
-                self.assertEqual(staged["data"].attrs[LAYOUT_ATTRIBUTE], NORMALIZED_LAYOUT)
+                self.assertEqual(
+                    staged["data"].attrs[LAYOUT_ATTRIBUTE], NORMALIZED_LAYOUT
+                )
+
+    def test_final_manifest_size_is_not_treated_as_source_size(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            relative = Path("mg/JacoOmron/PnPCounterToSink/data.hdf5")
+            source = root / "source" / relative
+            source.parent.mkdir(parents=True)
+            self.make_file(source, np.arange(12, dtype=np.float32).reshape(1, 12))
+            row = {
+                "relative_path": relative.as_posix(),
+                "demonstrations": "1",
+                "bytes": "1",
+            }
+
+            stage_manifest_row(row, root / "source", root / "release")
+
+            self.assertTrue((root / "release" / relative).is_file())
 
 
 if __name__ == "__main__":

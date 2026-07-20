@@ -1,10 +1,10 @@
 # BARX simulation dataset
 
-The source HDF5 selection is 283.13 GiB, so the normalized files are
-distributed separately. `manifest.csv` lists every selected file, its size,
+The normalized HDF5 release is 283.13 GiB, so its files are distributed
+separately. `manifest.csv` lists every selected file, its final staged size,
 embodiment, task, demonstration count, seed, relative path, and paper dataset
-membership. Until final staging is complete, its byte sizes describe the
-archival inputs and its checksum column is intentionally empty.
+membership. Its checksum column remains empty until the final upload hashing
+pass.
 
 ## Contents
 
@@ -39,7 +39,7 @@ manifest from the output tree:
 
 ```bash
 uv run --locked python scripts/build_data_manifest.py /path/to/barx-release-data \
-  --output dataset/manifest.csv --sha256
+  --output dataset/manifest.csv --sha256 --hash-workers 4
 ```
 
 Hashing the full release reads roughly 283 GiB and is therefore not part of
