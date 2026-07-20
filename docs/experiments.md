@@ -116,3 +116,11 @@ This defaults to action-only inference, as used for the main results. For the
 inference ablation, add `--inference-representation bounding_box`,
 `language_motion`, or `end_effector_trace`. The launcher maps Panda-OG and Jaco
 to their registered internal simulator classes.
+
+Each invocation creates a non-overwriting directory under
+`rollouts/<task>/<embodiment>/`. It contains the resolved `config.json`, one
+record per trial in `episodes.jsonl`, an atomic `summary.json`, a readable
+`log.txt`, and rollout videos. Failed runs retain their completed episode
+records and write the exception to the summary before returning a nonzero exit
+status. Add `--use-wandb` to mirror metrics and first-trial videos; the local
+files remain the source of record.

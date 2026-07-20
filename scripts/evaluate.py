@@ -25,12 +25,10 @@ def command(args: argparse.Namespace) -> list[str]:
     embodiment = EMBODIMENTS[args.embodiment]
     task = TASKS[args.task]
     conditions_dir = (
-        getattr(args, "conditions_dir", None)
-        or ROOT / "evaluation" / "conditions"
+        getattr(args, "conditions_dir", None) or ROOT / "evaluation" / "conditions"
     )
     rollout_dir = (
-        args.rollout_dir
-        or ROOT / "rollouts" / args.task / args.embodiment / "STEP"
+        args.rollout_dir or ROOT / "rollouts" / args.task / args.embodiment / "STEP"
     )
     result = [
         sys.executable,
@@ -65,7 +63,17 @@ def command(args: argparse.Namespace) -> list[str]:
     if args.inference_representation != "none":
         result.extend(["--inference_representation", args.inference_representation])
     if args.use_wandb:
-        result.extend(["--use_wandb", "True"])
+        result.extend(
+            [
+                "--use_wandb",
+                "True",
+                "--wandb_project",
+                getattr(args, "wandb_project", "barx"),
+            ]
+        )
+        wandb_entity = getattr(args, "wandb_entity", None)
+        if wandb_entity:
+            result.extend(["--wandb_entity", wandb_entity])
     return result
 
 
@@ -80,13 +88,19 @@ def main() -> None:
         default="none",
         help="Optional representation to predict before actions; paper main results use none",
     )
-    parser.add_argument("--unnorm-key", required=True, help="Prior dataset normalization key stored in the model")
+    parser.add_argument(
+        "--unnorm-key",
+        required=True,
+        help="Prior dataset normalization key stored in the model",
+    )
     parser.add_argument("--episodes", type=int, default=EVALUATION_EPISODES)
     parser.add_argument("--start-seed", type=int, default=EVALUATION_START_SEED)
     parser.add_argument("--max-steps", type=int)
     parser.add_argument("--rollout-dir", type=Path)
     parser.add_argument("--conditions-dir", type=Path)
     parser.add_argument("--use-wandb", action="store_true")
+    parser.add_argument("--wandb-project", default="barx")
+    parser.add_argument("--wandb-entity")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 

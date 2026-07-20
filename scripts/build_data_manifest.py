@@ -10,11 +10,11 @@ import re
 from pathlib import Path
 
 
-TASK_NAMES = {
-    "PnPCounterToSink": "pick-and-place counter-to-sink",
-    "PnPSinkToCounter": "pick-and-place sink-to-counter",
-    "TurnOnSinkFaucet": "turn-on-sink-faucet",
-    "FlipMugUpright": "flip-mug-upright",
+STORED_TASK_NAMES = {
+    "PnPCounterToSink": "PnP Counter to Sink",
+    "PnPSinkToCounter": "PnP Sink to Counter",
+    "TurnOnSinkFaucet": "Turn On Sink Faucet",
+    "FlipMugUpright": "Flip Mug Upright",
 }
 EMBODIMENT_NAMES = {
     "IIWAOmron": "IIWA",
@@ -38,10 +38,16 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def row_for_file(path: Path, data_root: Path, include_sha256: bool) -> dict[str, object] | None:
+def row_for_file(
+    path: Path, data_root: Path, include_sha256: bool
+) -> dict[str, object] | None:
     relative = path.relative_to(data_root)
     parts = relative.parts
-    if len(parts) < 4 or parts[1] not in EMBODIMENT_NAMES or parts[2] not in TASK_NAMES:
+    if (
+        len(parts) < 4
+        or parts[1] not in EMBODIMENT_NAMES
+        or parts[2] not in STORED_TASK_NAMES
+    ):
         return None
 
     partition, internal_embodiment, internal_task = parts[:3]
@@ -64,7 +70,10 @@ def row_for_file(path: Path, data_root: Path, include_sha256: bool) -> dict[str,
         else:
             return None
     elif partition == "human":
-        if internal_embodiment not in TARGET_EMBODIMENTS or path.name != "demo_gentex_im320.hdf5":
+        if (
+            internal_embodiment not in TARGET_EMBODIMENTS
+            or path.name != "demo_gentex_im320.hdf5"
+        ):
             return None
         release_group = "target demonstrations"
         paper_sets = "target-50"
@@ -75,7 +84,7 @@ def row_for_file(path: Path, data_root: Path, include_sha256: bool) -> dict[str,
         "release_group": release_group,
         "paper_sets": paper_sets,
         "embodiment": EMBODIMENT_NAMES[internal_embodiment],
-        "task": TASK_NAMES[internal_task],
+        "task": STORED_TASK_NAMES[internal_task],
         "demonstrations": 100 if partition == "mg" else 50,
         "seed": seed,
         "bytes": path.stat().st_size,
@@ -85,9 +94,22 @@ def row_for_file(path: Path, data_root: Path, include_sha256: bool) -> dict[str,
 
 
 def build_manifest(data_root: Path, include_sha256: bool) -> list[dict[str, object]]:
-    candidates = list((data_root / "mg").rglob("*.hdf5")) + list((data_root / "human").rglob("*.hdf5"))
-    rows = [row for path in candidates if (row := row_for_file(path, data_root, include_sha256)) is not None]
-    rows.sort(key=lambda row: (str(row["release_group"]), str(row["embodiment"]), str(row["task"]), str(row["seed"])))
+    candidates = list((data_root / "mg").rglob("*.hdf5")) + list(
+        (data_root / "human").rglob("*.hdf5")
+    )
+    rows = [
+        row
+        for path in candidates
+        if (row := row_for_file(path, data_root, include_sha256)) is not None
+    ]
+    rows.sort(
+        key=lambda row: (
+            str(row["release_group"]),
+            str(row["embodiment"]),
+            str(row["task"]),
+            str(row["seed"]),
+        )
+    )
     return rows
 
 
@@ -106,7 +128,9 @@ def validate(rows: list[dict[str, object]]) -> None:
     for group, expected in expected_files.items():
         group_rows = [key for key in counts if key[0] == group]
         if len(group_rows) != 12:
-            errors.append(f"{group}: expected 12 embodiment/task groups, found {len(group_rows)}")
+            errors.append(
+                f"{group}: expected 12 embodiment/task groups, found {len(group_rows)}"
+            )
         for key in group_rows:
             if counts[key] != expected:
                 errors.append(f"{key}: expected {expected} files, found {counts[key]}")
@@ -116,9 +140,15 @@ def validate(rows: list[dict[str, object]]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("data_root", type=Path, help="Directory containing the mg/ and human/ trees")
+    parser.add_argument(
+        "data_root", type=Path, help="Directory containing the mg/ and human/ trees"
+    )
     parser.add_argument("--output", type=Path, default=Path("dataset/manifest.csv"))
-    parser.add_argument("--sha256", action="store_true", help="Hash every selected file (slow for the full release)")
+    parser.add_argument(
+        "--sha256",
+        action="store_true",
+        help="Hash every selected file (slow for the full release)",
+    )
     args = parser.parse_args()
 
     rows = build_manifest(args.data_root.resolve(), args.sha256)
