@@ -4,9 +4,11 @@ The release selection is recorded in `dataset/manifest.csv`; see
 `dataset/README.md` for its composition. The public archive is normalized
 before upload and preserves the relative `mg/` and `human/` paths.
 
-Retained episode metadata and MuJoCo XML replace installation prefixes with
-`<ROBOCASA>/` and `<ROBOSUITE>/`. These tokens preserve the asset-relative path
-without exposing or depending on the original collection machine.
+Retained episode metadata replaces installation prefixes with `<ROBOCASA>/`.
+This token preserves asset-relative paths without exposing or depending on the
+original collection machine. Per-demo replay XML is omitted from the rendered
+training release; the exact evaluation XML and settled state are stored in the
+frozen condition bundles.
 
 ## Canonical action boundary
 

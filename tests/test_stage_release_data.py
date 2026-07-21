@@ -76,7 +76,7 @@ class StageReleaseDataTest(unittest.TestCase):
                     ENVIRONMENT_ALIASES["PnPCounterToSink"],
                 )
                 self.assertIn("<ROBOCASA>/models/assets", data["demo_0"].attrs["ep_meta"])
-                self.assertIn("<ROBOSUITE>/models/assets", data["demo_0"].attrs["model_file"])
+                self.assertNotIn("model_file", data["demo_0"].attrs)
                 self.assertEqual(private_attribute_hits(staged), [])
 
     def test_panda_actions_stay_unchanged_and_gripper_is_explicit(self):

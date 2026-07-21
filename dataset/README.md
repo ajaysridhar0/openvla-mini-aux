@@ -34,10 +34,11 @@ uv run --locked python scripts/stage_release_data.py \
 
 All output actions then use
 `[arm(6), gripper(1), base(3), torso(1), mode(1)]`, independent of
-embodiment. Stored episode metadata and MuJoCo XML use `<ROBOCASA>/` and
-`<ROBOSUITE>/` package-relative asset paths instead of collection-machine
-paths. Once all files have been staged, regenerate the checked release manifest
-from the output tree:
+embodiment. Stored episode metadata uses `<ROBOCASA>/` package-relative asset
+paths instead of collection-machine paths. Per-demo
+`model_file` XML is omitted because it is not used by conversion or training;
+exact evaluation replay is provided by `evaluation/conditions/`. Once all files
+have been staged, regenerate the checked release manifest from the output tree:
 
 ```bash
 uv run --locked python scripts/build_data_manifest.py /path/to/barx-release-data \

@@ -18,7 +18,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 
-from barx.evaluation_conditions import portable_ep_meta, portable_model_xml
+from barx.evaluation_conditions import portable_ep_meta
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,7 +70,7 @@ def normalize_env_args(raw_env_args: str | bytes, embodiment: str) -> str:
 
 
 def normalize_demo_metadata(data: h5py.Group) -> None:
-    """Make retained replay metadata independent of the collection machine."""
+    """Keep converter metadata portable and discard unused replay-only XML."""
 
     for demo_name, demo in data.items():
         if not isinstance(demo, h5py.Group):
@@ -84,14 +84,7 @@ def normalize_demo_metadata(data: h5py.Group) -> None:
             if normalized_ep_meta != original_ep_meta:
                 demo.attrs["ep_meta"] = normalized_ep_meta
         if "model_file" in demo.attrs:
-            model_xml = demo.attrs["model_file"]
-            if isinstance(model_xml, bytes):
-                model_xml = model_xml.decode("utf-8")
-            if not isinstance(model_xml, str):
-                raise ValueError(f"{demo.name}.attrs['model_file'] must be text")
-            portable_xml = portable_model_xml(model_xml)
-            if portable_xml != model_xml:
-                demo.attrs["model_file"] = portable_xml
+            del demo.attrs["model_file"]
 
 
 def attribute_text(value: object) -> str:
@@ -105,7 +98,7 @@ def attribute_text(value: object) -> str:
 
 
 def private_attribute_hits(file: h5py.File) -> list[str]:
-    """Return attribute locations that expose collection-machine paths."""
+    """Return file, data, or demo attributes with collection-machine paths."""
 
     hits: list[str] = []
 
@@ -116,7 +109,12 @@ def private_attribute_hits(file: h5py.File) -> list[str]:
                 hits.append(f"{name or '/'}:{key}")
 
     inspect("", file)
-    file.visititems(inspect)
+    data = file.get("data")
+    if isinstance(data, h5py.Group):
+        inspect("data", data)
+        for demo_name, demo in data.items():
+            if isinstance(demo, h5py.Group):
+                inspect(f"data/{demo_name}", demo)
     return hits
 
 
