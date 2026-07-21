@@ -106,7 +106,7 @@ name = "flash-attn"
 version = "2.5.5"
 requires-dist = ["torch", "einops"]
 
-# The vendored robosuite tree is byte-for-byte upstream 1.5.1. Its published
+# The pinned robosuite commit is unmodified upstream 1.5.1. Its published
 # metadata requires newer MuJoCo and Mink, while the BARX experiments used
 # MuJoCo 3.1.1 and do not exercise robosuite's optional Mink example. Keep
 # release-environment policy here instead of patching third-party source.

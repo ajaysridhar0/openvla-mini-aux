@@ -126,8 +126,21 @@ def build_command(args: argparse.Namespace) -> list[str]:
         mapping = statistics_map(args.prior, args.target, args.task)
         if mapping:
             command.extend(["--dataset_statistics_map", json.dumps(mapping, separators=(",", ":"))])
-    if args.wandb_entity:
-        command.extend(["--wandb_entity", args.wandb_entity])
+    use_wandb = getattr(args, "use_wandb", False)
+    wandb_entity = getattr(args, "wandb_entity", None)
+    if wandb_entity and not use_wandb:
+        raise ValueError("--wandb-entity requires --use-wandb.")
+    if use_wandb:
+        command.extend(
+            [
+                "--trackers",
+                '["jsonl","wandb"]',
+                "--wandb_project",
+                getattr(args, "wandb_project", "barx"),
+            ]
+        )
+        if wandb_entity:
+            command.extend(["--wandb_entity", wandb_entity])
     return command
 
 
@@ -149,6 +162,8 @@ def main() -> None:
         help="Defaults to 10000 for source priors and 1000 for target training",
     )
     parser.add_argument("--gpus", type=int, default=8)
+    parser.add_argument("--use-wandb", action="store_true")
+    parser.add_argument("--wandb-project", default="barx")
     parser.add_argument("--wandb-entity")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()

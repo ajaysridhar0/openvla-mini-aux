@@ -6,8 +6,8 @@ the Open-X Embodiment dataset. Performs training in native PyTorch, using Fully-
 distributed across GPUs (and nodes). By default, assumes that CUDA toolkit is >= 11.0 (to support BF16 mixed precision).
 
 Notes & Prerequisites:
-    - If you want to set a custom location for all HF / TIMM artifacts --> `export HF_HOME="<PATH>"` *before* running!
-        => For example (add to end of .bashrc): `export HF_HOME="/mnt/fsx/skaramcheti/cache"`
+    - To set a custom location for HF / TIMM artifacts, export
+      `HF_HOME="/path/to/cache"` before running.
     - If you want to suppress random Tensorflow logs --> `export TF_CPP_MIN_LOG_LEVEL=3`
 
 Run with:
@@ -27,7 +27,7 @@ import torch
 import torch.distributed as dist
 import yaml
 
-from prismatic.conf import VLAConfig, VLARegistry, DatasetConfig
+from prismatic.conf import VLAConfig, VLARegistry
 from prismatic.models import load, load_vla
 from prismatic.overwatch import initialize_overwatch
 from prismatic.training import VLAMetrics, get_train_strategy
@@ -35,7 +35,6 @@ from prismatic.util import set_global_seed
 from prismatic.vla import get_vla_dataset_and_collator
 from prismatic.vla.datasets.rlds.utils.data_utils import save_dataset_statistics
 from prismatic.vla.action_tokenizer import FastActionTokenizer
-from prismatic.preprocessing import get_dataset_and_collator
 
 # Sane Defaults
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -86,10 +85,9 @@ class TrainConfig:
     hf_token: Union[str, Path] = Path(".hf_token")                  # Environment variable or Path to HF Token
 
     # Tracking Parameters
-    trackers: Tuple[str, ...] = ("jsonl", "wandb")                  # Trackers to initialize (if W&B, add config!)
-    # TODO (ajaysri): debug wandb
-    wandb_project: str = "prismatic-aux"                            # Name of W&B project to log to (use default!)
-    wandb_entity: str = "ajaysridhar"                               # Name of entity to log under
+    trackers: Tuple[str, ...] = ("jsonl",)                          # Local logging unless W&B is explicitly enabled
+    wandb_project: str = "barx"
+    wandb_entity: Optional[str] = None
 
     random_llm_weights: bool = False
 
@@ -202,7 +200,7 @@ def train(cfg: TrainConfig) -> None:
                 cfg.resume_step = ckpt[0]
                 cfg.resume_epoch = ckpt[1]
                 break
-            except:
+            except Exception:
                 ckpt_idx += 1
 
     if vlm is None and cfg.pretrained_checkpoint is not None:

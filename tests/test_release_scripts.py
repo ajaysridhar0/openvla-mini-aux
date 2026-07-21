@@ -34,6 +34,8 @@ class TrainingLauncherTest(unittest.TestCase):
             "max_steps": 3_000,
             "save_interval": 1_000,
             "gpus": 8,
+            "use_wandb": False,
+            "wandb_project": "barx",
             "wandb_entity": None,
         }
         values.update(updates)
@@ -61,6 +63,18 @@ class TrainingLauncherTest(unittest.TestCase):
     def test_global_batch_size_cannot_silently_change(self):
         with self.assertRaisesRegex(ValueError, "divisor"):
             train.build_command(self.args(gpus=7))
+
+    def test_training_logging_is_local_unless_wandb_is_explicit(self):
+        local_command = train.build_command(self.args())
+        self.assertNotIn("--trackers", local_command)
+        self.assertNotIn("--wandb_entity", local_command)
+
+        wandb_command = train.build_command(
+            self.args(use_wandb=True, wandb_project="barx-release", wandb_entity="team")
+        )
+        self.assertIn('["jsonl","wandb"]', wandb_command)
+        self.assertIn("barx-release", wandb_command)
+        self.assertIn("team", wandb_command)
 
 
 class EvaluationLauncherTest(unittest.TestCase):

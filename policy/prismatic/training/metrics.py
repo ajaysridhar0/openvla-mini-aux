@@ -215,7 +215,7 @@ class VLAMetrics:
         run_dir: Path,
         hparams: Dict[str, Any],
         wandb_project: str = "openvla",
-        wandb_entity: Optional[str] = "stanford-voltron",
+        wandb_entity: Optional[str] = None,
         grad_accumulation_steps: int = 1,
         window_size: int = 1,
         resume_step: Optional[int] = None,
@@ -332,7 +332,7 @@ class VLAMetrics:
         if action_accuracy:
             action_accuracy = torch.stack(action_accuracy).mean().item()
         else:
-            l1_loss = np.nan
+            action_accuracy = np.nan
 
         # Get metrics per dataset and prediction type
         dataset_metrics = {}
@@ -344,13 +344,7 @@ class VLAMetrics:
                     else:
                         metric_value = np.mean(list(values))
                     
-                    # If this is a dataset-specific metric (contains '/')
                     dataset_metrics[f"{ds}/{metric_name}"] = metric_value
-                    # if '/' in ds:
-                    #     dataset_metrics[f"Dataset Specific/{ds}/{metric_name}"] = metric_value
-                    # else:
-                    #     # This is an aggregate metric for an aux type
-                    #     dataset_metrics[f"Aggregate/{ds}/{metric_name}"] = metric_value
 
         # Fire to Trackers
         prefix = "VLA Train"

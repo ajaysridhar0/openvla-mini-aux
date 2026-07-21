@@ -20,6 +20,36 @@ paper evaluations, representations are used during training but actions are
 predicted directly at inference unless evaluating the representation-inference
 ablation.
 
+## RoboCasa-X task variants
+
+The paper tasks are registered as separate `X*` environments; they do not
+replace the corresponding upstream RoboCasa tasks. This keeps unmodified
+RoboCasa behavior available while making the benchmark changes explicit:
+
+- all embodiments use the paper's robot base offsets, initial arm poses, and
+  zero-height Omron torso pose;
+- object names in instructions omit asset-number suffixes;
+- **PnP Counter to Sink** samples the manipulated object in a `0.30 x 0.40`
+  region and requires the released object to be inside the sink;
+- **PnP Sink to Counter** samples the manipulated object in a `0.25 x 0.25`
+  sink region and the goal receptacle in a `0.30 x 0.30` counter region;
+- **Turn On Sink Faucet** fixes the upstream faucet task to the `turn_on`
+  behavior; and
+- **Flip Mug Upright** is the new BARX task, with four infeasible mug assets
+  excluded and the initial mug rotated onto its side.
+
+The evaluation scene distribution uses layouts 4, 7, and 8 with styles 0--11.
+It excludes `(layout, style)` pairs `(8, 3)`, `(8, 5)`, `(8, 6)`, and `(8, 9)`
+as described in the paper appendix. Panda-OG additionally excludes style 4 for
+PnP Sink to Counter because the Franka Hand cannot reach that sampled goal.
+Turn On Sink Faucet uses styles 0, 1, 2, 3, 4, 7, 8, 10, and 11 over all
+compatible layouts. These rules live in `barx/benchmark.py` and are serialized
+into every frozen condition bundle.
+
+Each embodiment selects its robot, gripper, and calibrated third-person camera
+as one configuration. Camera pose randomization is used in the released
+training data, but evaluation uses the fixed base camera pose.
+
 ## VQ tokenizer
 
 Train one tokenizer per prior/task dataset before policy training. The paper
@@ -81,6 +111,10 @@ Use `--prior none` for target-only training and `--prior sp_900` for the
 same-embodiment prior. Those settings initialize from the base VLM and do not
 take a source-prior checkpoint. Add `--dry-run` to inspect a command without
 starting a distributed job.
+
+Training writes JSONL metrics and checkpoints locally by default. To mirror a
+run to Weights & Biases, add `--use-wandb` and optionally `--wandb-project` and
+`--wandb-entity`; no account or project name is embedded in the default run.
 
 ## Evaluation protocol
 

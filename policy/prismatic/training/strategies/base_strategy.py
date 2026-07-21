@@ -366,7 +366,8 @@ class TrainingStrategy(ABC):
                         pixel_values=batch["pixel_values"],
                         labels=batch["labels"],
                     )
-                    loss = output.loss # TODO (ajaysri): for per aux task loss, how to get unreduced loss without recomputing?
+                    # The model returns the aggregate loss used for backpropagation.
+                    loss = output.loss
                     transform_types = batch["transform_type"].to(output.loss.device)
 
                 # Commit Loss =>> Backward!
@@ -438,10 +439,7 @@ class TrainingStrategy(ABC):
                                         for ds in datasets:
                                             ds_mask = torch.tensor([elem == ds for elem in batch["dataset_names"]])
                                             ds_mask = ds_mask[transform_type_mask.cpu()]
-                                            try:
-                                                ds_correct_preds = correct_preds[ds_mask]
-                                            except:
-                                                breakpoint()
+                                            ds_correct_preds = correct_preds[ds_mask]
                                             
                                             ds_current_mask = current_mask[ds_mask]
                                             ds_accuracy = ds_correct_preds.sum().float() / ds_current_mask.sum().float()
@@ -482,10 +480,10 @@ class TrainingStrategy(ABC):
                                         action_tokenizer.decode_token_ids_to_actions(action_gt[action_mask].cpu().numpy())
                                     )
 
-                                try:
-                                    action_l1_loss = torch.nn.functional.l1_loss(continuous_actions_pred, continuous_actions_gt)
-                                except:
-                                    breakpoint()
+                                action_l1_loss = torch.nn.functional.l1_loss(
+                                    continuous_actions_pred,
+                                    continuous_actions_gt,
+                                )
                                 metrics.commit_for_dataset(dataset_name=transform_type_str, l1_loss=action_l1_loss)
 
                                 # Per-dataset L1 loss
