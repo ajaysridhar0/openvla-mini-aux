@@ -17,6 +17,14 @@ initialization rules explicit instead of silently replacing upstream behavior.
 Public launchers select the matching robot, gripper, and calibrated camera as
 one embodiment configuration.
 
+The retained RoboCasa core has only the compatibility extension points needed
+by those variants: injectable robot offsets and initial joint poses, deterministic
+RNG/episode-metadata replay, per-instance object exclusions, and capture of the
+processed MuJoCo XML. Their defaults preserve upstream task sampling. The
+shared RoboCasa-X controller loader provides one Omron action order without a
+robosuite fork; paper-specific cameras and fixed-base joints are installed only
+by the `X*` task mixin.
+
 The repository intentionally omits demonstration collection, state rendering,
 MimicGen generation, general RoboCasa demos, and upstream documentation. The
 released HDF5 files are already rendered and annotated. Dataset playback,

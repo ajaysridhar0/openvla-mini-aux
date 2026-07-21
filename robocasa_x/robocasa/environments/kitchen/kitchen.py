@@ -19,8 +19,6 @@ from robosuite.environments.base import EnvMeta
 from scipy.spatial.transform import Rotation
 
 from robosuite.models.robots import PandaOmron
-from robosuite_models.robots.compositional import UR5eOmron, Kinova3Omron, SawyerOmron
-from robocasa.models.compositional_robots import IIWAOmron, JacoOmron
 
 import robocasa
 import robocasa.macros as macros
@@ -1154,18 +1152,21 @@ class Kitchen(ManipulationEnv, metaclass=KitchenEnvMeta):
                 new_joint = "mobilebase0_" + old_joint[6:]
                 elem.set("joint", new_joint)
 
-        # BARX keeps the Omron base stationary. This belongs to the benchmark
-        # scene policy, not the general-purpose robosuite base asset.
-        locked_omron_joints = (
-            "joint_torso_height",
-            "joint_mobile_forward",
-            "joint_mobile_side",
-            "joint_mobile_yaw",
-        )
-        for joint in find_elements(root=worldbody, tags="joint", return_first=False):
-            name = joint.get("name", "")
-            if any(name.endswith(suffix) for suffix in locked_omron_joints):
-                joint.set("frictionloss", "999999999")
+        if getattr(self, "_barx_lock_omron_joints", False):
+            # BARX keeps the Omron base stationary without changing the
+            # general-purpose robosuite base asset or ordinary RoboCasa tasks.
+            locked_omron_joints = (
+                "joint_torso_height",
+                "joint_mobile_forward",
+                "joint_mobile_side",
+                "joint_mobile_yaw",
+            )
+            for joint in find_elements(
+                root=worldbody, tags="joint", return_first=False
+            ):
+                name = joint.get("name", "")
+                if any(name.endswith(suffix) for suffix in locked_omron_joints):
+                    joint.set("frictionloss", "999999999")
 
         # result = ET.tostring(root, encoding="utf8").decode("utf8")
         result = ET.tostring(root).decode("utf8")

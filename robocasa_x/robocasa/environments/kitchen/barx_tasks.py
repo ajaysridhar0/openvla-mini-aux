@@ -95,6 +95,8 @@ BARX_FLIP_MUG_EXCLUDED_INSTANCES = ("mug_0", "mug_7", "mug_10", "mug_12")
 class BARXTaskMixin:
     """Apply BARX embodiment alignment without changing RoboCasa defaults."""
 
+    _barx_lock_omron_joints = True
+
     def __init__(self, *args, robot_pos_offsets=None, robot_init_qpos=None, **kwargs):
         position_offsets = dict(BARX_ROBOT_POSITION_OFFSETS)
         if robot_pos_offsets is not None:
