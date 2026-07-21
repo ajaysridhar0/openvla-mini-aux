@@ -29,7 +29,7 @@ The simulation HDF5 files use a separate data archive; see
 | `robocasa_x/` | modified RoboCasa benchmark runtime |
 | `dataset/rlds/` | unified HDF5-to-RLDS converter |
 | `configs/experiments.toml` | paper protocol and compatibility identifiers |
-| `scripts/` | release-data and experiment entry points |
+| `scripts/` | training, evaluation, RLDS conversion, and result summaries |
 | `tests/` | dependency-light compatibility tests |
 
 MimicGen produced the synthetic demonstrations. The final rendered HDF5 files
@@ -97,5 +97,4 @@ entry points use only paper names.
 ## Licenses
 
 New BARX code is MIT licensed. Vendored upstream components retain their own
-license files. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). The
-simulation dataset license must be selected before the data host is published.
+license files. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).

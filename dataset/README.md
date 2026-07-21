@@ -1,10 +1,8 @@
 # BARX simulation dataset
 
-The normalized HDF5 release is 283.13 GiB, so its files are distributed
-separately. `manifest.csv` lists every selected file, its final staged size,
-embodiment, task, demonstration count, seed, relative path, and paper dataset
-membership. Its checksum column remains empty until the final upload hashing
-pass.
+The normalized HDF5 dataset is 283.13 GiB and uses a separate data archive.
+`manifest.csv` lists every file, its size, SHA-256 checksum, embodiment, task,
+demonstration count, seed, relative path, and paper dataset membership.
 
 ## Contents
 
@@ -22,32 +20,13 @@ pick-and-place sink-to-counter, turn-on-sink-faucet, and flip-mug-upright.
 The manifest selects the final rendered and annotated simulation files used by
 the paper's XP-900, XP-3K, SP-900, and target-50 experiments.
 
-## Stage and finalize the release
+## Data format
 
-Do not edit the archival source tree in place. Create normalized copies:
-
-```bash
-uv run --locked python scripts/stage_release_data.py \
-  /path/to/original-data /path/to/barx-release-data
-```
-
-For a large copy, independent workers can process non-overlapping manifest
-shards by passing the same `--shard-count` and a distinct `--shard-index` to
-each invocation. A final unsharded invocation verifies the complete tree.
-
-All output actions then use
+All actions use
 `[arm(6), gripper(1), base(3), torso(1), mode(1)]`, independent of
 embodiment. Stored episode metadata uses `<ROBOCASA>/` package-relative asset
 paths instead of collection-machine paths. Exact evaluation replay uses the
-XML and settled states in `evaluation/conditions/`. Once all files have been
-staged, regenerate the checked release manifest from the output tree:
-
-```bash
-uv run --locked python scripts/build_data_manifest.py /path/to/barx-release-data \
-  --output dataset/manifest.csv --sha256 --hash-workers 4
-```
-
-The final release-validation pass hashes all 283 GiB.
+XML and settled states in `evaluation/conditions/`.
 
 ## RLDS conversion
 
@@ -74,9 +53,3 @@ The public action schema is
 `[dx, dy, dz, droll, dpitch, dyaw, gripper]`. Legacy RLDS fields such as
 `ee_pose_2D`, `obj_bboxes`, and `language_motions` remain unchanged to preserve
 training compatibility.
-
-## Publishing the data
-
-Choose the data host and dataset license, run the manifest command with
-`--sha256`, and add the download URL and archive instructions here. A
-dedicated dataset host is appropriate for the HDF5 archive.
