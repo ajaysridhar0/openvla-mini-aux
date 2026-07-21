@@ -1,0 +1,26 @@
+[
+  {
+    "name": "robosuite_xembod",
+    "url": "https://github.com/jensen-gao/robosuite_xembod.git",
+    "commit": "9f768495ad92ae37c4deba400caef017fb636256",
+    "install_order": 1
+  },
+  {
+    "name": "robocasa_xembod",
+    "url": "https://github.com/ajaysridhar0/robocasa_xembod.git",
+    "commit": "a674a0c92bba56906bf53176b8cc2c4ac5ad6f26",
+    "install_order": 2
+  },
+  {
+    "name": "robomimic_xembod",
+    "url": "https://github.com/ajaysridhar0/robomimic_xembod.git",
+    "commit": "c8b95467dd6918b3a5838bdb90a1912db8431810",
+    "install_order": 3
+  },
+  {
+    "name": "mimicgen_xembod",
+    "url": "https://github.com/ajaysridhar0/mg_robocasa_xembod.git",
+    "commit": "6a9f1fcb76c3d5ce902599fce7579aed9699086f",
+    "install_order": 4
+  }
+]

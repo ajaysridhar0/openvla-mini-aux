@@ -5,19 +5,12 @@ import os
 
 import imageio
 import numpy as np
-import tensorflow as tf
-# from libero.libero import get_libero_path
-# try:
-#     from libero.libero.envs import OffScreenRenderEnv
-# except ImportError:
-#     print("could not import libero.libero.envs.OffScreenRenderEnv since you are probably using robosuite version != 1.4.1")
-
 from PIL import Image
+
 from experiments.robot.robot_utils import (
     DATE,
     DATE_TIME,
 )
-
 
 # def get_libero_env(task, model_family, resolution=256):
 #     """Initializes and returns the LIBERO environment, along with the task description."""
@@ -40,7 +33,7 @@ def get_robocasa_dummy_action(robot_name: str):
         return [0] * 6 + [-1] + [0] * 4 + [-1]
     else:
         return [0] * 10 + [-1] + [-1]
-    
+
 
 def pad_action_robocasa(action: list, robot_type: str):
     if robot_type == "PandaOmron":
@@ -59,6 +52,8 @@ def resize_image(img, resize_size):
     NOTE (Moo Jin): To make input images in distribution with respect to the inputs seen at training time, we follow
                     the same resizing scheme used in the Octo dataloader, which OpenVLA uses for training.
     """
+    import tensorflow as tf
+
     assert isinstance(resize_size, tuple)
     # Resize to image size expected by model
     img = tf.image.encode_jpeg(img)  # Encode as JPEG, as done in RLDS dataset builder
@@ -80,7 +75,7 @@ def get_libero_image(obs, resize_size, key="agentview_image", flip_image=True, i
     # img = img[::-1, ::-1]  # IMPORTANT: rotate 180 degrees to match train preprocessing
     if is_robocasa:
         img = np.transpose(img, (1, 2, 0))
-        img = (255*img).astype(np.uint8)
+        img = (255 * img).astype(np.uint8)
     img = Image.fromarray(img)
     img = img.resize(resize_size, Image.Resampling.LANCZOS)  # resize to size seen at train time
     img = img.convert("RGB")
@@ -89,7 +84,7 @@ def get_libero_image(obs, resize_size, key="agentview_image", flip_image=True, i
 
 def patch_model_for_generation(model):
     """Add required attributes for newer transformers compatibility."""
-    if not hasattr(model, '_supports_cache_class'):
+    if not hasattr(model, "_supports_cache_class"):
         model._supports_cache_class = False
     return model
 

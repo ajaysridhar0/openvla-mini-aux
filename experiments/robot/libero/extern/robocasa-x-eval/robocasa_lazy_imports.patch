@@ -1,0 +1,27 @@
+diff --git a/robocasa/utils/robomimic/robomimic_dataset_utils.py b/robocasa/utils/robomimic/robomimic_dataset_utils.py
+index d44adb5..8f00470 100644
+--- a/robocasa/utils/robomimic/robomimic_dataset_utils.py
++++ b/robocasa/utils/robomimic/robomimic_dataset_utils.py
+@@ -1,11 +1,8 @@
+ import os
+ import h5py
+ import json
+-import torch
+ import numpy as np
+ 
+-import robocasa.utils.robomimic.robomimic_torch_utils as TorchUtils
+-
+ 
+ def get_env_metadata_from_dataset(dataset_path):
+     """
+@@ -29,6 +26,10 @@ def get_env_metadata_from_dataset(dataset_path):
+ 
+ 
+ def extract_action_dict(dataset):
++    import torch
++
++    import robocasa.utils.robomimic.robomimic_torch_utils as TorchUtils
++
+     # find files
+     f = h5py.File(os.path.expanduser(dataset), mode="r+")
+ 

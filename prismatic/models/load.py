@@ -29,6 +29,14 @@ HF_HUB_REPO = "TRI-ML/prismatic-vlms"
 VLA_HF_HUB_REPO = "openvla/openvla-dev"
 
 
+# Released BARX configs use Hugging Face repository slugs for the base VLM,
+# while the Prismatic registry uses the original internal model ID.
+BASE_VLM_ID_ALIASES = {
+    "prism-qwen25-extra-dinosiglip-224px-0_5b-stage-finetune-x7":
+        "prism-qwen25-extra-dinosiglip-224px+0_5b+stage-finetune+x7",
+}
+
+
 # === Available Models ===
 def available_models() -> List[str]:
     return list(MODEL_REGISTRY.keys())
@@ -257,11 +265,10 @@ def load_vla(
             base_cfg = json.load(f)["model"]
             base_vlm = base_cfg["model_id"]
 
-    overwatch.info(f"Base vlm: {base_vlm}")
-    try:
-        model_cfg = ModelConfig.get_choice_class(base_vlm)()
-    except KeyError:
-        model_cfg = ModelConfig.get_choice_class(Path(vla_cfg["base_vlm"]).name)()
+    base_vlm_id = Path(str(base_vlm)).name
+    base_vlm_id = BASE_VLM_ID_ALIASES.get(base_vlm_id, base_vlm_id)
+    overwatch.info(f"Base vlm: {base_vlm} (registry ID: {base_vlm_id})")
+    model_cfg = ModelConfig.get_choice_class(base_vlm_id)()
 
     # Load Dataset Statistics for Action Denormalization
     # TODO (ajaysri) :: Make this dynamic

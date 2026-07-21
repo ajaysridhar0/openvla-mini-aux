@@ -1,0 +1,165 @@
+version: 1
+
+training:
+  model_type: prism-qwen25-dinosiglip-224px+0_5b+mx-xembod-robocasa-full
+  global_batch_size: 256
+  per_device_batch_size: 32
+  learning_rate: 0.00002
+  finetune_steps: 3000
+  target_only_steps: 3000
+  finetune_save_interval: 1000
+  pretrain:
+    xp900:
+      pnp:
+        default: {max_steps: 100000, save_interval: 10000}
+      turn-on-sink-faucet:
+        default: {max_steps: 15000, save_interval: 5000}
+      flip-mug-upright:
+        joint-reps: {max_steps: 15000, save_interval: 5000}
+        no-reps: {max_steps: 25000, save_interval: 5000}
+        default: {max_steps: 15000, save_interval: 5000}
+    xp3k:
+      pnp:
+        default: {max_steps: 1000000, save_interval: 25000}
+      turn-on-sink-faucet:
+        default: {max_steps: 30000, save_interval: 10000}
+      flip-mug-upright:
+        default: {max_steps: 50000, save_interval: 10000}
+    sp900:
+      pnp:
+        default: {max_steps: 100000, save_interval: 10000}
+      turn-on-sink-faucet:
+        default: {max_steps: 15000, save_interval: 5000}
+      flip-mug-upright:
+        default: {max_steps: 15000, save_interval: 5000}
+
+representations:
+  no-reps:
+    run_id: base
+    transforms: action
+  joint-reps:
+    run_id: aux
+    transforms: bbox->,low_level_motion->,ee_pose_2D->,action
+  bbox:
+    run_id: bbox
+    transforms: bbox->,action
+  ee-trace:
+    run_id: ee
+    transforms: ee_pose_2D->,action
+  language-motion:
+    run_id: lm
+    transforms: low_level_motion->,action
+  ecot:
+    run_id: chain
+    transforms: bbox->low_level_motion->ee_pose_2D,action
+
+tasks:
+  pnp:
+    dataset: pnp
+    eval_environments: [pnp-counter-to-sink, pnp-sink-to-counter]
+  turn-on-sink-faucet:
+    dataset: turn-on-sink-faucet
+    eval_environments: [turn-on-sink-faucet]
+  flip-mug-upright:
+    dataset: flip-mug-upright
+    eval_environments: [flip-mug-upright]
+
+environments:
+  pnp-counter-to-sink:
+    name: PnPCounterToSink
+    task: pnp
+    source_robot: ur5e
+    max_steps: 600
+    object_ref: sink
+    subtask_offset: [10, 20]
+  pnp-sink-to-counter:
+    name: PnPSinkToCounter
+    task: pnp
+    source_robot: ur5e
+    max_steps: 600
+    object_ref: container
+    subtask_offset: [20, 30]
+    stage_2_interpolation_steps: false
+  turn-on-sink-faucet:
+    name: TurnOnSinkFaucet
+    task: turn-on-sink-faucet
+    source_robot: iiwa
+    max_steps: 650
+    object_ref: handle
+    subtask_signal: stage_contact_handle
+    subtask_offset: null
+    action_noise: 0.0
+  flip-mug-upright:
+    name: FlipMugUpright
+    task: flip-mug-upright
+    source_robot: ur5e
+    max_steps: 500
+    object_ref: obj
+    subtask_offset: [10, 20]
+
+robots:
+  panda:
+    name: PandaOmron
+    output_name: PandaOmron
+    gripper: Robotiq85Gripper
+    camera: panda_agentview_left
+    action_space: panda
+    target: true
+  panda-og:
+    name: PandaOmron
+    output_name: PandaOGOmron
+    gripper: PandaGripper
+    generation_gripper: PandaGripper
+    camera: panda_agentview_left
+    action_space: panda
+    target: true
+  jaco:
+    name: JacoOmron
+    output_name: JacoOmron
+    gripper: Robotiq85Gripper
+    camera: jaco_agentview_left
+    action_space: non-panda
+    target: true
+  iiwa:
+    name: IIWAOmron
+    output_name: IIWAOmron
+    gripper: Robotiq85Gripper
+    camera: iiwa_agentview_left
+    action_space: non-panda
+    target: false
+  ur5e:
+    name: UR5eOmron
+    output_name: UR5eOmron
+    gripper: Robotiq85Gripper
+    camera: ur5e_agentview_left
+    action_space: non-panda
+    target: false
+  kinova3:
+    name: Kinova3Omron
+    output_name: Kinova3Omron
+    gripper: Robotiq85Gripper
+    camera: kinova_agentview_left
+    action_space: non-panda
+    target: false
+
+generation:
+  num_demos: 100
+  guarantee_success: true
+  keep_failed: true
+  select_source_per_subtask: true
+  transform_first_robot_pose: true
+  interpolation_steps: 5
+  action_noise: 0.05
+  nearest_neighbors: 5
+  render_successes: 5
+  render_failures: 5
+
+evaluation:
+  trials: 100
+  smoke_trials: 1
+  start_seed: 1000
+  act_horizon: 8
+  settling_steps: 10
+  object_groups: obj_set1
+  save_videos: true
+  max_videos: 10

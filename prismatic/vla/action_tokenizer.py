@@ -5,6 +5,7 @@ Extension class; wraps base LLM/VLM tokenizer with logic to discretize and token
 """
 
 import json
+import os
 from functools import partial
 from pathlib import Path
 from typing import List, Union
@@ -16,42 +17,97 @@ from transformers.models.qwen2.tokenization_qwen2_fast import Qwen2TokenizerFast
 
 from prismatic.overwatch.overwatch import initialize_overwatch
 
-
 overwatch = initialize_overwatch(__name__)
 
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+VQ_ROOT = Path(os.environ.get("BARX_VQ_ROOT", REPO_ROOT / "vq")).expanduser().resolve()
+
+
+def _repo_vq_path(dirname: str) -> str:
+    return str(VQ_ROOT / dirname)
+
+
+def _is_valid_vq_dir(vq_dir: Path) -> bool:
+    return (vq_dir / "config.json").exists() and (vq_dir / "checkpoints" / "model.pt").exists()
+
+
+def _register_vq_action_tokenizer(action_tokenizers, tokenizer_name: str, vq_dir: Path) -> None:
+    action_tokenizers[tokenizer_name] = partial(VQActionTokenizer, vq_vae_path=str(vq_dir), use_extra=True)
+
+
 ROBOCASA_X_VQ_ACTION_TOKENIZER_DIRS = {
-    "robocasa-x-xp3k-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_xp3k_pnp",
-    "robocasa-x-xp900-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_xp900_pnp",
-    "robocasa-x-xp3k-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_xp3k_turn_on_sink_faucet",
-    "robocasa-x-xp900-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_xp900_turn_on_sink_faucet",
-    "robocasa-x-xp3k-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_xp3k_flip_mug_upright",
-    "robocasa-x-xp900-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_xp900_flip_mug_upright",
-    "robocasa-x-sp900-panda-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_panda_pnp",
-    "robocasa-x-sp900-panda-og-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_panda_og_pnp",
-    "robocasa-x-sp900-jaco-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_jaco_pnp",
-    "robocasa-x-sp900-panda-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_panda_turn_on_sink_faucet",
-    "robocasa-x-sp900-panda-og-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_panda_og_turn_on_sink_faucet",
-    "robocasa-x-sp900-jaco-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_jaco_turn_on_sink_faucet",
-    "robocasa-x-sp900-panda-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_panda_flip_mug_upright",
-    "robocasa-x-sp900-panda-og-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_panda_og_flip_mug_upright",
-    "robocasa-x-sp900-jaco-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_sp900_jaco_flip_mug_upright",
-    "robocasa-x-target-panda-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_target_panda_pnp",
-    "robocasa-x-target-panda-og-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_target_panda_og_pnp",
-    "robocasa-x-target-jaco-pnp-vq-extra-action-tokenizer": "vq/robocasa_x_target_jaco_pnp",
-    "robocasa-x-target-panda-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_target_panda_turn_on_sink_faucet",
-    "robocasa-x-target-panda-og-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_target_panda_og_turn_on_sink_faucet",
-    "robocasa-x-target-jaco-turn-on-sink-faucet-vq-extra-action-tokenizer": "vq/robocasa_x_target_jaco_turn_on_sink_faucet",
-    "robocasa-x-target-panda-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_target_panda_flip_mug_upright",
-    "robocasa-x-target-panda-og-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_target_panda_og_flip_mug_upright",
-    "robocasa-x-target-jaco-flip-mug-upright-vq-extra-action-tokenizer": "vq/robocasa_x_target_jaco_flip_mug_upright",
+    "robocasa-x-xp3k-pnp-vq-extra-action-tokenizer": _repo_vq_path("robocasa_x_xp3k_pnp"),
+    "robocasa-x-xp900-pnp-vq-extra-action-tokenizer": _repo_vq_path("robocasa_x_xp900_pnp"),
+    "robocasa-x-xp3k-turn-on-sink-faucet-vq-extra-action-tokenizer": _repo_vq_path(
+        "robocasa_x_xp3k_turn_on_sink_faucet"
+    ),
+    "robocasa-x-xp900-turn-on-sink-faucet-vq-extra-action-tokenizer": _repo_vq_path(
+        "robocasa_x_xp900_turn_on_sink_faucet"
+    ),
+    "robocasa-x-xp3k-flip-mug-upright-vq-extra-action-tokenizer": _repo_vq_path("robocasa_x_xp3k_flip_mug_upright"),
+    "robocasa-x-xp900-flip-mug-upright-vq-extra-action-tokenizer": _repo_vq_path("robocasa_x_xp900_flip_mug_upright"),
+    "robocasa-x-sp900-panda-pnp-vq-extra-action-tokenizer": _repo_vq_path("robocasa_x_sp900_panda_pnp"),
+    "robocasa-x-sp900-panda-og-pnp-vq-extra-action-tokenizer": _repo_vq_path("robocasa_x_sp900_panda_og_pnp"),
+    "robocasa-x-sp900-jaco-pnp-vq-extra-action-tokenizer": _repo_vq_path("robocasa_x_sp900_jaco_pnp"),
+    "robocasa-x-sp900-panda-turn-on-sink-faucet-vq-extra-action-tokenizer": _repo_vq_path(
+        "robocasa_x_sp900_panda_turn_on_sink_faucet"
+    ),
+    "robocasa-x-sp900-panda-og-turn-on-sink-faucet-vq-extra-action-tokenizer": _repo_vq_path(
+        "robocasa_x_sp900_panda_og_turn_on_sink_faucet"
+    ),
+    "robocasa-x-sp900-jaco-turn-on-sink-faucet-vq-extra-action-tokenizer": _repo_vq_path(
+        "robocasa_x_sp900_jaco_turn_on_sink_faucet"
+    ),
+    "robocasa-x-sp900-panda-flip-mug-upright-vq-extra-action-tokenizer": _repo_vq_path(
+        "robocasa_x_sp900_panda_flip_mug_upright"
+    ),
+    "robocasa-x-sp900-panda-og-flip-mug-upright-vq-extra-action-tokenizer": _repo_vq_path(
+        "robocasa_x_sp900_panda_og_flip_mug_upright"
+    ),
+    "robocasa-x-sp900-jaco-flip-mug-upright-vq-extra-action-tokenizer": _repo_vq_path(
+        "robocasa_x_sp900_jaco_flip_mug_upright"
+    ),
+    "robocasa-x-target-panda-pnp-vq-extra-action-tokenizer": _repo_vq_path("robocasa_x_target_panda_pnp"),
+    "robocasa-x-target-panda-og-pnp-vq-extra-action-tokenizer": _repo_vq_path("robocasa_x_target_panda_og_pnp"),
+    "robocasa-x-target-jaco-pnp-vq-extra-action-tokenizer": _repo_vq_path("robocasa_x_target_jaco_pnp"),
+    "robocasa-x-target-panda-turn-on-sink-faucet-vq-extra-action-tokenizer": _repo_vq_path(
+        "robocasa_x_target_panda_turn_on_sink_faucet"
+    ),
+    "robocasa-x-target-panda-og-turn-on-sink-faucet-vq-extra-action-tokenizer": _repo_vq_path(
+        "robocasa_x_target_panda_og_turn_on_sink_faucet"
+    ),
+    "robocasa-x-target-jaco-turn-on-sink-faucet-vq-extra-action-tokenizer": _repo_vq_path(
+        "robocasa_x_target_jaco_turn_on_sink_faucet"
+    ),
+    "robocasa-x-target-panda-flip-mug-upright-vq-extra-action-tokenizer": _repo_vq_path(
+        "robocasa_x_target_panda_flip_mug_upright"
+    ),
+    "robocasa-x-target-panda-og-flip-mug-upright-vq-extra-action-tokenizer": _repo_vq_path(
+        "robocasa_x_target_panda_og_flip_mug_upright"
+    ),
+    "robocasa-x-target-jaco-flip-mug-upright-vq-extra-action-tokenizer": _repo_vq_path(
+        "robocasa_x_target_jaco_flip_mug_upright"
+    ),
+}
+
+# Backwards-compatible names embedded in the released BARX checkpoint configs.
+# Each alias resolves to the corresponding public RoboCasa-X tokenizer folder
+# documented in BARX_README.md; no private legacy folder is required.
+ROBOCASA_X_VQ_ACTION_TOKENIZER_ALIASES = {
+    "mg_pnp_vq_extra_action_tokenizer": "robocasa_x_xp3k_pnp",
+    "mg_pnp_lite_vq_extra_action_tokenizer": "robocasa_x_xp900_pnp",
+    "mg_turn_on_sink_vq_extra_action_tokenizer": "robocasa_x_xp3k_turn_on_sink_faucet",
+    "mg_turn_on_sink_lite_vq_extra_action_tokenizer": "robocasa_x_xp900_turn_on_sink_faucet",
+    "mg_flip_mug_vq_extra_action_tokenizer": "robocasa_x_xp3k_flip_mug_upright",
+    "mg_flip_mug_lite_vq_extra_action_tokenizer": "robocasa_x_xp900_flip_mug_upright",
 }
 
 
 class ActionTokenizer:
     # Universal EOS token ID used across the codebase
     EOS_TOKEN_ID = 151645
-    
+
     def __init__(
         self,
         tokenizer: PreTrainedTokenizerBase,
@@ -294,4 +350,16 @@ ACTION_TOKENIZERS = {
 }
 
 for tokenizer_name, vq_dir in ROBOCASA_X_VQ_ACTION_TOKENIZER_DIRS.items():
-    ACTION_TOKENIZERS[tokenizer_name] = partial(VQActionTokenizer, vq_vae_path=vq_dir, use_extra=True)
+    _register_vq_action_tokenizer(ACTION_TOKENIZERS, tokenizer_name, Path(vq_dir))
+
+for tokenizer_name, vq_dirname in ROBOCASA_X_VQ_ACTION_TOKENIZER_ALIASES.items():
+    _register_vq_action_tokenizer(ACTION_TOKENIZERS, tokenizer_name, VQ_ROOT / vq_dirname)
+
+# Preserve historical short names such as `mg_pnp_lite_vq_extra_action_tokenizer` by
+# registering any valid top-level tokenizer directory that exists in the checked-out repo.
+if VQ_ROOT.exists():
+    for vq_dir in sorted(VQ_ROOT.iterdir()):
+        if not vq_dir.is_dir() or not _is_valid_vq_dir(vq_dir):
+            continue
+        tokenizer_name = f"{vq_dir.name}_vq_extra_action_tokenizer"
+        ACTION_TOKENIZERS.setdefault(tokenizer_name, partial(VQActionTokenizer, vq_vae_path=str(vq_dir), use_extra=True))

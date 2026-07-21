@@ -7,15 +7,8 @@ import time
 from pathlib import Path
 
 import numpy as np
-import tensorflow as tf
 import torch
 from PIL import Image
-from transformers import AutoConfig, AutoImageProcessor, AutoModelForVision2Seq, AutoProcessor
-
-from prismatic.extern.hf.configuration_prismatic import OpenVLAConfig
-from prismatic.extern.hf.modeling_prismatic import OpenVLAForActionPrediction
-from prismatic.extern.hf.processing_prismatic import PrismaticImageProcessor, PrismaticProcessor
-from prismatic.models.load import load_vla
 
 # Initialize important constants and pretty-printing mode in NumPy.
 ACTION_DIM = 7
@@ -31,20 +24,34 @@ OPENVLA_V01_SYSTEM_PROMPT = (
 )
 
 
+def resolve_hf_token(token_source):
+    """Resolve an optional token file or environment-variable name."""
+    if token_source is None:
+        return None
+    if isinstance(token_source, Path):
+        return token_source.read_text().strip() if token_source.is_file() else None
+    token_path = Path(token_source)
+    if token_path.is_file():
+        return token_path.read_text().strip()
+    return os.environ.get(token_source)
+
+
 def get_prismatic_vla(cfg):
     """Loads and returns a VLA model from checkpoint."""
+    from prismatic.models.load import load_vla
+
     # Prepare for model loading.
     print(f"[*] Initializing Generation Playground with `{cfg.model_family}`")
-    hf_token = cfg.hf_token.read_text().strip() if isinstance(cfg.hf_token, Path) else os.environ[cfg.hf_token]
+    hf_token = resolve_hf_token(cfg.hf_token)
     # set_seed(cfg.seed)
     # Load VLA checkpoint.
     print(f"Loading VLM from checkpoint: {cfg.pretrained_checkpoint}")
-    
+
     # Check if we should randomly initialize LLM weights
-    random_llm_weights = getattr(cfg, 'random_llm_weights', False)
+    random_llm_weights = getattr(cfg, "random_llm_weights", False)
     if random_llm_weights:
-        print(f"[*] Using randomly initialized LLM weights (for ablation study)")
-    
+        print("[*] Using randomly initialized LLM weights (for ablation study)")
+
     vla = load_vla(
         cfg.pretrained_checkpoint,
         hf_token=hf_token,
@@ -64,6 +71,12 @@ def get_prismatic_vla(cfg):
 
 def get_vla(cfg):
     """Loads and returns a VLA model from checkpoint."""
+    from transformers import AutoConfig, AutoImageProcessor, AutoModelForVision2Seq, AutoProcessor
+
+    from prismatic.extern.hf.configuration_prismatic import OpenVLAConfig
+    from prismatic.extern.hf.modeling_prismatic import OpenVLAForActionPrediction
+    from prismatic.extern.hf.processing_prismatic import PrismaticImageProcessor, PrismaticProcessor
+
     # Load VLA checkpoint.
     print("[*] Instantiating Pretrained VLA model")
     print("[*] Loading in BF16 with Flash-Attention Enabled")
@@ -108,6 +121,8 @@ def get_vla(cfg):
 
 def get_processor(cfg):
     """Get VLA model's Hugging Face processor."""
+    from transformers import AutoProcessor
+
     processor = AutoProcessor.from_pretrained(cfg.pretrained_checkpoint, trust_remote_code=True)
     return processor
 
@@ -124,6 +139,11 @@ def crop_and_resize(image, crop_scale, batch_size):
         crop_scale: The area of the center crop with respect to the original image.
         batch_size: Batch size.
     """
+    # TensorFlow is only needed by the legacy OpenVLA center-crop path. Keeping
+    # this import local avoids loading TensorFlow during every BARX/Prismatic
+    # evaluator startup.
+    import tensorflow as tf
+
     # Convert from 3D Tensor (H, W, C) to 4D Tensor (batch_size, H, W, C)
     assert image.shape.ndims == 3 or image.shape.ndims == 4
     expanded_dims = False
@@ -193,6 +213,8 @@ def get_vla_action(vla, processor, base_vla_name, obs, task_label, unnorm_key, c
     # IMPORTANT: Let's say crop scale == 0.9. To get the new height and width (post-crop), multiply
     #            the original height and width by sqrt(0.9) -- not 0.9!
     if center_crop:
+        import tensorflow as tf
+
         batch_size = 1
         crop_scale = 0.9
 
@@ -226,11 +248,13 @@ def get_vla_action(vla, processor, base_vla_name, obs, task_label, unnorm_key, c
     inputs = processor(prompt, image).to(DEVICE, dtype=torch.bfloat16)
 
     # Get action.
-    action = vla.predict_action(**inputs, unnorm_key=unnorm_key, do_sample=False)['action']
+    action = vla.predict_action(**inputs, unnorm_key=unnorm_key, do_sample=False)["action"]
     return action
 
 
-def get_prismatic_vla_action(vla, processor, base_vla_name, obs, task_label, unnorm_key, aux_task_types=None, center_crop=False, **kwargs):
+def get_prismatic_vla_action(
+    vla, processor, base_vla_name, obs, task_label, unnorm_key, aux_task_types=None, center_crop=False, **kwargs
+):
     """Generates an action with the VLA policy."""
 
     if not isinstance(obs["full_image"], list):
@@ -266,5 +290,7 @@ def get_prismatic_vla_action(vla, processor, base_vla_name, obs, task_label, unn
     if len(processed_images) == 1:
         processed_images = processed_images[0]
 
-    action = vla.predict_action(processed_images, task_label, unnorm_key=unnorm_key, aux_task_types=aux_task_types, **kwargs)
+    action = vla.predict_action(
+        processed_images, task_label, unnorm_key=unnorm_key, aux_task_types=aux_task_types, **kwargs
+    )
     return action

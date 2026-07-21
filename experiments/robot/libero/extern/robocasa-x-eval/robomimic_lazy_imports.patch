@@ -1,0 +1,57 @@
+diff --git a/robomimic/utils/file_utils.py b/robomimic/utils/file_utils.py
+index 819b0df..9bc3774 100644
+--- a/robomimic/utils/file_utils.py
++++ b/robomimic/utils/file_utils.py
+@@ -11,14 +11,7 @@ import numpy as np
+ from collections import OrderedDict
+ from tqdm import tqdm
+ 
+-import torch
+-
+-import robomimic.utils.obs_utils as ObsUtils
+ import robomimic.utils.env_utils as EnvUtils
+-import robomimic.utils.torch_utils as TorchUtils
+-from robomimic.config import config_factory
+-from robomimic.algo import algo_factory
+-from robomimic.algo import RolloutPolicy
+ 
+ 
+ def create_hdf5_filter_key(hdf5_path, demo_keys, key_name):
+@@ -132,6 +125,8 @@ def get_shape_metadata_from_dataset(dataset_path, action_keys, all_obs_keys=None
+             :`'use_images'`: bool, whether or not image modalities are present
+     """
+ 
++    import robomimic.utils.obs_utils as ObsUtils
++
+     shape_meta = {}
+ 
+     # read demo file for some metadata
+@@ -222,6 +217,8 @@ def load_dict_from_checkpoint(ckpt_path):
+     Returns:
+         ckpt_dict (dict): Loaded checkpoint dictionary.
+     """
++    import torch
++
+     ckpt_path = os.path.expanduser(ckpt_path)
+     if not torch.cuda.is_available():
+         ckpt_dict = torch.load(ckpt_path, map_location=lambda storage, loc: storage)
+@@ -377,6 +374,8 @@ def config_from_checkpoint(algo_name=None, ckpt_path=None, ckpt_dict=None, verbo
+         ckpt_dict (dict): loaded checkpoint dictionary (convenient to avoid
+             re-loading checkpoint from disk multiple times)
+     """
++    from robomimic.config import config_factory
++
+     ckpt_dict = maybe_dict_from_checkpoint(ckpt_path=ckpt_path, ckpt_dict=ckpt_dict)
+     if algo_name is None:
+         algo_name, _ = algo_name_from_checkpoint(ckpt_dict=ckpt_dict)
+@@ -419,6 +418,10 @@ def policy_from_checkpoint(device=None, ckpt_path=None, ckpt_dict=None, verbose=
+         ckpt_dict (dict): loaded checkpoint dictionary (convenient to avoid
+             re-loading checkpoint from disk multiple times)
+     """
++    import robomimic.utils.obs_utils as ObsUtils
++    import robomimic.utils.torch_utils as TorchUtils
++    from robomimic.algo import RolloutPolicy, algo_factory
++
+     ckpt_dict = maybe_dict_from_checkpoint(ckpt_path=ckpt_path, ckpt_dict=ckpt_dict)
+ 
+     # algo name and config from model dict

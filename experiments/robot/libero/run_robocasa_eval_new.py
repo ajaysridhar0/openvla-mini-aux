@@ -1,68 +1,43 @@
-"""
-run_libero_eval.py
+"""Run BARX policy rollouts in the pinned RoboCasa evaluation environment."""
 
-Runs a model in a LIBERO simulation environment.
-
-Usage:
-    # OpenVLA:
-    # IMPORTANT: Set `center_crop=True` if model is fine-tuned with augmentations
-    python experiments/robot/libero/run_libero_eval.py \
-        --model_family openvla \
-        --pretrained_checkpoint <CHECKPOINT_PATH> \
-        --task_suite_name [ libero_spatial | libero_object | libero_goal | libero_10 | libero_90 ] \
-        --center_crop [ True | False ] \
-        --run_id_note <OPTIONAL TAG TO INSERT INTO RUN ID FOR LOGGING> \
-        --use_wandb [ True | False ] \
-        --wandb_project <PROJECT> \
-        --wandb_entity <ENTITY>
-"""
-
+import json
 import os
+import random
+import re
 import sys
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import List, Optional, Union, Tuple
-from termcolor import colored
+from typing import Any, Dict, List, Optional, Union
 
+import cv2
 import draccus
 import numpy as np
 import tqdm
-import re
+from termcolor import colored
 
-import wandb
-import cv2
-from matplotlib import colors
-import random
+# Append the repository root so the script also works when invoked from this directory.
+REPO_ROOT = Path(__file__).resolve().parents[3]
+sys.path.append(str(REPO_ROOT))
+import robocasa.utils.robomimic.robomimic_obs_utils as ObsUtils  # noqa: E402
+from robocasa.utils.robomimic.robomimic_env_utils import create_env  # noqa: E402
+from robosuite.controllers import load_composite_controller_config  # noqa: E402
 
-
-# Append current directory so that interpreter can find experiments.robot
-sys.path.append("../..")
-from experiments.robot.libero.libero_utils import (
-    get_robocasa_dummy_action, 
+from experiments.robot.libero.libero_utils import (  # noqa: E402
+    get_robocasa_dummy_action,
     pad_action_robocasa,
+    patch_model_for_generation,
     quat2axisangle,
     save_rollout_video,
-    patch_model_for_generation,
 )
-from experiments.robot.openvla_utils import get_processor
-from experiments.robot.robot_utils import (
+from experiments.robot.openvla_utils import get_processor  # noqa: E402
+from experiments.robot.robot_utils import (  # noqa: E402
     DATE_TIME,
     get_action,
-    get_image_resize_size,
     get_model,
     invert_gripper_action,
     normalize_gripper_action,
     set_seed_everywhere,
 )
-
-# Core imports needed
-import robocasa
-from robocasa.utils.robomimic.robomimic_env_utils import create_env
-import robocasa.utils.robomimic.robomimic_obs_utils as ObsUtils
-from robosuite.controllers import load_composite_controller_config
-import robosuite
-import h5py
-import json
 
 
 @dataclass
@@ -72,218 +47,242 @@ class GenerateConfig:
     #################################################################################################################
     # Model-specific parameters
     #################################################################################################################
-    model_family: str = "prismatic"                    # Model family
-    hf_token: str = Path(".hf_token")                       # Model family
-    pretrained_checkpoint: Union[str, Path] = ""     # Pretrained checkpoint path
-    load_in_8bit: bool = False                       # (For OpenVLA only) Load with 8-bit quantization
-    load_in_4bit: bool = False                       # (For OpenVLA only) Load with 4-bit quantization
-    random_llm_weights: bool = False                 # Randomly initialize LLM weights (for ablation studies)
+    model_family: str = "prismatic"
+    hf_token: Union[str, Path] = Path(".hf_token")
+    pretrained_checkpoint: Union[str, Path] = ""
+    load_in_8bit: bool = False
+    load_in_4bit: bool = False
+    random_llm_weights: bool = False
 
-    center_crop: bool = False                        # Center crop? (if trained w/ random crop image aug)
-    obs_history: int = 1                             # Number of images to pass in from history
-    use_wrist_image: bool = False                    # Use wrist images (doubles the number of input images)
-    unnorm_key: str = None
+    center_crop: bool = False
+    obs_history: int = 1
+    use_wrist_image: bool = False
+    unnorm_key: Optional[str] = None
 
     #################################################################################################################
-    # ROBOCASA environment-specific parameters
+    # RoboCasa environment-specific parameters
     #################################################################################################################
-    robot: str = None                              
-    task: str = None
-    num_steps_wait: int = 10                         # Number of steps to wait for objects to stabilize in sim
-    num_trials_per_task: int = 100                   # Number of rollouts per task
+    robot: Optional[str] = None
+    task: Optional[str] = None
+    num_steps_wait: int = 10
+    num_trials_per_task: int = 100
     max_steps: int = 600
     use_distractors: bool = True
-    obj_groups: str = "obj_set1"
+    obj_groups: Optional[str] = "obj_set1"
     generative_textures: bool = True
-    controller: str = None
+    controller: Optional[str] = None
     gripper_types: str = "default"
 
     #################################################################################################################
-    # Utils
+    # Output and runtime parameters
     #################################################################################################################
     run_id: str = "robocasa_xembod_eval"
-    run_id_note: Optional[str] = None                # Extra note to add in run ID for logging
-    local_log_dir: str = "./experiments/logs"        # Local directory for eval logs
-    prefix: str = ''
+    run_id_note: Optional[str] = None
+    local_log_dir: str = "./experiments/logs"
+    prefix: str = ""
 
-    use_wandb: bool = False                          # Whether to also log results in Weights & Biases
-    wandb_project: str = "prismatic"        # Name of W&B project to log to (use default!)
-    wandb_entity: Optional[str] = None          # Name of entity to log under
+    use_wandb: bool = False
+    wandb_project: str = "prismatic"
+    wandb_entity: Optional[str] = None
 
-    seed: int = 7                                    # Random Seed (for reproducibility)
+    seed: int = 7
     start_seed: int = 1000
 
-    aux_task_types: Optional[str] = None     # Auxiliary task types to query before action prediction
+    aux_task_types: Optional[str] = None
     aux_context_freq: int = 1
-    obj_xinit_range: float = None
-    obj_yinit_range: float = None
+    obj_xinit_range: Optional[float] = None
+    obj_yinit_range: Optional[float] = None
     act_horizon: int = 1
-    rollout_dir: str = None
+    rollout_dir: Optional[str] = None
     camera_width: int = 320
     camera_height: int = 180
+    save_videos: bool = True
+    max_videos: int = 10
+    result_filename: str = "result.json"
+    trials_filename: str = "trials.jsonl"
+    protocol_version: str = "barx-robocasa-v1"
+    camera: Optional[str] = None
     # fmt: on
 
 
 END_TEXT = "<|im_end|>"
 
 
-def draw_bbox_on_image(img, bbox_dict, color_map):
-    """Draw bounding boxes on image with consistent colors per object.
-    
-    Args:
-        img: numpy array of shape (H,W,3) with values in [0,255]
-        bbox_dict: dict of object_name: [x1,y1,x2,y2] in normalized coordinates
-        color_map: dict mapping object names to RGB colors
-    """
+def extract_step_k(checkpoint: Union[str, Path]) -> Optional[str]:
+    """Extract the historical ``2k``-style rollout tag from a checkpoint name."""
+    match = re.search(r"step-(\d{6})-epoch", str(checkpoint))
+    if match is None:
+        return None
+    step_num = int(match.group(1))
+    rounded_k = round(step_num / 1000, 1)
+    return f"{rounded_k}k".replace(".", "_")
+
+
+def checkpoint_tag(checkpoint: Union[str, Path]) -> str:
+    """Return a filesystem-safe tag for paths, Hub IDs, and nonstandard filenames."""
+    step_tag = extract_step_k(checkpoint)
+    if step_tag is not None:
+        return step_tag
+
+    checkpoint_name = str(checkpoint).rstrip("/").rsplit("/", maxsplit=1)[-1]
+    checkpoint_name = Path(checkpoint_name).stem
+    safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "-", checkpoint_name).strip("-._")
+    return safe_name or "checkpoint"
+
+
+def camera_for_robot(robot: str) -> str:
+    """Resolve the robot-relative third-person camera used by BARX."""
+    robot_name = robot.lower()
+    for robot_prefix in ("panda", "kinova", "ur5e", "iiwa", "jaco"):
+        if robot_prefix in robot_name:
+            return f"{robot_prefix}_agentview_left"
+    return "robot0_agentview_left"
+
+
+def append_jsonl(path: Path, record: Dict[str, Any]) -> None:
+    """Append one durable trial record."""
+    with path.open("a", encoding="utf-8") as output_file:
+        output_file.write(json.dumps(record, sort_keys=True) + "\n")
+        output_file.flush()
+
+
+def write_json(path: Path, payload: Dict[str, Any]) -> None:
+    """Atomically publish the current aggregate result."""
+    temporary_path = path.with_suffix(path.suffix + ".tmp")
+    with temporary_path.open("w", encoding="utf-8") as output_file:
+        json.dump(payload, output_file, indent=2, sort_keys=True)
+        output_file.write("\n")
+    os.replace(temporary_path, path)
+
+
+def public_config(cfg: GenerateConfig) -> Dict[str, Any]:
+    """Serialize evaluation settings without recording credential locations."""
+    config = asdict(cfg)
+    config.pop("hf_token", None)
+    for key, value in config.items():
+        if isinstance(value, Path):
+            config[key] = str(value)
+    return config
+
+
+def build_result(cfg: GenerateConfig, trial_records: List[Dict[str, Any]], status: str) -> Dict[str, Any]:
+    """Build a machine-readable aggregate while retaining incomplete or failed trials."""
+    completed_records = [record for record in trial_records if record.get("error") is None]
+    total_successes = sum(bool(record.get("success")) for record in completed_records)
+    completed_trials = len(completed_records)
+    success_rate = 100.0 * total_successes / completed_trials if completed_trials else 0.0
+    return {
+        "status": status,
+        "protocol_version": cfg.protocol_version,
+        "config": public_config(cfg),
+        "requested_trials": cfg.num_trials_per_task,
+        "recorded_trials": len(trial_records),
+        "completed_trials": completed_trials,
+        "total_successes": total_successes,
+        "success_rate": success_rate,
+        "seeds": [record["seed"] for record in trial_records],
+        "trials": trial_records,
+    }
+
+
+def draw_bbox_on_image(img: np.ndarray, bbox_dict: Dict[str, Any], color_map: Dict[str, Any]) -> np.ndarray:
+    """Draw normalized bounding boxes with stable per-object colors."""
     img_with_bbox = img.copy()
-    h, w = img.shape[:2]
-    
+    height, width = img.shape[:2]
+
     for obj_name, bbox in bbox_dict.items():
         if obj_name not in color_map:
-            # Generate random RGB color if not already assigned
             color_map[obj_name] = tuple(random.random() for _ in range(3))
-        
+
         color = color_map[obj_name]
         x1, y1, x2, y2 = bbox
-        
-        # Convert normalized coords to pixel coords
-        x1, x2 = int(x1 * w), int(x2 * w)
-        y1, y2 = int(y1 * h), int(y2 * h)
-        
-        # Draw rectangle
-        cv2.rectangle(img_with_bbox, (x1, y1), (x2, y2), 
-                     tuple(int(c * 255) for c in color), 2)
-        
-        # Add label
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(img_with_bbox, obj_name, (x1, y1-5), font, 0.5, 
-                    tuple(int(c * 255) for c in color), 1)
-    
+        x1, x2 = int(x1 * width), int(x2 * width)
+        y1, y2 = int(y1 * height), int(y2 * height)
+        display_color = tuple(int(component * 255) for component in color)
+
+        cv2.rectangle(img_with_bbox, (x1, y1), (x2, y2), display_color, 2)
+        cv2.putText(img_with_bbox, obj_name, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, display_color, 1)
+
     return img_with_bbox
 
 
-def extract_step_k(s):
-    match = re.search(r'step-(\d{6})-epoch', s)
-    if match:
-        step_num = int(match.group(1))
-        rounded_k = round(step_num / 1000, 1)
- 
-        return f"{rounded_k}k".replace(".", "_")
-    return None
-
-
-def draw_trajectory_on_image(img, trajectory_points):
-    """Draw end-effector trajectory on image.
-    
-    Args:
-        img: numpy array of shape (H,W,3) with values in [0,255]
-        trajectory_points: list of (x,y) tuples in normalized coordinates
-    """
+def draw_trajectory_on_image(img: np.ndarray, trajectory_points: Any) -> np.ndarray:
+    """Draw normalized end-effector trajectory points."""
     img_with_traj = img.copy()
-    h, w = img.shape[:2]
-    
-    # Convert normalized coordinates to pixel coordinates
-    pixel_points = [(int(x * w), int(y * h)) for x, y in trajectory_points]
-    
-    # Draw lines connecting consecutive points
-    for i in range(len(pixel_points)-1):
-        cv2.line(img_with_traj, pixel_points[i], pixel_points[i+1], 
-                (0, 255, 0), 2)  # Green color for trajectory
-        
-    # Draw points
+    height, width = img.shape[:2]
+    pixel_points = [(int(x * width), int(y * height)) for x, y in trajectory_points]
+
+    for start, end in zip(pixel_points[:-1], pixel_points[1:]):
+        cv2.line(img_with_traj, start, end, (0, 255, 0), 2)
     for point in pixel_points:
-        cv2.circle(img_with_traj, point, 3, (255, 0, 0), -1)  # Red dots for waypoints
-        
+        cv2.circle(img_with_traj, point, 3, (255, 0, 0), -1)
     return img_with_traj
 
 
-def draw_motion_text_on_image(img, motion_text):
-    """Draw motion text as subtitles on the image with black background and white text.
-    
-    Args:
-        img: numpy array of shape (H,W,3) with values in [0,255]
-        motion_text: string describing the motion
-    """
+def draw_motion_text_on_image(img: np.ndarray, motion_text: str) -> np.ndarray:
+    """Draw low-level motion text as a centered subtitle."""
     img_with_text = img.copy()
-    h, w = img.shape[:2]
-    
-    # Remove end token if present
-    motion_text = motion_text.replace('<|im_end|>', '').strip()
-    
-    # Font settings
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 0.5  # Reduced from 0.7
-    font_thickness = 1
-    text_color = (255, 255, 255)  # White text
-    bg_color = (0, 0, 0)  # Black background
-    
-    # Split text into lines if too long (wrap at ~40 chars)
+    height, width = img.shape[:2]
+    motion_text = motion_text.replace(END_TEXT, "").strip()
+
     words = motion_text.split()
     lines = []
     current_line = []
     current_length = 0
-    
     for word in words:
-        if current_length + len(word) + 1 <= 40:  # +1 for space
+        if current_length + len(word) + 1 <= 40:
             current_line.append(word)
             current_length += len(word) + 1
         else:
-            lines.append(' '.join(current_line))
+            lines.append(" ".join(current_line))
             current_line = [word]
             current_length = len(word)
     if current_line:
-        lines.append(' '.join(current_line))
-    
-    # Calculate text sizes and positions
-    padding = 8  # Slightly reduced padding to match smaller text
-    line_spacing = 4  # Slightly reduced spacing to match smaller text
-    total_height = 0
-    
-    # Get size of each line
-    line_sizes = []
-    for line in lines:
-        (text_width, text_height), _ = cv2.getTextSize(line, font, font_scale, font_thickness)
-        line_sizes.append((text_width, text_height))
-        total_height += text_height + line_spacing
-    
-    # Calculate starting y position (near bottom of image)
-    y_pos = h - total_height - padding
-    
-    # Draw background and text for each line
+        lines.append(" ".join(current_line))
+
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.5
+    font_thickness = 1
+    padding = 8
+    line_spacing = 4
+    line_sizes = [cv2.getTextSize(line, font, font_scale, font_thickness)[0] for line in lines]
+    total_height = sum(text_height + line_spacing for _, text_height in line_sizes)
+    y_pos = height - total_height - padding
+
     for line, (text_width, text_height) in zip(lines, line_sizes):
-        # Calculate text position
-        x_pos = (w - text_width) // 2  # Center text
-        
-        # Draw background rectangle
-        bg_pts = np.array([[x_pos - padding, y_pos - padding],
-                          [x_pos + text_width + padding, y_pos + text_height + padding]])
-        cv2.rectangle(img_with_text, bg_pts[0], bg_pts[1], bg_color, -1)
-        
-        # Draw text
-        cv2.putText(img_with_text, line, (x_pos, y_pos + text_height), 
-                    font, font_scale, text_color, font_thickness)
-        
+        x_pos = (width - text_width) // 2
+        cv2.rectangle(
+            img_with_text,
+            (x_pos - padding, y_pos - padding),
+            (x_pos + text_width + padding, y_pos + text_height + padding),
+            (0, 0, 0),
+            -1,
+        )
+        cv2.putText(
+            img_with_text,
+            line,
+            (x_pos, y_pos + text_height),
+            font,
+            font_scale,
+            (255, 255, 255),
+            font_thickness,
+        )
         y_pos += text_height + line_spacing
-    
+
     return img_with_text
 
-def get_env_config(cfg):
-    controller_config = load_composite_controller_config(
-        controller=cfg.controller,
-        robot=cfg.robot,
-    )
 
-    if cfg.obj_xinit_range and cfg.obj_yinit_range:
+def get_env_config(cfg: GenerateConfig) -> Dict[str, Any]:
+    """Build the exact BARX RoboCasa rollout environment configuration."""
+    controller_config = load_composite_controller_config(controller=cfg.controller, robot=cfg.robot)
+    obj_init_range = None
+    if cfg.obj_xinit_range is not None and cfg.obj_yinit_range is not None:
         obj_init_range = [cfg.obj_xinit_range, cfg.obj_yinit_range]
-    else:
-        obj_init_range = None
 
     camera_names = [cfg.camera]
     if cfg.use_wrist_image:
         camera_names.append("robot0_eye_in_hand")
 
-
-    # Create argument configuration
     config = {
         "env_name": cfg.task,
         "robots": [cfg.robot],
@@ -296,158 +295,141 @@ def get_env_config(cfg):
         "camera_heights": cfg.camera_height,
         "gripper_types": cfg.gripper_types,
     }
-
-    if cfg.generative_textures is True:
+    if cfg.generative_textures:
         config["generative_textures"] = "100p"
 
-    # Mirror actions if using a kitchen environment
-    mirror_actions = True
-
     if "PnP" in cfg.task or "Mug" in cfg.task:
-        layout = [4, 7, 8]  # only layouts where object spawns on right
+        layouts = [4, 7, 8]
         if "Panda" in cfg.robot and "Panda" in cfg.gripper_types and cfg.task == "PnPSinkToCounter":
-            style = [0, 1, 2, 3, 5, 6, 7, 8, 9, 10]  # remove style 4 because object unreachable with this gripper
+            styles = [0, 1, 2, 3, 5, 6, 7, 8, 9, 10]
         else:
-            style = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-        bad_combos = [(8, 3), (8, 5), (8, 6), (8, 9)]  # object sometimes spawns on left
-        config["layout_and_style_ids"] = [(l, s) for l in layout for s in style if (l, s) not in bad_combos]
+            styles = list(range(12))
+        bad_combinations = {(8, 3), (8, 5), (8, 6), (8, 9)}
+        config["layout_and_style_ids"] = [
+            (layout, style) for layout in layouts for style in styles if (layout, style) not in bad_combinations
+        ]
     elif cfg.task == "TurnOnSinkFaucet":
         config["layout_ids"] = -1
         config["style_ids"] = [0, 1, 2, 3, 4, 7, 8, 10, 11]
     else:
-        raise NotImplementedError
+        raise NotImplementedError(f"Unsupported RoboCasa evaluation task: {cfg.task}")
 
-    ### update config for kitchen envs ###
     if "pnp" in cfg.task.lower() and cfg.obj_groups is not None:
-        config.update({"obj_groups": cfg.obj_groups})
-
+        config["obj_groups"] = cfg.obj_groups
     config["translucent_robot"] = False
-
-    # by default use obj instance split A
     config["obj_instance_split"] = "A"
-
     return config
 
-def robocasa_img_transform(img):
-    img = np.transpose(img, (1, 2, 0))
-    img = (255*img).astype(np.uint8)
-    return img
 
-def eval_single_task(cfg: GenerateConfig, model, log_file) -> None:
-    """Evaluate a single robot task"""
-    # if cfg.unnorm_key is None:    
-    #     cfg.unnorm_key = f"{cfg.robot}_{cfg.task}"
+def robocasa_img_transform(img: np.ndarray) -> np.ndarray:
+    """Convert RoboCasa CHW float observations to HWC uint8 frames."""
+    if img.ndim != 3:
+        raise ValueError(f"Expected a 3-D image, got shape {img.shape}")
+    if img.shape[0] in (1, 3, 4):
+        img = np.transpose(img, (1, 2, 0))
+    if np.issubdtype(img.dtype, np.floating):
+        img = img * 255
+    return np.clip(img, 0, 255).astype(np.uint8)
 
-    # [OpenVLA] Check that the model contains the action un-normalization key
-    if cfg.model_family in ["openvla", "prismatic"]:
-        assert cfg.unnorm_key in model.norm_stats, f"Action un-norm key {cfg.unnorm_key} not found in VLA `norm_stats`!"
 
-    # [OpenVLA] Get Hugging Face processor
-    processor = None
-    if cfg.model_family == "openvla":
-        processor = get_processor(cfg)
+def task_succeeded(info: Dict[str, Any]) -> bool:
+    """Use RoboCasa's explicit task signal instead of the generic done flag."""
+    return bool(info.get("is_success", {}).get("task", False))
 
-    # Initialize environment
-    env_config = get_env_config(cfg)
 
-    env = create_env(
-        **env_config,
-        env_type=1,
-        render=False,
-        render_offscreen=True,
-        use_image_obs=True,
-        use_camera_obs=False,
-        rng=np.random.default_rng(cfg.start_seed),
-    )
+def close_environment(env: Any) -> None:
+    """Close either the RoboMimic wrapper or its underlying RoboCasa environment."""
+    close_method = getattr(env, "close", None)
+    if callable(close_method):
+        close_method()
+        return
+    base_env = getattr(env, "env", None)
+    close_method = getattr(base_env, "close", None)
+    if callable(close_method):
+        close_method()
 
-    # env = create_env(env_config, cfg.start_seed)
 
-    log_file.write(f"Robocasa task: {cfg.task}\n")
+def normalize_model_output(raw_output: Any) -> Dict[str, Any]:
+    """Normalize Prismatic and OpenVLA model returns to one dictionary shape."""
+    if isinstance(raw_output, dict):
+        if "action" not in raw_output:
+            raise KeyError("Model output dictionary is missing the action field")
+        return raw_output
+    return {"action": raw_output}
 
-    # Get expected image dimensions
-    resize_size = get_image_resize_size(cfg)
 
-    # Initialize tracking for single task
-    total_episodes = 0
-    total_successes = 0
-    current_seed = cfg.start_seed
+def should_save_video(cfg: GenerateConfig, episode_index: int) -> bool:
+    if not cfg.save_videos:
+        return False
+    return cfg.max_videos < 0 or episode_index <= cfg.max_videos
 
-    # Run trials for the task
-    for trial_idx in range(cfg.num_trials_per_task):
-        print(f"\nTrial {trial_idx + 1}/{cfg.num_trials_per_task}")
-        log_file.write(f"\nTrial {trial_idx + 1}/{cfg.num_trials_per_task}\n")
 
-        # Reset environment
-        env.env.rng = np.random.default_rng(current_seed)
-        env.reset()
+def run_trial(
+    cfg: GenerateConfig,
+    env: Any,
+    model: Any,
+    processor: Any,
+    trial_index: int,
+    seed: int,
+    log_file: Any,
+) -> Dict[str, Any]:
+    """Run one deterministic rollout and return its record and replay frames."""
+    env.env.rng = np.random.default_rng(seed)
+    obs = env.reset()
+    ep_meta = env.env.get_ep_meta()
+    language_instruction = ep_meta.get("lang", "")
+    style_id = ep_meta.get("style_id")
+    layout_id = ep_meta.get("layout_id")
+    if isinstance(style_id, np.generic):
+        style_id = style_id.item()
+    if isinstance(layout_id, np.generic):
+        layout_id = layout_id.item()
 
-        
-        ep_meta = env.env.get_ep_meta()
-        lang = ep_meta.get("lang", None)
-        if lang is not None:
-            print(colored(f"Instruction: {lang}", "green"))
+    print(f"\nTrial {trial_index + 1}/{cfg.num_trials_per_task}")
+    log_file.write(f"\nTrial {trial_index + 1}/{cfg.num_trials_per_task}\n")
+    if language_instruction:
+        print(colored(f"Instruction: {language_instruction}", "green"))
+    print(colored(f"Style ID: {style_id}", "blue"))
+    print(colored(f"Layout ID: {layout_id}", "blue"))
 
-        # print the style and layout ids
-        print(colored(f"Style ID: {ep_meta['style_id']}", "blue"))
-        print(colored(f"Layout ID: {ep_meta['layout_id']}", "blue"))
+    replay_images = []
+    replay_wrist_images = []
+    replay_visualizations = []
+    bbox_color_map = {}
+    visualization_flags = {"bbox": False, "ee_pose": False, "motion": False}
+    action_buffer = []
+    output: Dict[str, Any] = {}
+    success = False
+    simulator_done = False
+    control_steps = 0
 
-        # Setup
-        t = 0
-        replay_images = []
-        replay_images_with_bbox = []  # Separate list for bbox images
-        replay_wrist_images = []  # Add list for wrist images
-        bbox_color_map = {}  # Reset color map for each new video
-        has_bbox_predictions = False
-        has_ee_pose_predictions = False
-        has_motion_predictions = False
+    progress = tqdm.tqdm(total=cfg.max_steps + cfg.num_steps_wait, desc="Environment steps")
+    try:
+        for _ in range(cfg.num_steps_wait):
+            obs, _, simulator_done, info = env.step(get_robocasa_dummy_action(cfg.robot))
+            success = task_succeeded(info)
+            progress.update(1)
+            if success:
+                break
 
-        print(f"Starting episode {total_episodes+1}...")
-        log_file.write(f"Starting episode {total_episodes+1}...\n")
-        
-        # Create progress bar for steps
-        pbar = tqdm.tqdm(total=cfg.max_steps + cfg.num_steps_wait, desc='Environment steps')
+        while control_steps < cfg.max_steps and not success:
+            image = robocasa_img_transform(obs[f"{cfg.camera}_image"])
+            replay_images.append(image)
 
-        action_buffer = []
-        
-        while t < cfg.max_steps + cfg.num_steps_wait:
-            # IMPORTANT: Do nothing for the first few timesteps because the simulator drops objects
-            # and we need to wait for them to fall
-            if t < cfg.num_steps_wait:
-                obs, reward, done, info = env.step(get_robocasa_dummy_action(cfg.robot))
-                t += 1
-                pbar.update(1)
-                continue
-
-            # Get preprocessed image
-            cam_key = f"{cfg.camera}_image"
-            # img = get_libero_image(obs, resize_size, flip_image=False, key=cam_key, is_robocasa=True)
-            img = obs[cam_key]
-            img = robocasa_img_transform(img)
-
-            # Save preprocessed image for replay video
-            replay_images.append(img)
-
-            # use_wrist_image
             if cfg.use_wrist_image:
-                # wrist_img = get_libero_image(obs, resize_size, key="robot0_eye_in_hand_image", flip_image=False, is_robocasa=True)
-                wrist_img = obs["robot0_eye_in_hand_image"]
-                wrist_img = robocasa_img_transform(img)
-                replay_wrist_images.append(wrist_img)
+                wrist_image = robocasa_img_transform(obs["robot0_eye_in_hand_image"])
+                replay_wrist_images.append(wrist_image)
 
-            # buffering #obs_history images, optionally
-            image_history = replay_images[-cfg.obs_history :]
+            image_history = list(replay_images[-cfg.obs_history :])
             if len(image_history) < cfg.obs_history:
                 image_history.extend([replay_images[-1]] * (cfg.obs_history - len(image_history)))
 
-            # same but for optional wrist images
             if cfg.use_wrist_image:
-                wrist_image_history = replay_wrist_images[-cfg.obs_history :]
-                if len(wrist_image_history) < cfg.obs_history:
-                    wrist_image_history.extend([replay_wrist_images[-1]] * (cfg.obs_history - len(wrist_image_history)))
-                # interleaved images [... image_t, wrist_t ...]
-                image_history = [val for tup in zip(image_history, wrist_image_history) for val in tup]
+                wrist_history = list(replay_wrist_images[-cfg.obs_history :])
+                if len(wrist_history) < cfg.obs_history:
+                    wrist_history.extend([replay_wrist_images[-1]] * (cfg.obs_history - len(wrist_history)))
+                image_history = [frame for pair in zip(image_history, wrist_history) for frame in pair]
 
-            # Prepare observations dict
             observation = {
                 "full_image": image_history,
                 "state": np.concatenate(
@@ -455,244 +437,264 @@ def eval_single_task(cfg: GenerateConfig, model, log_file) -> None:
                 ),
             }
 
-            ep_meta = env.env.get_ep_meta()
-            lang = ep_meta["lang"]
-
-            if len(action_buffer) == 0:
-                # Query model to get action
-                output = get_action(
-                    cfg,
-                    model,
-                    observation,
-                    lang,
-                    aux_task_types=cfg.aux_task_types,
-                    processor=processor,
+            if not action_buffer:
+                output = normalize_model_output(
+                    get_action(
+                        cfg,
+                        model,
+                        observation,
+                        language_instruction,
+                        aux_task_types=cfg.aux_task_types,
+                        processor=processor,
+                    )
                 )
+                actions = np.asarray(output["action"])
+                if actions.ndim == 1:
+                    actions = actions[None, :]
+                if actions.shape[0] == 0:
+                    raise ValueError("Model returned an empty action chunk")
+                action_buffer.extend(np.asarray(action).copy() for action in actions[: cfg.act_horizon])
 
-                actions = output['action']
-                if len(actions.shape) == 1:
-                    actions = [actions]
-                for act in actions[:cfg.act_horizon]:
-                    action_buffer.append(act)
-            
-            action = action_buffer[0]
-            action_buffer = action_buffer[1:]
-                
-            # Save original image
-            replay_images.append(img)
-            
-            # Process image with visualizations
-            current_img = img.copy()
-            
-            # Draw bounding boxes if available
-            if 'bbox' in output:
-                has_bbox_predictions = True
-                try:
-                    current_img = draw_bbox_on_image(current_img, output['bbox'], bbox_color_map)
-                except Exception as e:
-                    print(f"Error drawing bounding boxes: {e}")
-                    print(f"Output: {output['bbox']}")
-            
-            # Draw trajectory if available
-            if 'ee_pose_2D' in output:
-                has_ee_pose_predictions = True
-                try:
-                    current_img = draw_trajectory_on_image(current_img, output['ee_pose_2D'])
-                except Exception as e:
-                    print(f"Error drawing trajectory: {e}")
-                    print(f"Output: {output['ee_pose_2D']}")
-            
-            # Draw motion text if available
-            if 'low_level_motion' in output:
-                has_motion_predictions = True
-                try:
-                    current_img = draw_motion_text_on_image(current_img, output['low_level_motion'])
-                except Exception as e:
-                    print(f"Error drawing motion text: {e}")
-                    print(f"Output: {output['low_level_motion']}")
-            
-            replay_images_with_bbox.append(current_img)
+            action = action_buffer.pop(0)
+            visualization = image.copy()
+            if "bbox" in output:
+                visualization_flags["bbox"] = True
+                visualization = draw_bbox_on_image(visualization, output["bbox"], bbox_color_map)
+            if "ee_pose_2D" in output:
+                visualization_flags["ee_pose"] = True
+                visualization = draw_trajectory_on_image(visualization, output["ee_pose_2D"])
+            if "low_level_motion" in output:
+                visualization_flags["motion"] = True
+                visualization = draw_motion_text_on_image(visualization, output["low_level_motion"])
+            replay_visualizations.append(visualization)
 
-            # Normalize gripper action [0,1] -> [-1,+1] because the environment expects the latter
-            action = normalize_gripper_action(action, binarize=True)
-            # [OpenVLA] The dataloader flips the sign of the gripper action to align with other datasets
-            # (0 = close, 1 = open), so flip it back (-1 = open, +1 = close) before executing the action
-            if cfg.model_family in ["openvla", "prismatic"]:
-                # data for this task is always open gripper, which causes bug in openvla code where
-                # gripper dim is always set to 0 (after normalizing) in the data, so do not flip
-                if "faucet" not in cfg.task.lower():
-                    action = invert_gripper_action(action)
-            # Execute action in environment
+            action = normalize_gripper_action(np.asarray(action).copy(), binarize=True)
+            if cfg.model_family in ("openvla", "prismatic") and "faucet" not in cfg.task.lower():
+                action = invert_gripper_action(action)
             env_action = pad_action_robocasa(action.tolist(), cfg.robot)
-            obs, reward, done, info = env.step(env_action)
-            if info["is_success"]["task"]:
-                done = True
-                reward = 1
-                break
-            t += 1
-            pbar.update(1)
+            obs, _, simulator_done, info = env.step(env_action)
+            success = task_succeeded(info)
+            control_steps += 1
+            progress.update(1)
+    finally:
+        progress.close()
 
-        pbar.close()
+    return {
+        "record": {
+            "trial_index": trial_index,
+            "seed": seed,
+            "success": success,
+            "control_steps": control_steps,
+            "settling_steps": cfg.num_steps_wait,
+            "simulator_done": bool(simulator_done),
+            "layout_id": layout_id,
+            "style_id": style_id,
+            "language_instruction": language_instruction,
+            "error": None,
+        },
+        "replay_images": replay_images,
+        "replay_wrist_images": replay_wrist_images,
+        "replay_visualizations": replay_visualizations,
+        "visualization_flags": visualization_flags,
+    }
 
-        total_episodes += 1
-        if done:
-            total_successes += 1
-        current_seed += 1
 
-        # Save videos and log results
-        save_rollout_video(
-            replay_images, total_episodes, success=done, task_description=cfg.task, log_file=log_file, rollout_dir=cfg.rollout_dir
-        )
-        
-        # Add wrist camera video saving if enabled
-        if cfg.use_wrist_image:
-            save_rollout_video(
-                replay_wrist_images, total_episodes, success=done, 
-                task_description=f"{cfg.task}_wrist", log_file=log_file, rollout_dir=cfg.rollout_dir
-            )
-        
-        if has_bbox_predictions or has_ee_pose_predictions or has_motion_predictions:
-            viz_suffix = "_with_" + "_".join(
-                x for x in ["bbox", "ee_pose", "motion"] 
-                if (x == "bbox" and has_bbox_predictions) or 
-                   (x == "ee_pose" and has_ee_pose_predictions) or
-                   (x == "motion" and has_motion_predictions)
-            )
-            save_rollout_video(
-                replay_images_with_bbox, total_episodes, success=done,
-                task_description=f"{cfg.task}{viz_suffix}", log_file=log_file, rollout_dir=cfg.rollout_dir
-            )
+def eval_single_task(
+    cfg: GenerateConfig,
+    model: Any,
+    log_file: Any,
+    trials_path: Path,
+    result_path: Path,
+    wandb_module: Optional[Any] = None,
+) -> Dict[str, Any]:
+    """Evaluate one model/task pair and persist every completed trial."""
+    if cfg.model_family in ("openvla", "prismatic"):
+        if cfg.unnorm_key not in model.norm_stats:
+            raise KeyError(f"Action un-normalization key {cfg.unnorm_key!r} is not present in model norm_stats")
 
-        # Log current results
-        success_rate = float(total_successes) / float(total_episodes) * 100
-        print(f"Success rate: {success_rate:.1f}%")
-        log_file.write(f"Success rate: {success_rate:.1f}%\n")
+    processor = get_processor(cfg) if cfg.model_family == "openvla" else None
+    env = create_env(
+        **get_env_config(cfg),
+        env_type=1,
+        render=False,
+        render_offscreen=True,
+        use_image_obs=True,
+        use_camera_obs=False,
+        rng=np.random.default_rng(cfg.start_seed),
+    )
+    log_file.write(f"Robocasa task: {cfg.task}\n")
 
-        # Log to wandb after each episode (only for first trial)
-        if cfg.use_wandb:
-            log_dict = {
-                f"{cfg.task}/success_rate": success_rate,
-                f"{cfg.task}/total_successes": total_successes,
-                f"{cfg.task}/total_episodes": total_episodes,
-                f"{cfg.task}/episode_success": 1.0 if done else 0.0,
-            }
-            
-            # Only log videos for the first trial
-            if trial_idx == 0:
-                group = "success" if done else "failure"
-                log_dict[f"{cfg.task}/{group}/trial_0"] = wandb.Video(
-                    np.array(replay_images).transpose(0, 3, 1, 2)
+    trial_records = []
+    try:
+        for trial_index in range(cfg.num_trials_per_task):
+            seed = cfg.start_seed + trial_index
+            try:
+                trial_output = run_trial(cfg, env, model, processor, trial_index, seed, log_file)
+            except Exception as exc:
+                error_record = {
+                    "trial_index": trial_index,
+                    "seed": seed,
+                    "success": False,
+                    "error": f"{type(exc).__name__}: {exc}",
+                }
+                trial_records.append(error_record)
+                append_jsonl(trials_path, error_record)
+                write_json(result_path, build_result(cfg, trial_records, status="failed"))
+                raise
+
+            record = trial_output["record"]
+            trial_records.append(record)
+            append_jsonl(trials_path, record)
+
+            episode_index = len(trial_records)
+            if should_save_video(cfg, episode_index) and trial_output["replay_images"]:
+                save_rollout_video(
+                    trial_output["replay_images"],
+                    episode_index,
+                    success=record["success"],
+                    task_description=cfg.task,
+                    log_file=log_file,
+                    rollout_dir=cfg.rollout_dir,
                 )
-                
                 if cfg.use_wrist_image:
-                    log_dict[f"{cfg.task}_wrist/{group}/trial_0"] = wandb.Video(
-                        np.array(replay_wrist_images).transpose(0, 3, 1, 2)
+                    save_rollout_video(
+                        trial_output["replay_wrist_images"],
+                        episode_index,
+                        success=record["success"],
+                        task_description=f"{cfg.task}_wrist",
+                        log_file=log_file,
+                        rollout_dir=cfg.rollout_dir,
                     )
-                    
-                if has_bbox_predictions or has_ee_pose_predictions or has_motion_predictions:
-                    viz_suffix = "_with_" + "_".join(
-                        x for x in ["bbox", "ee_pose", "motion"] 
-                        if (x == "bbox" and has_bbox_predictions) or 
-                           (x == "ee_pose" and has_ee_pose_predictions) or
-                           (x == "motion" and has_motion_predictions)
-                    )
-                    log_dict[f"{cfg.task}{viz_suffix}/{group}/trial_0"] = wandb.Video(
-                        np.array(replay_images_with_bbox).transpose(0, 3, 1, 2)
-                    )
-            
-            wandb.log(log_dict)
 
-        log_file.flush()
+                flags = trial_output["visualization_flags"]
+                if any(flags.values()):
+                    suffix = "_with_" + "_".join(name for name, enabled in flags.items() if enabled)
+                    save_rollout_video(
+                        trial_output["replay_visualizations"],
+                        episode_index,
+                        success=record["success"],
+                        task_description=f"{cfg.task}{suffix}",
+                        log_file=log_file,
+                        rollout_dir=cfg.rollout_dir,
+                    )
+
+            current_result = build_result(cfg, trial_records, status="running")
+            write_json(result_path, current_result)
+            print(f"Success rate: {current_result['success_rate']:.1f}%")
+            log_file.write(f"Success rate: {current_result['success_rate']:.1f}%\n")
+            log_file.flush()
+
+            if cfg.use_wandb:
+                if wandb_module is None:
+                    raise RuntimeError("W&B logging was requested but W&B was not initialized")
+                wandb_module.log(
+                    {
+                        f"{cfg.task}/success_rate": current_result["success_rate"],
+                        f"{cfg.task}/total_successes": current_result["total_successes"],
+                        f"{cfg.task}/total_episodes": current_result["completed_trials"],
+                        f"{cfg.task}/episode_success": float(record["success"]),
+                    }
+                )
+    finally:
+        close_environment(env)
+
+    final_result = build_result(cfg, trial_records, status="completed")
+    write_json(result_path, final_result)
+    return final_result
+
+
+def validate_config(cfg: GenerateConfig) -> None:
+    checkpoint = str(cfg.pretrained_checkpoint)
+    if not checkpoint:
+        raise ValueError("pretrained_checkpoint must be provided")
+    if "image_aug" in checkpoint and not cfg.center_crop:
+        raise ValueError("center_crop must be enabled for a checkpoint trained with image augmentation")
+    if cfg.load_in_8bit and cfg.load_in_4bit:
+        raise ValueError("load_in_8bit and load_in_4bit cannot both be enabled")
+    if not cfg.robot or not cfg.task or not cfg.unnorm_key:
+        raise ValueError("robot, task, and unnorm_key must be provided")
+    if cfg.num_trials_per_task <= 0 or cfg.max_steps <= 0:
+        raise ValueError("num_trials_per_task and max_steps must be positive")
+    if cfg.num_steps_wait < 0:
+        raise ValueError("num_steps_wait cannot be negative")
+    if cfg.obs_history <= 0 or cfg.act_horizon <= 0:
+        raise ValueError("obs_history and act_horizon must be positive")
+    if cfg.max_videos < -1:
+        raise ValueError("max_videos must be -1 or non-negative")
 
 
 @draccus.wrap()
 def eval_robocasa(cfg: GenerateConfig) -> None:
-    assert cfg.pretrained_checkpoint is not None, "cfg.pretrained_checkpoint must not be None!"
-    if "image_aug" in cfg.pretrained_checkpoint:
-        assert cfg.center_crop, "Expecting `center_crop==True` because model was trained with image augmentations!"
-    assert not (cfg.load_in_8bit and cfg.load_in_4bit), "Cannot use both 8-bit and 4-bit quantization!"
-
-    step_str = extract_step_k(cfg.pretrained_checkpoint)
-    cfg.rollout_dir = cfg.rollout_dir.replace("STEP", step_str)
-        
-    # Set random seed
+    """Load one checkpoint and run the configured deterministic RoboCasa trials."""
+    validate_config(cfg)
     set_seed_everywhere(cfg.seed)
+    cfg.camera = camera_for_robot(cfg.robot)
 
-    if "kinova" in cfg.robot.lower():
-        cfg.camera = "kinova_agentview_left"
-    elif "ur5e" in cfg.robot.lower():
-        cfg.camera = "ur5e_agentview_left"
-    elif "iiwa" in cfg.robot.lower():
-        cfg.camera = "iiwa_agentview_left"
-    elif "jaco" in cfg.robot.lower():
-        cfg.camera = "jaco_agentview_left"
-    else:
-        cfg.camera = "robot0_agentview_left"
+    if cfg.rollout_dir is None:
+        cfg.rollout_dir = str(
+            Path("experiments/rollouts") / cfg.task / cfg.robot / checkpoint_tag(cfg.pretrained_checkpoint) / "act"
+        )
+    cfg.rollout_dir = cfg.rollout_dir.replace("STEP", checkpoint_tag(cfg.pretrained_checkpoint))
+    rollout_dir = Path(cfg.rollout_dir)
+    rollout_dir.mkdir(parents=True, exist_ok=True)
+
+    result_path = rollout_dir / cfg.result_filename
+    trials_path = rollout_dir / cfg.trials_filename
+    log_path = rollout_dir / "log.txt"
+    trials_path.write_text("", encoding="utf-8")
+    write_json(result_path, build_result(cfg, [], status="starting"))
 
     ObsUtils.OBS_KEYS_TO_MODALITIES = {
-        f"{cfg.camera}_image": 'rgb', 
-        'robot0_eye_in_hand_image': 'rgb', 
-        'mean': 'low_dim', 
-        'scale': 'low_dim', 
-        'logits': 'low_dim'
+        f"{cfg.camera}_image": "rgb",
+        "robot0_eye_in_hand_image": "rgb",
+        "mean": "low_dim",
+        "scale": "low_dim",
+        "logits": "low_dim",
     }
 
-     # Split aux_task_types by "->"
-    if cfg.aux_task_types is not None:
+    if cfg.aux_task_types is None or cfg.aux_task_types.lower() in ("", "none", "null"):
+        cfg.aux_task_types = None
+    else:
         cfg.aux_task_types = cfg.aux_task_types.split("->")
 
-    # Load model
-    model = get_model(cfg)
+    run_id = f"{cfg.prefix}EVAL-{cfg.run_id}-{DATE_TIME}"
+    if cfg.run_id_note:
+        run_id += f"--{cfg.run_id_note}"
 
-    # After loading your model, add:
-    model = patch_model_for_generation(model)
-
-    if cfg.use_wrist_image:
-        model.vision_backbone.image_sequence_len *= 2
-
-    # Move log file initialization before the task loop
-    # run_id = f"{cfg.prefix}EVAL-{cfg.run_id}-{DATE_TIME}"
-    # if cfg.run_id_note is not None:
-    #     run_id += f"--{cfg.run_id_note}"
-    # os.makedirs(cfg.local_log_dir, exist_ok=True)
-    # local_log_filepath = os.path.join(cfg.local_log_dir, run_id + ".txt")
-    # log_file = open(local_log_filepath, "w")
-
-    os.makedirs(cfg.rollout_dir, exist_ok=True)
-    log_path = os.path.join(cfg.rollout_dir, "log.txt")
-    log_file = open(log_path, "w")
+    log_file = log_path.open("w", encoding="utf-8")
     print(f"Logging to local log file: {log_path}")
-
-
+    wandb_module = None
+    wandb_run = None
     try:
-        # Initialize Weights & Biases logging
         if cfg.use_wandb:
-            wandb.init(
-                entity=cfg.wandb_entity,
-                project=cfg.wandb_project,
-                name=run_id,
-            )
+            import wandb
 
-        # [OpenVLA] Set action un-normalization key
-        eval_single_task(cfg, model, log_file)
+            wandb_module = wandb
+            wandb_run = wandb_module.init(entity=cfg.wandb_entity, project=cfg.wandb_project, name=run_id)
 
-        # Save local log file
-        log_file.close()
+        model = patch_model_for_generation(get_model(cfg))
+        if cfg.use_wrist_image:
+            model.vision_backbone.image_sequence_len *= 2
 
-        # Final wandb logging not needed since we're logging throughout
+        eval_single_task(cfg, model, log_file, trials_path, result_path, wandb_module=wandb_module)
         if cfg.use_wandb:
-            wandb.save(log_path)
-
-    except ZeroDivisionError as e:
-        print(f"Caught exception: {e}")
-        log_file.write(f"Caught exception: {e}\n")
+            wandb_module.save(str(log_path))
+    except Exception as exc:
+        print(f"Evaluation failed: {type(exc).__name__}: {exc}")
+        log_file.write(f"Evaluation failed: {type(exc).__name__}: {exc}\n")
+        log_file.flush()
+        try:
+            result = json.loads(result_path.read_text(encoding="utf-8"))
+        except (FileNotFoundError, json.JSONDecodeError):
+            result = build_result(cfg, [], status="failed")
+        result["status"] = "failed"
+        result["error"] = f"{type(exc).__name__}: {exc}"
+        write_json(result_path, result)
+        raise
     finally:
-        # Close log file in finally block to ensure it's closed properly
         log_file.close()
-        
-        # Final wandb logging if needed
-        if cfg.use_wandb:
-            wandb.save(local_path)
+        if wandb_run is not None:
+            wandb_run.finish()
 
 
 if __name__ == "__main__":

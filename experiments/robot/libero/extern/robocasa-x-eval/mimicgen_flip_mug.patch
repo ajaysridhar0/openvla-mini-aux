@@ -1,0 +1,97 @@
+diff --git a/mimicgen/__init__.py b/mimicgen/__init__.py
+index a5a1699..5a7b959 100644
+--- a/mimicgen/__init__.py
++++ b/mimicgen/__init__.py
+@@ -14,5 +14,6 @@ from mimicgen.env_interfaces.robocasa.single_stage.mg_microwave import *
+ from mimicgen.env_interfaces.robocasa.single_stage.mg_pnp import *
+ from mimicgen.env_interfaces.robocasa.single_stage.mg_sink import *
+ from mimicgen.env_interfaces.robocasa.single_stage.mg_stove import *
++from mimicgen.env_interfaces.robocasa.single_stage.mg_mug import *
+ # except ImportError as e:
+ #     print("WARNING: robosuite environment interfaces not imported...")
+diff --git a/mimicgen/configs/__init__.py b/mimicgen/configs/__init__.py
+index e3ace55..1d41192 100644
+--- a/mimicgen/configs/__init__.py
++++ b/mimicgen/configs/__init__.py
+@@ -12,4 +12,5 @@ from mimicgen.configs.robocasa.single_stage.config_pnp import *
+ from mimicgen.configs.robocasa.single_stage.config_sink import *
+ from mimicgen.configs.robocasa.single_stage.config_stove import *
+ from mimicgen.configs.robocasa.single_stage.config_coffee import *
+-from mimicgen.configs.robocasa.single_stage.config_microwave import *
+\ No newline at end of file
++from mimicgen.configs.robocasa.single_stage.config_microwave import *
++from mimicgen.configs.robocasa.single_stage.config_mug import *
+\ No newline at end of file
+diff --git a/mimicgen/configs/robocasa/single_stage/config_mug.py b/mimicgen/configs/robocasa/single_stage/config_mug.py
+new file mode 100644
+index 0000000..901f66b
+--- /dev/null
++++ b/mimicgen/configs/robocasa/single_stage/config_mug.py
+@@ -0,0 +1,28 @@
++"""MimicGen task specification for BARX mug flipping."""
++
++from mimicgen.configs.config import MG_Config
++
++
++class FlipMugUprightConfig(MG_Config):
++    NAME = "FlipMugUpright"
++    TYPE = "robosuite"
++
++    def task_config(self):
++        common = {
++            "object_ref": "obj",
++            "action_noise": 0.05,
++            "num_interpolation_steps": 5,
++            "selection_strategy": "nearest_neighbor_interpolation",
++            "selection_strategy_kwargs": {"nn_k": 5},
++        }
++        self.task.task_spec.stage_1 = {
++            **common,
++            "subtask_term_signal": "stage_contact_obj",
++            "subtask_term_offset_range": (10, 20),
++        }
++        self.task.task_spec.stage_2 = {
++            **common,
++            "subtask_term_signal": None,
++            "subtask_term_offset_range": None,
++        }
++        self.task.task_spec.do_not_lock_keys()
+diff --git a/mimicgen/env_interfaces/robocasa/single_stage/mg_mug.py b/mimicgen/env_interfaces/robocasa/single_stage/mg_mug.py
+new file mode 100644
+index 0000000..13f3739
+--- /dev/null
++++ b/mimicgen/env_interfaces/robocasa/single_stage/mg_mug.py
+@@ -0,0 +1,20 @@
++"""MimicGen environment interface for BARX mug flipping."""
++
++from mimicgen.env_interfaces.robosuite import RobosuiteInterface
++
++
++class MG_FlipMugUpright(RobosuiteInterface):
++    def get_object_poses(self):
++        return {
++            "obj": self.get_object_pose(
++                obj_name=self.env.objects["obj"].root_body,
++                obj_type="body",
++            )
++        }
++
++    def get_subtask_term_signals(self):
++        contact = self.env.check_contact(
++            self.env.robots[0].gripper["right"],
++            self.env.objects["obj"],
++        )
++        return {"stage_contact_obj": int(contact), "stage_place_obj": int(self.env._check_success())}
+diff --git a/mimicgen/utils/robomimic_utils.py b/mimicgen/utils/robomimic_utils.py
+index ad5ca8d..fcc2ff4 100644
+--- a/mimicgen/utils/robomimic_utils.py
++++ b/mimicgen/utils/robomimic_utils.py
+@@ -75,7 +75,7 @@ def create_env(
+         # for now, only support this argument for robosuite environments
+         assert EnvUtils.is_robosuite_env(env_meta)
+         single_arms = ["IIWA", "Sawyer", "UR5e", "Panda", "Jaco", "Kinova3"]
+-        mobile_manips = ["Kinova3Omron", "IIWAOmron", "UR5eOmron", "PandaOmron"]
++        mobile_manips = ["Kinova3Omron", "IIWAOmron", "UR5eOmron", "PandaOmron", "JacoOmron"]
+         assert robot in single_arms + mobile_manips
+         env_meta["env_kwargs"]["robots"] = [robot]
+     if gripper is not None:

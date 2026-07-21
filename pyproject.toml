@@ -40,6 +40,7 @@ dependencies = [
     "matplotlib",
     "peft==0.11.1",
     "protobuf",
+    "pyyaml",
     "rich",
     "sentencepiece==0.1.99",
     "timm==0.9.10",
@@ -49,11 +50,15 @@ dependencies = [
     "torchaudio==2.2.0",
     "transformers==4.40.1",
     "wandb",
+    "vq-bet @ git+https://github.com/jayLEE0301/vq_bet_official.git@09d4851288ca5deaaa1ab367a208e520f8ee9a84",
     "tensorflow==2.15.0",
     "tensorflow_datasets==4.9.3",
     "tensorflow_graphics==2021.12.3",
     "dlimp @ git+https://github.com/moojink/dlimp_openvla"
 ]
+
+[project.scripts]
+barx = "barx.cli:main"
 
 [project.optional-dependencies]
 dev = [
@@ -62,6 +67,22 @@ dev = [
     "ipython",
     "pre-commit",
     "ruff>=0.2.2",
+]
+sim = [
+    "chardet",
+    "h5py",
+    "hidapi",
+    "imageio",
+    "imageio-ffmpeg",
+    "lxml",
+    "mujoco==3.1.1",
+    "numba==0.56.4; python_version < '3.11'",
+    "numpy==1.23.5; python_version < '3.11'",
+    "opencv-python-headless",
+    "pygame",
+    "pynput",
+    "robosuite-models==1.0.0",
+    "tensorboardX",
 ]
 sagemaker = [
     "boto3",
@@ -75,19 +96,23 @@ documentation = "https://github.com/openvla/openvla"
 
 [tool.setuptools.packages.find]
 where = ["."]
+include = ["barx*", "prismatic*"]
 exclude = ["cache"]
 
 [tool.setuptools.package-data]
 "prismatic" = ["py.typed"]
+"barx" = ["configs/*.yaml"]
 
 [tool.black]
 line-length = 121
 target-version = ["py38", "py39", "py310"]
 preview = true
+extend-exclude = "experiments/robot/libero/extern/robocasa-x-eval/src"
 
 [tool.ruff]
 line-length = 121
 target-version = "py38"
+exclude = ["experiments/robot/libero/extern/robocasa-x-eval/src"]
 
 [tool.ruff.lint]
 select = ["A", "B", "E", "F", "I", "RUF", "W"]

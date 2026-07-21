@@ -16,8 +16,8 @@ clean:
 
 check:
 	black --check .
-	ruff check --show-source .
+	ruff check .
 
 autoformat:
 	black .
-	ruff check --fix --show-fixes .
+	ruff check --fix .
