@@ -19,11 +19,11 @@ PAPER_SET_NAMES = {
 }
 TASK_NAMES = {
     "pnp": {
-        "pick-and-place counter-to-sink",
-        "pick-and-place sink-to-counter",
+        "PnP Counter to Sink",
+        "PnP Sink to Counter",
     },
-    "turn_on_sink": {"turn-on-sink-faucet"},
-    "flip_mug": {"flip-mug-upright"},
+    "turn_on_sink": {"Turn On Sink Faucet"},
+    "flip_mug": {"Flip Mug Upright"},
 }
 TARGET_NAMES = {
     "panda": "Panda",
@@ -45,7 +45,9 @@ def stored_dataset_name(dataset: str, task: str, target: str | None) -> str:
     return f"{target}_{task}"
 
 
-def selected_paths(dataset: str, task: str, target: str | None, raw_root: Path) -> list[Path]:
+def selected_paths(
+    dataset: str, task: str, target: str | None, raw_root: Path
+) -> list[Path]:
     paper_set = PAPER_SET_NAMES[dataset]
     target_name = TARGET_NAMES.get(target) if target else None
     selected = []
@@ -63,7 +65,9 @@ def selected_paths(dataset: str, task: str, target: str | None, raw_root: Path) 
                 raise ValueError(f"Size mismatch for {path}")
             selected.append(path.resolve())
     if not selected:
-        raise ValueError(f"No manifest entries matched {dataset}/{target or 'source'}/{task}")
+        raise ValueError(
+            f"No manifest entries matched {dataset}/{target or 'source'}/{task}"
+        )
     return selected
 
 
@@ -72,8 +76,18 @@ def main() -> None:
     parser.add_argument("--dataset", choices=PAPER_SET_NAMES, required=True)
     parser.add_argument("--task", choices=TASK_NAMES, required=True)
     parser.add_argument("--target", choices=TARGET_NAMES)
-    parser.add_argument("--raw-root", type=Path, required=True, help="Directory containing manifest-relative HDF5 files")
-    parser.add_argument("--rlds-root", type=Path, required=True, help="TFDS output root used by policy training")
+    parser.add_argument(
+        "--raw-root",
+        type=Path,
+        required=True,
+        help="Directory containing manifest-relative HDF5 files",
+    )
+    parser.add_argument(
+        "--rlds-root",
+        type=Path,
+        required=True,
+        help="TFDS output root used by policy training",
+    )
     parser.add_argument("--workers", type=int, default=32)
     parser.add_argument("--path-batch", type=int, default=160)
     parser.add_argument("--dry-run", action="store_true")
@@ -89,7 +103,9 @@ def main() -> None:
 
     output_name = stored_dataset_name(args.dataset, args.task, args.target)
     paths = selected_paths(args.dataset, args.task, args.target, args.raw_root)
-    print(f"{args.dataset}/{args.target or 'source'}/{args.task}: {len(paths)} files -> {args.rlds_root / output_name}")
+    print(
+        f"{args.dataset}/{args.target or 'source'}/{args.task}: {len(paths)} files -> {args.rlds_root / output_name}"
+    )
     if args.dry_run:
         return
 

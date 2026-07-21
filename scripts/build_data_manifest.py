@@ -20,7 +20,7 @@ STORED_TASK_NAMES = {
 }
 EMBODIMENT_NAMES = {
     "IIWAOmron": "IIWA",
-    "Kinova3Omron": "Kinova 3",
+    "Kinova3Omron": "Kinova3",
     "UR5eOmron": "UR5e",
     "PandaOmron": "Panda",
     "PandaOGGripperOmron": "Panda-OG",

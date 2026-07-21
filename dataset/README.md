@@ -8,7 +8,7 @@ pass.
 
 ## Contents
 
-- **XP-900**: 300 demonstrations per task for each of IIWA, Kinova 3, and UR5e
+- **XP-900**: 300 demonstrations per task for each of IIWA, Kinova3, and UR5e
   (900 demonstrations per task total).
 - **XP-3K**: 1,000 demonstrations per task for each source embodiment (3,000
   demonstrations per task total). XP-900 is the first three 100-demo shards

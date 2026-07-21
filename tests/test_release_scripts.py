@@ -1,6 +1,9 @@
 import argparse
+import csv
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from barx.benchmark import (
     EMBODIMENTS,
@@ -13,10 +16,55 @@ from scripts import build_rlds, evaluate, train
 
 class DatasetReleaseScriptTest(unittest.TestCase):
     def test_paper_sets_resolve_to_checkpoint_compatible_dataset_names(self):
-        self.assertEqual(build_rlds.stored_dataset_name("xp_900", "pnp", None), "mg_pnp_lite")
-        self.assertEqual(build_rlds.stored_dataset_name("xp_3k", "flip_mug", None), "mg_flip_mug")
-        self.assertEqual(build_rlds.stored_dataset_name("sp_900", "pnp", "panda_og"), "mg_panda_og_pnp")
-        self.assertEqual(build_rlds.stored_dataset_name("target_50", "pnp", "jaco"), "jaco_pnp")
+        self.assertEqual(
+            build_rlds.stored_dataset_name("xp_900", "pnp", None), "mg_pnp_lite"
+        )
+        self.assertEqual(
+            build_rlds.stored_dataset_name("xp_3k", "flip_mug", None), "mg_flip_mug"
+        )
+        self.assertEqual(
+            build_rlds.stored_dataset_name("sp_900", "pnp", "panda_og"),
+            "mg_panda_og_pnp",
+        )
+
+    def test_manifest_task_names_select_paper_data(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            relative_path = Path("mg/IIWAOmron/PnPCounterToSink/data.hdf5")
+            data_path = root / relative_path
+            data_path.parent.mkdir(parents=True)
+            data_path.write_bytes(b"barx")
+
+            manifest = root / "manifest.csv"
+            with manifest.open("w", newline="") as stream:
+                writer = csv.DictWriter(
+                    stream,
+                    fieldnames=[
+                        "paper_sets",
+                        "task",
+                        "embodiment",
+                        "bytes",
+                        "relative_path",
+                    ],
+                )
+                writer.writeheader()
+                writer.writerow(
+                    {
+                        "paper_sets": "XP-3K;XP-900",
+                        "task": "PnP Counter to Sink",
+                        "embodiment": "IIWA",
+                        "bytes": data_path.stat().st_size,
+                        "relative_path": relative_path.as_posix(),
+                    }
+                )
+
+            with mock.patch.object(build_rlds, "MANIFEST", manifest):
+                selected = build_rlds.selected_paths("xp_900", "pnp", None, root)
+
+            self.assertEqual(selected, [data_path.resolve()])
+        self.assertEqual(
+            build_rlds.stored_dataset_name("target_50", "pnp", "jaco"), "jaco_pnp"
+        )
 
 
 class TrainingLauncherTest(unittest.TestCase):
@@ -50,7 +98,9 @@ class TrainingLauncherTest(unittest.TestCase):
 
     def test_target_only_and_same_embodiment_runs_start_from_base_vlm(self):
         target_only = train.build_command(self.args(prior="none", checkpoint=None))
-        same_embodiment = train.build_command(self.args(prior="sp_900", checkpoint=None))
+        same_embodiment = train.build_command(
+            self.args(prior="sp_900", checkpoint=None)
+        )
         self.assertNotIn("--pretrained_checkpoint", target_only)
         self.assertNotIn("--pretrained_checkpoint", same_embodiment)
         self.assertIn("panda_pnp", target_only)
@@ -108,7 +158,10 @@ class EvaluationLauncherTest(unittest.TestCase):
         )
         for name, spec in EMBODIMENTS.items():
             with self.subTest(name=name):
-                self.assertEqual(spec.camera, f"barx_{'panda' if name == 'panda_og' else name}_agentview")
+                self.assertEqual(
+                    spec.camera,
+                    f"barx_{'panda' if name == 'panda_og' else name}_agentview",
+                )
 
     def test_paper_scene_filters_are_frozen(self):
         standard = evaluation_scene_config("pnp_counter_to_sink", "panda")
@@ -116,7 +169,9 @@ class EvaluationLauncherTest(unittest.TestCase):
         self.assertEqual(len(standard["layout_and_style_ids"]), 32)
         self.assertEqual(len(panda_og_sink["layout_and_style_ids"]), 29)
         self.assertNotIn((8, 3), standard["layout_and_style_ids"])
-        self.assertFalse(any(style == 4 for _, style in panda_og_sink["layout_and_style_ids"]))
+        self.assertFalse(
+            any(style == 4 for _, style in panda_og_sink["layout_and_style_ids"])
+        )
 
 
 if __name__ == "__main__":
