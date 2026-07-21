@@ -24,7 +24,7 @@ same environment. The generator does this automatically.
 Generate one bundle after installing the RoboCasa assets:
 
 ```bash
-uv run --locked python scripts/generate_eval_conditions.py \
+uv run --locked --no-dev python scripts/generate_eval_conditions.py \
   --task pnp_counter_to_sink \
   --embodiment panda
 ```
@@ -37,7 +37,7 @@ receiving different sampled objects, layouts, styles, or initial poses.
 Restore and hash-check every condition in one generated bundle with:
 
 ```bash
-uv run --locked python scripts/verify_eval_conditions.py \
+uv run --locked --no-dev python scripts/verify_eval_conditions.py \
   --task pnp_counter_to_sink \
   --embodiment panda
 ```

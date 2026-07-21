@@ -105,6 +105,7 @@ class HFCausalLLMBackbone(LLMBackbone, ABC):
         llm_family: str,
         llm_cls: Type[PreTrainedModel],
         hf_hub_path: str,
+        hf_hub_revision: Optional[str] = None,
         llm_max_length: int = 2048,
         hf_token: Optional[str] = None,
         inference_mode: bool = False,
@@ -123,6 +124,7 @@ class HFCausalLLMBackbone(LLMBackbone, ABC):
                 overwatch.info(f"Loading [bold]{llm_family}[/] LLM from [underline]`{hf_hub_path}`[/]", ctx_level=1)
                 self.llm = llm_cls.from_pretrained(
                     hf_hub_path,
+                    revision=hf_hub_revision,
                     token=hf_token,
                     use_flash_attention_2=use_flash_attention_2 if not self.inference_mode else False,
                     # The following parameters are set to prevent `UserWarnings` from HF; we want greedy decoding!
@@ -131,14 +133,18 @@ class HFCausalLLMBackbone(LLMBackbone, ABC):
                     top_p=1.0,
                 )
             else:
-                overwatch.info(f"Initializing [bold]{llm_family}[/] LLM with random weights from config in [underline]`{hf_hub_path}`[/]", ctx_level=1)
-                config = AutoConfig.from_pretrained(hf_hub_path, token=hf_token)
+                overwatch.info(
+                    f"Initializing [bold]{llm_family}[/] LLM with random weights from config in "
+                    f"[underline]`{hf_hub_path}`[/]",
+                    ctx_level=1,
+                )
+                config = AutoConfig.from_pretrained(hf_hub_path, revision=hf_hub_revision, token=hf_token)
                 self.llm = llm_cls.from_config(config)
 
         # [Contract] `inference_mode` means we're loading from a pretrained checkpoint; no need to load base weights!
         else:
             overwatch.info(f"Building empty [bold]{llm_family}[/] LLM from [underline]`{hf_hub_path}`[/]", ctx_level=1)
-            llm_config = AutoConfig.from_pretrained(hf_hub_path, token=hf_token)
+            llm_config = AutoConfig.from_pretrained(hf_hub_path, revision=hf_hub_revision, token=hf_token)
 
             # versioning difference for prismatic models.
             if hasattr(llm_cls, "from_config"):
@@ -161,7 +167,11 @@ class HFCausalLLMBackbone(LLMBackbone, ABC):
         # Load (Fast) Tokenizer
         overwatch.info(f"Loading [bold]{llm_family}[/] (Fast) Tokenizer via the AutoTokenizer API", ctx_level=1)
         self.tokenizer = AutoTokenizer.from_pretrained(
-            hf_hub_path, model_max_length=self.llm_max_length, token=hf_token, padding_side="right"
+            hf_hub_path,
+            revision=hf_hub_revision,
+            model_max_length=self.llm_max_length,
+            token=hf_token,
+            padding_side="right",
         )
 
         # Validation =>> Our VLM logic currently operates under the assumption that the tokenization of a new input

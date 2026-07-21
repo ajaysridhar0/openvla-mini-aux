@@ -62,7 +62,7 @@ uses 7 action dimensions, an 8-action chunk (`future_action_horizon=7`), 256
 codes, 7 residual groups, and 512 latent dimensions. For XP-900 PnP:
 
 ```bash
-uv run --locked python policy/vla-scripts/pretrain_vq.py \
+uv run --locked --no-dev python policy/vla-scripts/pretrain_vq.py \
   --data_dir /data/barx-rlds --data_mix xp_900_pnp \
   --save_folder /tmp/barx-vq --action_dim 7 \
   --future_action_horizon 7 --vqvae_n_embed 256 \
@@ -101,12 +101,12 @@ Paper-facing launchers print the complete underlying command before running it.
 For example:
 
 ```bash
-uv run --locked python scripts/train.py prior \
+uv run --locked --extra train --no-dev python scripts/train.py prior \
   --prior xp_900 --task pnp --method joint_reps \
   --data-root /data/barx-rlds --base-vlm /models/minivla \
   --max-steps 50000
 
-uv run --locked python scripts/train.py adapt \
+uv run --locked --extra train --no-dev python scripts/train.py adapt \
   --prior xp_900 --target panda --task pnp --method joint_reps \
   --data-root /data/barx-rlds --base-vlm /models/minivla \
   --checkpoint /models/xp_900_joint_reps_step_50000.pt \
@@ -122,10 +122,17 @@ Training writes JSONL metrics and checkpoints locally by default. To mirror a
 run to Weights & Biases, add `--use-wandb` and optionally `--wandb-project` and
 `--wandb-entity`; no account or project name is embedded in the default run.
 
-For a disposable one-GPU A40 initialization and optimizer smoke test, append:
+For a disposable one-GPU A40 initialization and optimizer smoke test, use the
+complete command below after setting `BARX_ARTIFACT_ROOT`, `HF_HOME`, and
+`BARX_VQ_ROOT` as shown in the root README:
 
 ```bash
---gpus 1 --global-batch-size 1 --per-device-batch-size 1 \
+uv run --locked --extra train --no-dev python scripts/train.py prior \
+  --prior xp_900 --task pnp --method joint_reps \
+  --data-root "$BARX_ARTIFACT_ROOT/data" \
+  --base-vlm "$BARX_ARTIFACT_ROOT/base-vlm" \
+  --run-root "$BARX_ARTIFACT_ROOT/runs/smoke" \
+  --gpus 1 --global-batch-size 1 --per-device-batch-size 1 \
   --max-steps 1 --save-interval 100 --skip-final-checkpoint
 ```
 
@@ -152,18 +159,21 @@ they are not independent command-line choices.
 The paper evaluates three checkpoints per model and reports the best success
 rate separately for each task/embodiment combination.
 
-Example (checkpoint path and normalization key supplied by the user):
+Literal one-trial execution check for the optional public source-prior
+checkpoint downloaded by `scripts/download_public_artifacts.py` with
+`--include-pretrain-checkpoint`:
 
 ```bash
-uv run --locked python scripts/evaluate.py \
-  --checkpoint /path/to/checkpoint.pt \
-  --embodiment panda \
-  --task pnp_counter_to_sink \
-  --unnorm-key mg_pnp_lite
+uv run --locked --extra train --no-dev python scripts/evaluate.py \
+  --checkpoint "$BARX_ARTIFACT_ROOT/runs/xp900-pnp-joint-reps/checkpoints/step-050000-epoch-15-loss=0.2577.pt" \
+  --embodiment panda --task pnp_counter_to_sink --unnorm-key mg_pnp_lite \
+  --episodes 1 --rollout-dir "$BARX_ARTIFACT_ROOT/rollouts/one-trial"
 ```
 
-This defaults to action-only inference, as used for the main results. For the
-inference ablation, add `--inference-representation bounding_box`,
+One trial checks execution but is not a success-rate estimate. Omit
+`--episodes 1` for the 100-seed paper protocol. Both commands default to
+action-only inference, as used for the main results. For the inference
+ablation, add `--inference-representation bounding_box`,
 `language_motion`, or `end_effector_trace`. The launcher maps Panda-OG and Jaco
 to their registered internal simulator classes.
 
@@ -178,6 +188,6 @@ files remain the source of record.
 Aggregate any collection of complete and failed runs without parsing text logs:
 
 ```bash
-uv run --locked python scripts/summarize_evaluations.py rollouts \
+uv run --locked --no-dev python scripts/summarize_evaluations.py rollouts \
   --output evaluation/results.csv
 ```

@@ -18,7 +18,7 @@ From the repository root:
 
 ```bash
 uv sync --locked --no-dev
-uv run --locked python -m unittest discover -s tests -v
+uv run --locked --no-dev python -m unittest discover -s tests -v
 ```
 
 uv installs `policy` and `robocasa_x` editably from this repository.
@@ -28,13 +28,21 @@ Download RoboCasa's Objaverse models and high-resolution kitchen textures
 through the static upstream asset archives before constructing an environment:
 
 ```bash
-uv run --locked python robocasa_x/robocasa/scripts/download_kitchen_assets.py
+uv run --locked --no-dev python robocasa_x/robocasa/scripts/download_kitchen_assets.py --yes
+uv run --locked --no-dev python -c "import robocasa, robosuite; print('RoboCasa-X import OK')"
 ```
 
-The download is about 5.8 GiB. The script places assets under the editable
+The download is about 3.5 GiB compressed and occupies about 8.8 GiB after
+extraction. The script places assets under the editable
 `robocasa_x/robocasa/models/assets/` tree, where the simulator
 expects them. A missing bundle causes task construction to fail before an
 episode begins; dependency-only tests do not require it.
+
+The downloader verifies the published byte count and SHA-256 of each archive,
+extracts into a temporary directory, and exits nonzero without replacing a
+working asset tree if a download or verification fails. Omit `--yes` for an
+interactive confirmation, or use repeated `--asset NAME` flags to install only
+specific groups.
 
 For training, install the optional FlashAttention build:
 
@@ -70,3 +78,19 @@ release-environment override without forking third-party source.
 Use `--locked` in published commands. `uv sync --locked` fails if
 `pyproject.toml` and `uv.lock` disagree instead of silently updating packages.
 Do not run `uv lock --upgrade` when reproducing paper results.
+
+## Expected first-run warnings and pauses
+
+RoboCasa/robosuite may warn that no private macro file exists, Mink whole-body
+IK is unavailable, or MimicGen is not installed. Those optional components are
+not used by the BARX walkthrough. TensorFlow may report duplicate CUDA plugin
+registration, missing TensorRT, and a Transformers cache migration; an absent
+`OpenGL_accelerate` module is also optional. These messages are non-fatal if
+the command continues and ultimately exits zero.
+
+The artifact downloader prefetches the pinned DINOv2, SigLIP, and Qwen files
+into `$HF_HOME`. Model initialization can still be quiet for several minutes
+while multi-gigabyte checkpoints are read from a network filesystem. Treat an
+exception, nonzero exit, checksum failure, CUDA out-of-memory error, or missing
+asset/checkpoint message as actionable. `hf_xet` is optional and only speeds
+Hugging Face transfers.

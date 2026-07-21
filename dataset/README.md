@@ -29,9 +29,9 @@ different directory, which scrubs private paths and normalizes metadata while
 leaving the source untouched:
 
 ```bash
-uv run --locked python scripts/stage_release_data.py \
+uv run --locked --no-dev python scripts/stage_release_data.py \
   /data/barx-archive /data/barx-public
-uv run --locked python scripts/build_data_manifest.py \
+uv run --locked --no-dev python scripts/build_data_manifest.py \
   /data/barx-public --output dataset/manifest.csv
 ```
 
@@ -55,11 +55,11 @@ every embodiment. The release launcher retains historical TFDS directory
 names required by training statistics and future checkpoints:
 
 ```bash
-uv run --locked python scripts/build_rlds.py \
+uv run --locked --no-dev python scripts/build_rlds.py \
   --dataset xp_900 --task pnp \
   --raw-root /data/barx --rlds-root /data/barx-rlds
 
-uv run --locked python scripts/build_rlds.py \
+uv run --locked --no-dev python scripts/build_rlds.py \
   --dataset target_50 --target panda --task pnp \
   --raw-root /data/barx --rlds-root /data/barx-rlds
 ```

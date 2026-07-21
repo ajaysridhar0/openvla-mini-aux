@@ -34,7 +34,7 @@ Build those training-compatible directories through the manifest-driven
 launcher rather than invoking the TFDS builder directly:
 
 ```bash
-uv run --locked python scripts/build_rlds.py \
+uv run --locked --no-dev python scripts/build_rlds.py \
   --dataset xp_3k --task flip_mug \
   --raw-root /data/barx --rlds-root /data/barx-rlds
 ```

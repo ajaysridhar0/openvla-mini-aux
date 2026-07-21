@@ -19,10 +19,12 @@ from prismatic.models.backbones.llm.prompting.qwen_prompter import QwenPromptBui
 QWEN25_MODELS = {
     # === Pure Qwen2.5 (non-instruct/chat-tuned) Models ===
     "qwen25-0_5b-extra": {
-        "llm_family": "qwen2.5", "llm_cls": AutoModelForCausalLM, "hf_hub_path": "Qwen/Qwen2.5-0.5B"
+        "llm_family": "qwen2.5", "llm_cls": AutoModelForCausalLM, "hf_hub_path": "Qwen/Qwen2.5-0.5B",
+        "hf_hub_revision": "060db6499f32faf8b98477b0a26969ef7d8b9987",
     },
     "qwen25-0_5b-pure": {
-        "llm_family": "qwen2.5", "llm_cls": AutoModelForCausalLM, "hf_hub_path": "Qwen/Qwen2.5-0.5B"
+        "llm_family": "qwen2.5", "llm_cls": AutoModelForCausalLM, "hf_hub_path": "Qwen/Qwen2.5-0.5B",
+        "hf_hub_revision": "060db6499f32faf8b98477b0a26969ef7d8b9987",
     },
     "qwen25-1_5b-pure": {
         "llm_family": "qwen2.5", "llm_cls": AutoModelForCausalLM, "hf_hub_path": "Qwen/Qwen2.5-1.5B"
@@ -50,8 +52,7 @@ class Qwen25LLMBackbone(HFCausalLLMBackbone):
         pretrained: bool = True,
     ) -> None:
         model_info = QWEN25_MODELS[llm_backbone_id]
-        
-        
+
         # Initialize the parent class first
         super().__init__(
             llm_backbone_id,

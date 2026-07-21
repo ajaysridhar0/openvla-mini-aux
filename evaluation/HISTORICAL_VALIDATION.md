@@ -57,7 +57,7 @@ their upstream behavior.
 Given access to a retained local rollout directory, repeat the check with:
 
 ```bash
-uv run --locked python scripts/audit_historical_rollouts.py \
+uv run --locked --no-dev python scripts/audit_historical_rollouts.py \
   --task flip_mug_upright \
   --embodiment panda \
   --rollout-dir /path/to/historical/act \

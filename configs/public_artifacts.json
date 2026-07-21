@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "artifacts": [
+    {
+      "name": "BARX base VLM",
+      "repo_id": "ajaysri/prism-qwen25-extra-dinosiglip-224px-0_5b-stage-finetune-x7",
+      "repo_type": "model",
+      "revision": "98e7cc6e564d8af6302f3d6e3fe2f8280a8b16ce",
+      "destination": "base-vlm",
+      "allow_patterns": [
+        "config.json",
+        "checkpoints/latest-checkpoint.pt"
+      ],
+      "expected_files": {
+        "checkpoints/latest-checkpoint.pt": {
+          "size_bytes": 2630986501,
+          "sha256": "d86525b8d21865b2e83d4a403ee9d1b641579bb41259111d7e3cc7f7ed46564a"
+        }
+      }
+    },
+    {
+      "name": "XP-900 PnP RLDS data",
+      "repo_id": "ajaysri/robocasa-x-xp900-pnp",
+      "repo_type": "dataset",
+      "revision": "a2b5256a48428ea56064b0afb3dc184a045b10ae",
+      "destination": "data/mg_pnp_lite"
+    },
+    {
+      "name": "XP-900 PnP VQ tokenizer",
+      "repo_id": "ajaysri/robocasa-x-xp900-pnp-vq-extra-action-tokenizer",
+      "repo_type": "model",
+      "revision": "7d50d28628237c499eb8488e1cf91aab8acbaec6",
+      "destination": "vq/mg_pnp_lite",
+      "allow_patterns": [
+        "config.json",
+        "checkpoints/model.pt"
+      ],
+      "expected_files": {
+        "checkpoints/model.pt": {
+          "size_bytes": 9519250,
+          "sha256": "cbf410959839f99ee131aa8c7d4c2dc2116d134f23ee9e88e90fa089270e7378"
+        }
+      }
+    },
+    {
+      "name": "XP-900 PnP Joint Reps source prior",
+      "repo_id": "ajaysri/barx-joint-reps-xp900-pnp-pretrain",
+      "repo_type": "model",
+      "revision": "191da4c06c1050767a0379feb67a5c20e85bd703",
+      "destination": "runs/xp900-pnp-joint-reps",
+      "optional": true,
+      "allow_patterns": [
+        "config.json",
+        "dataset_statistics.json",
+        "checkpoints/step-050000-epoch-15-loss=0.2577.pt"
+      ],
+      "expected_files": {
+        "checkpoints/step-050000-epoch-15-loss=0.2577.pt": {
+          "size_bytes": 5554882540,
+          "sha256": "ffce76802a8e75d4806b30dee43624accf2c4de4213c17059457e34a8243efce"
+        }
+      }
+    }
+  ],
+  "runtime_dependencies": [
+    {
+      "name": "DINOv2 vision backbone",
+      "repo_id": "timm/vit_large_patch14_reg4_dinov2.lvd142m",
+      "repo_type": "model",
+      "revision": "f3c408e77602bb412aa65fb03dfa0d5f95cb3832",
+      "allow_patterns": [
+        "config.json",
+        "model.safetensors"
+      ]
+    },
+    {
+      "name": "SigLIP vision backbone",
+      "repo_id": "timm/ViT-SO400M-14-SigLIP",
+      "repo_type": "model",
+      "revision": "9179d15177ece40964c50492136eda2f3e0c9f61",
+      "allow_patterns": [
+        "open_clip_config.json",
+        "open_clip_model.safetensors"
+      ]
+    },
+    {
+      "name": "Qwen2.5 language backbone",
+      "repo_id": "Qwen/Qwen2.5-0.5B",
+      "repo_type": "model",
+      "revision": "060db6499f32faf8b98477b0a26969ef7d8b9987",
+      "allow_patterns": [
+        "config.json",
+        "generation_config.json",
+        "merges.txt",
+        "model.safetensors",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "vocab.json"
+      ]
+    }
+  ]
+}

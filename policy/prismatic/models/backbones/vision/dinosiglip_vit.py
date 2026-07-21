@@ -27,11 +27,19 @@ from prismatic.models.backbones.vision.base_vision import (
 DINOSigLIP_VISION_BACKBONES = {
     "dinosiglip-vit-so-224px": {
         "dino": "vit_large_patch14_reg4_dinov2.lvd142m",
+        "dino_hf_hub_id": (
+            "timm/vit_large_patch14_reg4_dinov2.lvd142m@f3c408e77602bb412aa65fb03dfa0d5f95cb3832"
+        ),
         "siglip": "vit_so400m_patch14_siglip_224",
+        "siglip_hf_hub_id": "timm/ViT-SO400M-14-SigLIP@9179d15177ece40964c50492136eda2f3e0c9f61",
     },
     "dinosiglip-vit-so-384px": {
         "dino": "vit_large_patch14_reg4_dinov2.lvd142m",
+        "dino_hf_hub_id": (
+            "timm/vit_large_patch14_reg4_dinov2.lvd142m@f3c408e77602bb412aa65fb03dfa0d5f95cb3832"
+        ),
         "siglip": "vit_so400m_patch14_siglip_384",
+        "siglip_hf_hub_id": "timm/ViT-SO400M-14-SigLIP@9179d15177ece40964c50492136eda2f3e0c9f61",
     },
 }
 
@@ -62,15 +70,25 @@ class DinoSigLIPViTBackbone(VisionBackbone):
         )
         self.dino_timm_path_or_url = DINOSigLIP_VISION_BACKBONES[vision_backbone_id]["dino"]
         self.siglip_timm_path_or_url = DINOSigLIP_VISION_BACKBONES[vision_backbone_id]["siglip"]
+        dino_hf_hub_id = DINOSigLIP_VISION_BACKBONES[vision_backbone_id]["dino_hf_hub_id"]
+        siglip_hf_hub_id = DINOSigLIP_VISION_BACKBONES[vision_backbone_id]["siglip_hf_hub_id"]
 
         # Initialize both Featurizers (ViTs) by downloading from HF / TIMM Hub if necessary
         self.dino_featurizer: VisionTransformer = timm.create_model(
-            self.dino_timm_path_or_url, pretrained=True, num_classes=0, img_size=self.default_image_size
+            self.dino_timm_path_or_url,
+            pretrained=True,
+            pretrained_cfg_overlay={"hf_hub_id": dino_hf_hub_id},
+            num_classes=0,
+            img_size=self.default_image_size,
         )
         self.dino_featurizer.eval()
 
         self.siglip_featurizer: VisionTransformer = timm.create_model(
-            self.siglip_timm_path_or_url, pretrained=True, num_classes=0, img_size=self.default_image_size
+            self.siglip_timm_path_or_url,
+            pretrained=True,
+            pretrained_cfg_overlay={"hf_hub_id": siglip_hf_hub_id},
+            num_classes=0,
+            img_size=self.default_image_size,
         )
         self.siglip_featurizer.eval()
 

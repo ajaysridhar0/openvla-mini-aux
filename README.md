@@ -47,34 +47,65 @@ Install [uv](https://docs.astral.sh/uv/) 0.11.11 or newer, then run:
 
 ```bash
 uv sync --locked --no-dev
-uv run --locked python -m unittest discover -s tests -v
+uv run --locked --no-dev python -m unittest discover -s tests -v
 ```
 
 Before simulation or evaluation, download the upstream RoboCasa kitchen asset
-bundle (about 5.8 GiB) through its standard distribution workflow:
+bundle (about 3.5 GiB compressed and 8.8 GiB installed):
 
 ```bash
-uv run --locked python robocasa_x/robocasa/scripts/download_kitchen_assets.py
+uv run --locked --no-dev python robocasa_x/robocasa/scripts/download_kitchen_assets.py --yes
+uv run --locked --no-dev python -c "import robocasa, robosuite; print('RoboCasa-X import OK')"
 ```
 
-Download the base VLM, XP-900 PnP RLDS data, and its VQ tokenizer into the
-runtime-compatible directory names:
+Choose one external artifact directory, then download the base VLM, XP-900 PnP
+RLDS data, its VQ tokenizer, and the pinned DINOv2, SigLIP, and Qwen runtime
+dependencies. Every Hugging Face snapshot is locked to the revision recorded
+in `configs/public_artifacts.json`.
 
 ```bash
-uv run --locked python scripts/download_public_artifacts.py \
-  --data-root /data/barx-rlds \
-  --base-vlm-dir /models/barx-base
+export BARX_ARTIFACT_ROOT="$(pwd)/../barx-artifacts"
+export HF_HOME="$BARX_ARTIFACT_ROOT/hf"
+export BARX_VQ_ROOT="$BARX_ARTIFACT_ROOT/vq"
+uv run --locked --no-dev python scripts/download_public_artifacts.py \
+  --artifact-root "$BARX_ARTIFACT_ROOT"
 ```
 
-Plan for at least 60 GiB of free space for that training walkthrough and the
-environment/cache. Add `--include-pretrain-checkpoint` to also download the
-released Joint Reps source-prior run.
+This fetches only the runtime base checkpoint, not the three historical copies
+or W&B files in its source repository. Plan for at least 60 GiB of free space
+for the walkthrough and environment/cache. Add `--include-pretrain-checkpoint`
+to also fetch the released Joint Reps source-prior run (about 5.2 GiB).
 
 For training with FlashAttention and a CUDA development toolkit:
 
 ```bash
 uv sync --locked --extra train --no-dev
 ```
+
+The complete one-A40 initialization and optimizer smoke test is:
+
+```bash
+uv run --locked --extra train --no-dev python scripts/train.py prior \
+  --prior xp_900 --task pnp --method joint_reps \
+  --data-root "$BARX_ARTIFACT_ROOT/data" \
+  --base-vlm "$BARX_ARTIFACT_ROOT/base-vlm" \
+  --run-root "$BARX_ARTIFACT_ROOT/runs/smoke" \
+  --gpus 1 --global-batch-size 1 --per-device-batch-size 1 \
+  --max-steps 1 --save-interval 100 --skip-final-checkpoint
+```
+
+For a single simulator trial of the released checkpoint, rerun the artifact
+download with `--include-pretrain-checkpoint`, then execute:
+
+```bash
+uv run --locked --extra train --no-dev python scripts/evaluate.py \
+  --checkpoint "$BARX_ARTIFACT_ROOT/runs/xp900-pnp-joint-reps/checkpoints/step-050000-epoch-15-loss=0.2577.pt" \
+  --embodiment panda --task pnp_counter_to_sink --unnorm-key mg_pnp_lite \
+  --episodes 1 --rollout-dir "$BARX_ARTIFACT_ROOT/rollouts/one-trial"
+```
+
+This one trial is an execution check, not a success-rate estimate; the paper
+protocol uses 100 held-out seeds per setting.
 
 See [`docs/installation.md`](docs/installation.md) for system requirements,
 [`docs/data.md`](docs/data.md) for dataset preparation, and
