@@ -39,7 +39,7 @@ ENVIRONMENT_ALIASES = {
     "FlipMugUpright": "XFlipMugUpright",
 }
 LEGACY_TO_NORMALIZED = [0, 1, 2, 3, 4, 5, 10, 6, 7, 8, 9, 11]
-PRIVATE_METADATA_MARKERS = ("/iliad", "/sailhome", "jenseng")
+PRIVATE_METADATA_MARKERS = ("/iliad", "/sailhome", "/home/")
 
 
 def internal_embodiment(relative_path: Path) -> str:

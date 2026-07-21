@@ -40,7 +40,7 @@ class StageReleaseDataTest(unittest.TestCase):
                     "object_cfgs": [
                         {
                             "info": {
-                                "mjcf_path": "/iliad2/u/jenseng/project/robocasa/"
+                                "mjcf_path": "/iliad2/u/private-user/project/robocasa/"
                                 "models/assets/objects/mug/model.xml"
                             }
                         }
@@ -48,7 +48,7 @@ class StageReleaseDataTest(unittest.TestCase):
                 }
             )
             demo.attrs["model_file"] = (
-                '<mujoco><asset><mesh file="/sailhome/jenseng/project/robosuite/'
+                '<mujoco><asset><mesh file="/sailhome/private-user/project/robosuite/'
                 'models/assets/robots/arm.stl"/></asset></mujoco>'
             )
 
