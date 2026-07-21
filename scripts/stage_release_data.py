@@ -18,6 +18,8 @@ from pathlib import Path
 import h5py
 import numpy as np
 
+from barx.evaluation_conditions import portable_ep_meta, portable_model_xml
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MANIFEST = ROOT / "dataset" / "manifest.csv"
@@ -37,6 +39,7 @@ ENVIRONMENT_ALIASES = {
     "FlipMugUpright": "XFlipMugUpright",
 }
 LEGACY_TO_NORMALIZED = [0, 1, 2, 3, 4, 5, 10, 6, 7, 8, 9, 11]
+PRIVATE_METADATA_MARKERS = ("/iliad", "/sailhome", "jenseng")
 
 
 def internal_embodiment(relative_path: Path) -> str:
@@ -64,6 +67,57 @@ def normalize_env_args(raw_env_args: str | bytes, embodiment: str) -> str:
     if stored_environment in ENVIRONMENT_ALIASES:
         env_args["env_name"] = ENVIRONMENT_ALIASES[stored_environment]
     return json.dumps(env_args, separators=(",", ":"), sort_keys=True)
+
+
+def normalize_demo_metadata(data: h5py.Group) -> None:
+    """Make retained replay metadata independent of the collection machine."""
+
+    for demo_name, demo in data.items():
+        if not isinstance(demo, h5py.Group):
+            continue
+        if "ep_meta" in demo.attrs:
+            original_ep_meta = demo.attrs["ep_meta"]
+            ep_meta = json.loads(original_ep_meta)
+            normalized_ep_meta = json.dumps(
+                portable_ep_meta(ep_meta), separators=(",", ":"), sort_keys=True
+            )
+            if normalized_ep_meta != original_ep_meta:
+                demo.attrs["ep_meta"] = normalized_ep_meta
+        if "model_file" in demo.attrs:
+            model_xml = demo.attrs["model_file"]
+            if isinstance(model_xml, bytes):
+                model_xml = model_xml.decode("utf-8")
+            if not isinstance(model_xml, str):
+                raise ValueError(f"{demo.name}.attrs['model_file'] must be text")
+            portable_xml = portable_model_xml(model_xml)
+            if portable_xml != model_xml:
+                demo.attrs["model_file"] = portable_xml
+
+
+def attribute_text(value: object) -> str:
+    """Return a searchable text representation of an HDF5 attribute."""
+
+    if isinstance(value, bytes):
+        return value.decode("utf-8", errors="replace")
+    if isinstance(value, np.ndarray):
+        return " ".join(attribute_text(item) for item in value.reshape(-1))
+    return str(value)
+
+
+def private_attribute_hits(file: h5py.File) -> list[str]:
+    """Return attribute locations that expose collection-machine paths."""
+
+    hits: list[str] = []
+
+    def inspect(name: str, obj: h5py.Group | h5py.Dataset) -> None:
+        for key, value in obj.attrs.items():
+            text = attribute_text(value).lower()
+            if any(marker in text for marker in PRIVATE_METADATA_MARKERS):
+                hits.append(f"{name or '/'}:{key}")
+
+    inspect("", file)
+    file.visititems(inspect)
+    return hits
 
 
 def normalize_hdf5(path: Path, embodiment: str) -> int:
@@ -100,6 +154,7 @@ def normalize_hdf5(path: Path, embodiment: str) -> int:
 
         if demo_count == 0:
             raise ValueError(f"{path} contains no demonstrations")
+        normalize_demo_metadata(data)
         data.attrs["env_args"] = normalize_env_args(data.attrs["env_args"], embodiment)
         data.attrs[LAYOUT_ATTRIBUTE] = NORMALIZED_LAYOUT
         output.flush()
@@ -129,8 +184,12 @@ def verify_hdf5(path: Path, expected_demos: int) -> None:
             raise ValueError(f"{path} contains a non-12-D action array")
         env_args = json.loads(data.attrs["env_args"])
         environment = env_args.get("env_name")
-        if environment in ENVIRONMENT_ALIASES:
-            raise ValueError(f"{path} retains legacy environment name {environment!r}")
+        if environment not in ENVIRONMENT_ALIASES.values():
+            raise ValueError(f"{path} has unsupported environment name {environment!r}")
+        private_hits = private_attribute_hits(staged)
+        if private_hits:
+            preview = ", ".join(private_hits[:5])
+            raise ValueError(f"{path} exposes private paths in attributes: {preview}")
 
 
 def normalize_existing_hdf5(path: Path, embodiment: str) -> None:
@@ -143,6 +202,7 @@ def normalize_existing_hdf5(path: Path, embodiment: str) -> None:
             or data.attrs.get(LAYOUT_ATTRIBUTE) != NORMALIZED_LAYOUT
         ):
             raise ValueError(f"{path} is not an existing normalized BARX file")
+        normalize_demo_metadata(data)
         data.attrs["env_args"] = normalize_env_args(
             data.attrs["env_args"], embodiment
         )

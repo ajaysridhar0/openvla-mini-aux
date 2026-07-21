@@ -12,8 +12,10 @@ from scripts.stage_release_data import (
     LAYOUT_ATTRIBUTE,
     NORMALIZED_LAYOUT,
     normalize_hdf5,
+    private_attribute_hits,
     stage_file,
     stage_manifest_row,
+    verify_hdf5,
 )
 
 
@@ -33,6 +35,22 @@ class StageReleaseDataTest(unittest.TestCase):
             data.attrs["env_args"] = json.dumps(env_args)
             demo = data.create_group("demo_0")
             demo.create_dataset("actions", data=actions)
+            demo.attrs["ep_meta"] = json.dumps(
+                {
+                    "object_cfgs": [
+                        {
+                            "info": {
+                                "mjcf_path": "/iliad2/u/jenseng/project/robocasa/"
+                                "models/assets/objects/mug/model.xml"
+                            }
+                        }
+                    ]
+                }
+            )
+            demo.attrs["model_file"] = (
+                '<mujoco><asset><mesh file="/sailhome/jenseng/project/robosuite/'
+                'models/assets/robots/arm.stl"/></asset></mujoco>'
+            )
 
     def test_non_panda_actions_are_losslessly_permuted(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -57,6 +75,9 @@ class StageReleaseDataTest(unittest.TestCase):
                     env_args["env_name"],
                     ENVIRONMENT_ALIASES["PnPCounterToSink"],
                 )
+                self.assertIn("<ROBOCASA>/models/assets", data["demo_0"].attrs["ep_meta"])
+                self.assertIn("<ROBOSUITE>/models/assets", data["demo_0"].attrs["model_file"])
+                self.assertEqual(private_attribute_hits(staged), [])
 
     def test_panda_actions_stay_unchanged_and_gripper_is_explicit(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -113,6 +134,17 @@ class StageReleaseDataTest(unittest.TestCase):
             stage_manifest_row(row, root / "source", root / "release")
 
             self.assertTrue((root / "release" / relative).is_file())
+
+    def test_verification_rejects_private_metadata(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "private.hdf5"
+            self.make_file(path, np.arange(12, dtype=np.float32).reshape(1, 12))
+            normalize_hdf5(path, "PandaOmron")
+            with h5py.File(path, "r+") as output:
+                output["data/demo_0"].attrs["scratch_path"] = "/iliad/u/user/data"
+
+            with self.assertRaisesRegex(ValueError, "exposes private paths"):
+                verify_hdf5(path, expected_demos=1)
 
 
 if __name__ == "__main__":
