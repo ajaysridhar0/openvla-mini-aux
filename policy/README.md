@@ -1,8 +1,8 @@
 # BARX policy code
 
 This directory contains the MiniVLA-derived training stack and the RoboCasa-X
-evaluator used by BARX. Install it through the repository-root uv project; do
-not create a second environment from this directory.
+evaluator used by BARX. Use the repository-root uv project as the shared
+environment.
 
 Public method names (`no_reps`, `joint_reps`, `ecot`) and representation names
 (`bounding_box`, `language_motion`, `end_effector_trace`) are resolved by the
@@ -12,6 +12,6 @@ root `barx` compatibility package. Stored RLDS field names remain unchanged.
 - RoboCasa-X evaluator: `experiments/robot/robocasa_x/evaluate.py`
 - Paper workflow: `../docs/experiments.md`
 
-VQ configuration files are included, but their `checkpoints/model.pt` files
-are intentionally absent from this release. Re-train them from the released
-data with `vla-scripts/pretrain_vq.py` or wait for a later checkpoint release.
+VQ configuration files and `vla-scripts/pretrain_vq.py` support training the
+task-specific tokenizers from the simulation dataset. Checkpoint paths are
+ignored by Git so locally trained artifacts remain local.

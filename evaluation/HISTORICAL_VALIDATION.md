@@ -44,8 +44,8 @@ The comparison identified and corrected three release-cleanup regressions:
 - supplying explicit arm joint positions had bypassed the paper evaluator's
   zero-height Omron torso initialization, shifting the camera vertically;
 - the global NumPy seed used by robosuite arm initialization was not restored;
-- four mug models excluded by the paper task were initially left in the public
-  sampling pool, changing the selected mug instance.
+- the public sampling pool initially included four mug models outside the
+  paper task's feasible pool, changing the selected mug instance.
 
 The torso and camera geometry now agrees with the historical source to floating
 point precision in the inspected Panda scene. The mug exclusions and calibrated
@@ -54,8 +54,7 @@ their upstream behavior.
 
 ## Repeating the check
 
-Retained rollouts are not distributed with the public release. Given a local
-rollout directory, run for example:
+Given access to a retained local rollout directory, repeat the check with:
 
 ```bash
 uv run --locked python scripts/audit_historical_rollouts.py \

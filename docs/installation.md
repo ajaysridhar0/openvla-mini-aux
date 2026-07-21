@@ -21,9 +21,8 @@ uv run --locked python -m unittest discover -s tests -v
 uv installs `policy` and `robocasa_x` editably from this repository.
 robosuite, dlimp, and VQ-BeT are pinned to immutable Git commits in `uv.lock`.
 
-RoboCasa's Objaverse models and high-resolution kitchen textures are excluded
-from Git by the upstream project. Download the static upstream asset archives
-before constructing an environment:
+Download RoboCasa's Objaverse models and high-resolution kitchen textures
+through the static upstream asset archives before constructing an environment:
 
 ```bash
 uv run --locked python robocasa_x/robocasa/scripts/download_kitchen_assets.py

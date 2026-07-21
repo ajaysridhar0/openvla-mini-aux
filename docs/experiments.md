@@ -1,8 +1,8 @@
 # Reproducing simulation experiments
 
-The machine-readable constants are in `configs/experiments.toml`. This release
-does not include model or VQ tokenizer checkpoints, so full training starts by
-training the task-specific VQ tokenizer from the released RLDS data.
+The machine-readable constants are in `configs/experiments.toml`. Full
+training starts by training the task-specific VQ tokenizer from the released
+RLDS data.
 
 ## Methods
 
@@ -28,20 +28,20 @@ RoboCasa behavior available while making the benchmark changes explicit:
 
 - all embodiments use the paper's robot base offsets, initial arm poses, and
   zero-height Omron torso pose;
-- object names in instructions omit asset-number suffixes;
+- object names in instructions strip asset-number suffixes;
 - **PnP Counter to Sink** samples the manipulated object in a `0.30 x 0.40`
   region and requires the released object to be inside the sink;
 - **PnP Sink to Counter** samples the manipulated object in a `0.25 x 0.25`
   sink region and the goal receptacle in a `0.30 x 0.30` counter region;
 - **Turn On Sink Faucet** fixes the upstream faucet task to the `turn_on`
   behavior; and
-- **Flip Mug Upright** is the new BARX task, with four infeasible mug assets
-  excluded and the initial mug rotated onto its side.
+- **Flip Mug Upright** is the new BARX task, using the feasible mug-asset pool
+  and an initial mug pose rotated onto its side.
 
 The evaluation scene distribution uses layouts 4, 7, and 8 with styles 0--11.
-It excludes `(layout, style)` pairs `(8, 3)`, `(8, 5)`, `(8, 6)`, and `(8, 9)`
-as described in the paper appendix. Panda-OG additionally excludes style 4 for
-PnP Sink to Counter because the Franka Hand cannot reach that sampled goal.
+Its layout-8 styles are 0, 1, 2, 4, 7, 8, 10, and 11, matching the paper
+appendix. Panda-OG uses styles 0--3 and 5--11 for PnP Sink to Counter because
+the Franka Hand cannot reach the style-4 sampled goal.
 Turn On Sink Faucet uses styles 0, 1, 2, 3, 4, 7, 8, 10, and 11 over all
 compatible layouts. These rules live in `barx/benchmark.py` and are serialized
 into every frozen condition bundle.

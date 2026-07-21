@@ -1,12 +1,12 @@
 # BARX: Cross-Embodiment Transfer via Behavior-Aligned Representations
 
-Official simulation-only code and data release for **BARX** and the
-**RoboCasa-X** benchmark, accompanying the ICRA 2026 paper
+Official simulation-only code release for **BARX** and the **RoboCasa-X**
+benchmark, accompanying the ICRA 2026 paper
 *Cross-Embodiment Transfer via Behavior-Aligned Representations*.
 
 [Project website](https://ajaysridhar.com/barx/)
 
-## Release scope
+## Release contents
 
 This repository contains:
 
@@ -14,13 +14,11 @@ This repository contains:
 - the modified RoboCasa-X benchmark and an exact robosuite 1.5.1 Git pin;
 - one action layout shared by every simulator embodiment and the RLDS
   converter;
-- a manifest for the 283.13 GiB simulation-data release; and
+- a manifest describing the 283.13 GiB simulation-data collection; and
 - paper-aligned experiment names, configuration, and protocols.
 
-It intentionally excludes model and VQ tokenizer checkpoints, real-robot code
-and data, failed/raw intermediate demonstrations, and cluster-specific logs.
-The simulation HDF5 files are distributed separately from Git; see
-[`dataset/README.md`](dataset/README.md).
+The simulation HDF5 files use a separate data archive; see
+[`dataset/README.md`](dataset/README.md) for its composition and preparation.
 
 ## Repository layout
 
@@ -34,11 +32,9 @@ The simulation HDF5 files are distributed separately from Git; see
 | `scripts/` | release-data and experiment entry points |
 | `tests/` | dependency-light compatibility tests |
 
-The `mg_robocasa_xembod` and custom `robomimic_xembod` repositories are not
-included. MimicGen was used to create the released simulation data, but it is
-not required to train or evaluate from the final files. Evaluation uses the
-local RoboCasa compatibility wrappers; the locked PyPI robomimic dependency is
-sufficient.
+MimicGen produced the synthetic demonstrations. The final rendered HDF5 files
+form the training-data boundary, while evaluation uses the local RoboCasa
+compatibility wrappers and the locked PyPI robomimic dependency.
 
 ## Quick start
 
@@ -51,8 +47,7 @@ uv run --locked python -m unittest discover -s tests -v
 ```
 
 Before simulation or evaluation, download the upstream RoboCasa kitchen asset
-bundle (about 5.8 GiB, excluded from Git by its upstream license/distribution
-workflow):
+bundle (about 5.8 GiB) through its standard distribution workflow:
 
 ```bash
 uv run --locked python robocasa_x/robocasa/scripts/download_kitchen_assets.py

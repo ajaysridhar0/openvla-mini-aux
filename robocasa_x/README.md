@@ -1,10 +1,9 @@
 # RoboCasa-X runtime
 
-This directory contains the RoboCasa runtime modified for the BARX
-simulation experiments. Install it through the repository-root uv project;
-do not create a separate environment here.
+This directory contains the RoboCasa runtime modified for the BARX simulation
+experiments. Use the repository-root uv project as the shared environment.
 
-Only the four paper tasks are public release entry points:
+The public release entry points are the four paper tasks:
 
 - `XPnPCounterToSink` (PnP Counter to Sink)
 - `XPnPSinkToCounter` (PnP Sink to Counter)
@@ -25,10 +24,9 @@ shared RoboCasa-X controller loader provides one Omron action order without a
 robosuite fork; paper-specific cameras and fixed-base joints are installed only
 by the `X*` task mixin.
 
-The repository intentionally omits demonstration collection, state rendering,
-dataset playback, MimicGen generation, general RoboCasa demos, and upstream
-documentation. The released HDF5 files are already rendered and annotated.
-Asset download and macro setup utilities remain under `robocasa/scripts/`.
+The supported workflow starts from the rendered, annotated HDF5 files and uses
+the four `X*` tasks for evaluation. Asset download and macro setup utilities
+are available under `robocasa/scripts/`.
 
 See the root [installation](../docs/installation.md),
 [data](../docs/data.md), and [experiment](../docs/experiments.md)

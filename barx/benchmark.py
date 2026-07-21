@@ -105,7 +105,7 @@ def evaluation_scene_config(task: str, embodiment: str) -> dict[str, object]:
 
     if task in {"pnp_counter_to_sink", "pnp_sink_to_counter", "flip_mug_upright"}:
         styles = _PNP_STYLES
-        # Historical paper evaluation excluded style 4 for Panda-OG on this
+        # Style 4 was outside the historical Panda-OG condition set for this
         # task because the Franka Hand could not reach the sampled goal.
         if task == "pnp_sink_to_counter" and embodiment == "panda_og":
             styles = tuple(style for style in styles if style != 4)

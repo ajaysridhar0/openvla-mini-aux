@@ -19,9 +19,8 @@ pass.
 
 All four RoboCasa-X tasks are present: pick-and-place counter-to-sink,
 pick-and-place sink-to-counter, turn-on-sink-faucet, and flip-mug-upright.
-Only final annotated files are selected. Raw `demo.hdf5`, `demo_failed.hdf5`,
-unannotated renders, held-out scratch files, checkpoints, and real-robot data
-are excluded.
+The manifest selects the final rendered and annotated simulation files used by
+the paper's XP-900, XP-3K, SP-900, and target-50 experiments.
 
 ## Stage and finalize the release
 
@@ -39,18 +38,16 @@ each invocation. A final unsharded invocation verifies the complete tree.
 All output actions then use
 `[arm(6), gripper(1), base(3), torso(1), mode(1)]`, independent of
 embodiment. Stored episode metadata uses `<ROBOCASA>/` package-relative asset
-paths instead of collection-machine paths. Per-demo
-`model_file` XML is omitted because it is not used by conversion or training;
-exact evaluation replay is provided by `evaluation/conditions/`. Once all files
-have been staged, regenerate the checked release manifest from the output tree:
+paths instead of collection-machine paths. Exact evaluation replay uses the
+XML and settled states in `evaluation/conditions/`. Once all files have been
+staged, regenerate the checked release manifest from the output tree:
 
 ```bash
 uv run --locked python scripts/build_data_manifest.py /path/to/barx-release-data \
   --output dataset/manifest.csv --sha256 --hash-workers 4
 ```
 
-Hashing the full release reads roughly 283 GiB and is therefore not part of
-the fast test suite.
+The final release-validation pass hashes all 283 GiB.
 
 ## RLDS conversion
 
@@ -78,8 +75,8 @@ The public action schema is
 `ee_pose_2D`, `obj_bboxes`, and `language_motions` remain unchanged to preserve
 training compatibility.
 
-## Publication blockers
+## Publishing the data
 
-Before uploading the data, choose the data host and dataset license, run the
-manifest command with `--sha256`, and replace this section with the download
-URL and archive instructions. Do not put the HDF5 files in Git or Git LFS.
+Choose the data host and dataset license, run the manifest command with
+`--sha256`, and add the download URL and archive instructions here. A
+dedicated dataset host is appropriate for the HDF5 archive.

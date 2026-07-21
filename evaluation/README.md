@@ -12,7 +12,7 @@ be described as reconstructed from the paper snapshot, not as extracted from
 the original rollouts. Each bundle records its source revision and verifies its
 complete metadata, model XML, and simulator-state hashes during evaluation.
 RoboCasa mutates resolved object-placement dictionaries while loading a scene;
-those redundant fields are excluded from the post-load metadata comparison,
+those redundant fields are left out of the post-load metadata comparison,
 while object identity and placement remain covered by the XML and state hashes.
 
 Generation is sequential: episode 1 uses seed 1000, episode 2 uses seed 1001,

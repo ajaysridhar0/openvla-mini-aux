@@ -6,9 +6,8 @@ before upload and preserves the relative `mg/` and `human/` paths.
 
 Retained episode metadata replaces installation prefixes with `<ROBOCASA>/`.
 This token preserves asset-relative paths without exposing or depending on the
-original collection machine. Per-demo replay XML is omitted from the rendered
-training release; the exact evaluation XML and settled state are stored in the
-frozen condition bundles.
+original collection machine. The frozen condition bundles store the exact
+evaluation XML and settled state needed for deterministic replay.
 
 ## Canonical action boundary
 

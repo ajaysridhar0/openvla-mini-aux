@@ -13,6 +13,6 @@ original copyright notices and licenses.
 | robosuite-models | locked package dependency | 1.0.0 | upstream terms |
 | robomimic | locked package dependency | 0.3.0 | upstream terms |
 
-MimicGen was used to synthesize data, but its source is not redistributed in
-this repository and it is not required to train from the final release data.
-See `uv.lock` for the complete resolved dependency graph.
+MimicGen was used to synthesize the rendered training data. Training consumes
+those final HDF5 files through the unified converter. See `uv.lock` for the
+complete resolved dependency graph.
