@@ -44,9 +44,9 @@ horizons.
 Set the two reusable paths:
 
 ```bash
-export BARX_DATA_ROOT="$PWD/data"
-export BARX_BASE_VLM="$PWD/models/base-vlm"
-export BARX_VQ_ROOT="$PWD/vq"
+export BARX_DATA_ROOT=data
+export BARX_BASE_VLM=models/base-vlm
+export BARX_VQ_ROOT=vq
 ```
 
 Download the base VLM once:
