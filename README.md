@@ -6,39 +6,19 @@ benchmark, accompanying the ICRA 2026 paper
 
 [Project website](https://ajaysridhar.com/barx/)
 
-## Release contents
+## What's included
 
 This repository contains:
 
 - MiniVLA policy training and RoboCasa-X evaluation code;
-- the modified RoboCasa-X benchmark and an exact robosuite 1.5.1 Git pin;
-- one action layout shared by every simulator embodiment and the RLDS
-  converter;
-- a manifest describing the 283.13 GiB simulation-data collection; and
-- paper-aligned experiment names, configuration, and protocols.
+- the RoboCasa-X simulation benchmark;
+- dataset conversion tools; and
+- reproducible experiment configurations.
 
-The simulation HDF5 files use a separate data archive; see
-[`dataset/README.md`](dataset/README.md) for its composition and preparation.
-
-Public model and dataset artifacts are hosted in the
+Simulation data is documented in [`dataset/README.md`](dataset/README.md).
+Public models and datasets are available from the
 [BARX Hugging Face collections](https://huggingface.co/collections/ajaysri/barx-pretraining-models-joint-reps-and-no-reps).
 They are ungated and do not require a Hugging Face token.
-
-## Repository layout
-
-| Path | Purpose |
-| --- | --- |
-| `barx/` | lightweight naming and normalized action-space API |
-| `policy/` | BARX policy training and RoboCasa-X evaluation |
-| `robocasa_x/` | modified RoboCasa benchmark runtime |
-| `dataset/rlds/` | unified HDF5-to-RLDS converter |
-| `configs/experiments.toml` | paper protocol and compatibility identifiers |
-| `scripts/` | training, evaluation, RLDS conversion, and result summaries |
-| `tests/` | dependency-light compatibility tests |
-
-MimicGen produced the synthetic demonstrations. The final rendered HDF5 files
-form the training-data boundary, while evaluation uses the local RoboCasa
-compatibility wrappers and the locked PyPI robomimic dependency.
 
 ## Quick start
 
@@ -50,18 +30,14 @@ uv sync --locked --no-dev
 uv run --locked --no-dev python -m unittest discover -s tests -v
 ```
 
-Before simulation or evaluation, download the upstream RoboCasa kitchen asset
-bundle (about 3.5 GiB compressed and 8.8 GiB installed):
+Download the RoboCasa kitchen assets:
 
 ```bash
 uv run --locked --no-dev python robocasa_x/robocasa/scripts/download_kitchen_assets.py --yes
 uv run --locked --no-dev python -c "import robocasa, robosuite; print('RoboCasa-X import OK')"
 ```
 
-Choose one external artifact directory, then download the base VLM, XP-900 PnP
-RLDS data, its VQ tokenizer, and the pinned DINOv2, SigLIP, and Qwen runtime
-dependencies. Every Hugging Face snapshot is locked to the revision recorded
-in `configs/public_artifacts.json`.
+Choose a directory for the XP-900 PnP walkthrough artifacts and download them:
 
 ```bash
 export BARX_ARTIFACT_ROOT="$(pwd)/../barx-artifacts"
@@ -71,18 +47,13 @@ uv run --locked --no-dev python scripts/download_public_artifacts.py \
   --artifact-root "$BARX_ARTIFACT_ROOT"
 ```
 
-This fetches only the runtime base checkpoint, not the three historical copies
-or W&B files in its source repository. Plan for at least 60 GiB of free space
-for the walkthrough and environment/cache. Add `--include-pretrain-checkpoint`
-to also fetch the released Joint Reps source-prior run (about 5.2 GiB).
-
-For training with FlashAttention and a CUDA development toolkit:
+Install the training dependencies:
 
 ```bash
 uv sync --locked --extra train --no-dev
 ```
 
-The complete one-A40 initialization and optimizer smoke test is:
+Run a one-GPU training smoke test:
 
 ```bash
 uv run --locked --extra train --no-dev python scripts/train.py prior \
@@ -94,8 +65,9 @@ uv run --locked --extra train --no-dev python scripts/train.py prior \
   --max-steps 1 --save-interval 100 --skip-final-checkpoint
 ```
 
-For a single simulator trial of the released checkpoint, rerun the artifact
-download with `--include-pretrain-checkpoint`, then execute:
+To evaluate the released Joint Reps checkpoint, first add
+`--include-pretrain-checkpoint` to the artifact download command above. Then
+run one simulator trial:
 
 ```bash
 uv run --locked --extra train --no-dev python scripts/evaluate.py \
@@ -104,32 +76,11 @@ uv run --locked --extra train --no-dev python scripts/evaluate.py \
   --episodes 1 --rollout-dir "$BARX_ARTIFACT_ROOT/rollouts/one-trial"
 ```
 
-This one trial is an execution check, not a success-rate estimate; the paper
-protocol uses 100 held-out seeds per setting.
+The paper protocol uses 100 trials; omit `--episodes 1` to run the full set.
 
 See [`docs/installation.md`](docs/installation.md) for system requirements,
 [`docs/data.md`](docs/data.md) for dataset preparation, and
 [`docs/experiments.md`](docs/experiments.md) for training and evaluation.
-
-## Paper names and stored names
-
-Public APIs use the names from the paper. Existing dataset fields and model
-internals retain their original names so that conversion results and future
-checkpoint releases remain compatible.
-
-| Paper name | Stored/internal identifier |
-| --- | --- |
-| No Reps | `base` / `action` |
-| Joint Reps | `aux` / `bbox->,low_level_motion->,ee_pose_2D->,action` |
-| ECoT | `chain` / `bbox->ee_pose_2D->low_level_motion->,action` |
-| bounding box | `bbox` |
-| language motion | `low_level_motion` |
-| end-effector trace | `ee_pose_2D` |
-| XP-900 | `mg_*_lite` |
-| XP-3K | `mg_*` |
-
-Both forms are accepted at compatibility boundaries, but documentation and new
-entry points use only paper names.
 
 ## Citation
 
