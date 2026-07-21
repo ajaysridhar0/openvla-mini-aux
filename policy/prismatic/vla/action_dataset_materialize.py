@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Tuple, Optional
+from typing import Any, Dict, Optional, Tuple
 
 from prismatic.vla.datasets.datasets import EpisodicRLDSDataset, RLDSDataset
 
@@ -37,7 +37,6 @@ def get_vla_action_dataset(
 ):
     """Only get the image / action / instruction, don't do any tokenization."""
 
-    # TODO new batch transform
     batch_transform = RLDSActionBatchTransform(include_images=include_images)
 
     # Build RLDS Iterable Dataset & Return
