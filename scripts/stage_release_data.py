@@ -201,9 +201,7 @@ def normalize_existing_hdf5(path: Path, embodiment: str) -> None:
         ):
             raise ValueError(f"{path} is not an existing normalized BARX file")
         normalize_demo_metadata(data)
-        data.attrs["env_args"] = normalize_env_args(
-            data.attrs["env_args"], embodiment
-        )
+        data.attrs["env_args"] = normalize_env_args(data.attrs["env_args"], embodiment)
         output.flush()
 
 
@@ -238,6 +236,23 @@ def manifest_rows(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(stream))
 
 
+def select_manifest_shard(
+    rows: list[dict[str, str]],
+    *,
+    shard_count: int,
+    shard_index: int,
+    limit: int | None,
+) -> list[dict[str, str]]:
+    """Select one deterministic, non-overlapping slice of the manifest."""
+
+    if shard_count < 1:
+        raise ValueError("shard_count must be at least 1")
+    if not 0 <= shard_index < shard_count:
+        raise ValueError("shard_index must be in [0, shard_count)")
+    selected = rows[shard_index::shard_count]
+    return selected if limit is None else selected[:limit]
+
+
 def stage_manifest_row(
     row: dict[str, str], source_root: Path, output_root: Path
 ) -> None:
@@ -268,6 +283,18 @@ def main() -> None:
         "--limit", type=int, help="Stage only the first N files for a dry run"
     )
     parser.add_argument(
+        "--shard-count",
+        type=int,
+        default=1,
+        help="Split the manifest into this many non-overlapping shards",
+    )
+    parser.add_argument(
+        "--shard-index",
+        type=int,
+        default=0,
+        help="Zero-based shard to process (default: 0)",
+    )
+    parser.add_argument(
         "--workers",
         type=int,
         default=4,
@@ -283,10 +310,17 @@ def main() -> None:
         )
     if args.workers < 1:
         parser.error("--workers must be at least 1")
+    if args.shard_count < 1:
+        parser.error("--shard-count must be at least 1")
+    if not 0 <= args.shard_index < args.shard_count:
+        parser.error("--shard-index must be in [0, --shard-count)")
 
-    rows = manifest_rows(args.manifest)
-    if args.limit is not None:
-        rows = rows[: args.limit]
+    rows = select_manifest_shard(
+        manifest_rows(args.manifest),
+        shard_count=args.shard_count,
+        shard_index=args.shard_index,
+        limit=args.limit,
+    )
     with ThreadPoolExecutor(max_workers=args.workers) as executor:
         list(
             executor.map(

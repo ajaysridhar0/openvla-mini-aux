@@ -13,6 +13,7 @@ from scripts.stage_release_data import (
     NORMALIZED_LAYOUT,
     normalize_hdf5,
     private_attribute_hits,
+    select_manifest_shard,
     stage_file,
     stage_manifest_row,
     verify_hdf5,
@@ -28,7 +29,7 @@ class StageReleaseDataTest(unittest.TestCase):
                     "type": "HYBRID_MOBILE_BASE",
                     "composite_controller_specific_configs": {},
                 }
-            }
+            },
         }
         with h5py.File(path, "w") as output:
             data = output.create_group("data")
@@ -75,7 +76,9 @@ class StageReleaseDataTest(unittest.TestCase):
                     env_args["env_name"],
                     ENVIRONMENT_ALIASES["PnPCounterToSink"],
                 )
-                self.assertIn("<ROBOCASA>/models/assets", data["demo_0"].attrs["ep_meta"])
+                self.assertIn(
+                    "<ROBOCASA>/models/assets", data["demo_0"].attrs["ep_meta"]
+                )
                 self.assertNotIn("model_file", data["demo_0"].attrs)
                 self.assertEqual(private_attribute_hits(staged), [])
 
@@ -145,6 +148,16 @@ class StageReleaseDataTest(unittest.TestCase):
 
             with self.assertRaisesRegex(ValueError, "exposes private paths"):
                 verify_hdf5(path, expected_demos=1)
+
+    def test_manifest_shards_are_disjoint_and_complete(self):
+        rows = [{"relative_path": str(index)} for index in range(10)]
+        shards = [
+            select_manifest_shard(rows, shard_count=3, shard_index=index, limit=None)
+            for index in range(3)
+        ]
+        paths = [row["relative_path"] for shard in shards for row in shard]
+        self.assertCountEqual(paths, [str(index) for index in range(10)])
+        self.assertEqual(len(paths), len(set(paths)))
 
 
 if __name__ == "__main__":

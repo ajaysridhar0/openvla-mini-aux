@@ -32,6 +32,10 @@ uv run --locked python scripts/stage_release_data.py \
   /path/to/original-data /path/to/barx-release-data
 ```
 
+For a large copy, independent workers can process non-overlapping manifest
+shards by passing the same `--shard-count` and a distinct `--shard-index` to
+each invocation. A final unsharded invocation verifies the complete tree.
+
 All output actions then use
 `[arm(6), gripper(1), base(3), torso(1), mode(1)]`, independent of
 embodiment. Stored episode metadata uses `<ROBOCASA>/` package-relative asset
