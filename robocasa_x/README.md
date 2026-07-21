@@ -26,9 +26,9 @@ robosuite fork; paper-specific cameras and fixed-base joints are installed only
 by the `X*` task mixin.
 
 The repository intentionally omits demonstration collection, state rendering,
-MimicGen generation, general RoboCasa demos, and upstream documentation. The
-released HDF5 files are already rendered and annotated. Dataset playback,
-asset download, and macro setup utilities remain under `robocasa/scripts/`.
+dataset playback, MimicGen generation, general RoboCasa demos, and upstream
+documentation. The released HDF5 files are already rendered and annotated.
+Asset download and macro setup utilities remain under `robocasa/scripts/`.
 
 See the root [installation](../docs/installation.md),
 [data](../docs/data.md), and [experiment](../docs/experiments.md)

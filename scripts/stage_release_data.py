@@ -30,6 +30,12 @@ PANDA_GRIPPERS = {
     "PandaOGGripperOmron": "PandaGripper",
     "PandaOGOmron": "PandaGripper",
 }
+ENVIRONMENT_ALIASES = {
+    "PnPCounterToSink": "XPnPCounterToSink",
+    "PnPSinkToCounter": "XPnPSinkToCounter",
+    "TurnOnSinkFaucet": "XTurnOnSinkFaucet",
+    "FlipMugUpright": "XFlipMugUpright",
+}
 LEGACY_TO_NORMALIZED = [0, 1, 2, 3, 4, 5, 10, 6, 7, 8, 9, 11]
 
 
@@ -54,6 +60,9 @@ def normalize_env_args(raw_env_args: str | bytes, embodiment: str) -> str:
 
     if embodiment in PANDA_GRIPPERS:
         env_kwargs["gripper_types"] = PANDA_GRIPPERS[embodiment]
+    stored_environment = env_args.get("env_name")
+    if stored_environment in ENVIRONMENT_ALIASES:
+        env_args["env_name"] = ENVIRONMENT_ALIASES[stored_environment]
     return json.dumps(env_args, separators=(",", ":"), sort_keys=True)
 
 
@@ -118,6 +127,26 @@ def verify_hdf5(path: Path, expected_demos: int) -> None:
             )
         if any(demo["actions"].shape[-1] != 12 for demo in demos):
             raise ValueError(f"{path} contains a non-12-D action array")
+        env_args = json.loads(data.attrs["env_args"])
+        environment = env_args.get("env_name")
+        if environment in ENVIRONMENT_ALIASES:
+            raise ValueError(f"{path} retains legacy environment name {environment!r}")
+
+
+def normalize_existing_hdf5(path: Path, embodiment: str) -> None:
+    """Apply idempotent metadata normalization to an existing staged file."""
+
+    with h5py.File(path, "r+") as output:
+        data = output.get("data")
+        if (
+            not isinstance(data, h5py.Group)
+            or data.attrs.get(LAYOUT_ATTRIBUTE) != NORMALIZED_LAYOUT
+        ):
+            raise ValueError(f"{path} is not an existing normalized BARX file")
+        data.attrs["env_args"] = normalize_env_args(
+            data.attrs["env_args"], embodiment
+        )
+        output.flush()
 
 
 def stage_file(
@@ -125,6 +154,7 @@ def stage_file(
 ) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination.exists():
+        normalize_existing_hdf5(destination, embodiment)
         verify_hdf5(destination, expected_demos)
         print(f"verified {destination}")
         return

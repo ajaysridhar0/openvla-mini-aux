@@ -8,6 +8,7 @@ import numpy as np
 
 from scripts.stage_release_data import (
     BODY_PART_ORDER,
+    ENVIRONMENT_ALIASES,
     LAYOUT_ATTRIBUTE,
     NORMALIZED_LAYOUT,
     normalize_hdf5,
@@ -19,6 +20,7 @@ from scripts.stage_release_data import (
 class StageReleaseDataTest(unittest.TestCase):
     def make_file(self, path: Path, actions: np.ndarray) -> None:
         env_args = {
+            "env_name": "PnPCounterToSink",
             "env_kwargs": {
                 "controller_configs": {
                     "type": "HYBRID_MOBILE_BASE",
@@ -51,6 +53,10 @@ class StageReleaseDataTest(unittest.TestCase):
                     "composite_controller_specific_configs"
                 ]["body_part_ordering"]
                 self.assertEqual(ordering, BODY_PART_ORDER)
+                self.assertEqual(
+                    env_args["env_name"],
+                    ENVIRONMENT_ALIASES["PnPCounterToSink"],
+                )
 
     def test_panda_actions_stay_unchanged_and_gripper_is_explicit(self):
         with tempfile.TemporaryDirectory() as directory:
