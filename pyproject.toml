@@ -26,6 +26,7 @@ dependencies = [
     "tensorflow==2.15.0",
     "tensorflow-datasets==4.9.3",
     "tensorflow-graphics==2021.12.3",
+    "tensorflow-metadata==1.17.2",
     "timm==0.9.10",
     "tokenizers==0.19.1",
     "torch==2.2.0",

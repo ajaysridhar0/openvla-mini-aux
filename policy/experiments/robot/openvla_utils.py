@@ -4,7 +4,6 @@ import json
 import math
 import os
 import time
-from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
@@ -12,6 +11,7 @@ import torch
 from PIL import Image
 from transformers import AutoConfig, AutoImageProcessor, AutoModelForVision2Seq, AutoProcessor
 
+from barx.auth import resolve_hf_token
 from prismatic.extern.hf.configuration_prismatic import OpenVLAConfig
 from prismatic.extern.hf.modeling_prismatic import OpenVLAForActionPrediction
 from prismatic.extern.hf.processing_prismatic import PrismaticImageProcessor, PrismaticProcessor
@@ -35,7 +35,7 @@ def get_prismatic_vla(cfg):
     """Loads and returns a VLA model from checkpoint."""
     # Prepare for model loading.
     print(f"[*] Initializing Generation Playground with `{cfg.model_family}`")
-    hf_token = cfg.hf_token.read_text().strip() if isinstance(cfg.hf_token, Path) else os.environ[cfg.hf_token]
+    hf_token = resolve_hf_token(cfg.hf_token)
     # set_seed(cfg.seed)
     # Load VLA checkpoint.
     print(f"Loading VLM from checkpoint: {cfg.pretrained_checkpoint}")

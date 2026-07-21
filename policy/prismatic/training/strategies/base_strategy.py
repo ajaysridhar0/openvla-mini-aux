@@ -315,6 +315,7 @@ class TrainingStrategy(ABC):
         metrics: VLAMetrics,
         save_interval: int = 2500,
         save_full_model: bool = True,
+        save_final_checkpoint: bool = True,
         sequence_level_decoding: bool = False,
     ) -> None:
         """
@@ -465,20 +466,20 @@ class TrainingStrategy(ABC):
                                         pred_sequences.append(action_preds[b][batch_mask].tolist())
                                         gt_sequences.append(action_gt[b][batch_mask].tolist())
                                     
-                                    continuous_actions_pred = torch.tensor(
+                                    continuous_actions_pred = torch.as_tensor(
                                         action_tokenizer.decode_token_ids_to_actions(pred_sequences)
-                                    )
-                                    continuous_actions_gt = torch.tensor(
+                                    ).detach()
+                                    continuous_actions_gt = torch.as_tensor(
                                         action_tokenizer.decode_token_ids_to_actions(gt_sequences)
-                                    )
+                                    ).detach()
                                 else:
                                     # Original flattened behavior
-                                    continuous_actions_pred = torch.tensor(
+                                    continuous_actions_pred = torch.as_tensor(
                                         action_tokenizer.decode_token_ids_to_actions(action_preds[action_mask].cpu().numpy())
-                                    )
-                                    continuous_actions_gt = torch.tensor(
+                                    ).detach()
+                                    continuous_actions_gt = torch.as_tensor(
                                         action_tokenizer.decode_token_ids_to_actions(action_gt[action_mask].cpu().numpy())
-                                    )
+                                    ).detach()
 
                                 action_l1_loss = torch.nn.functional.l1_loss(
                                     continuous_actions_pred,
@@ -550,21 +551,21 @@ class TrainingStrategy(ABC):
                                     pred_sequences.append(action_preds[b][batch_mask].tolist())
                                     gt_sequences.append(action_gt[b][batch_mask].tolist())
                                 
-                                continuous_actions_pred = torch.tensor(
+                                continuous_actions_pred = torch.as_tensor(
                                     action_tokenizer.decode_token_ids_to_actions(pred_sequences),
                                     device=action_preds.device
                                 ).clone().detach()
-                                continuous_actions_gt = torch.tensor(
+                                continuous_actions_gt = torch.as_tensor(
                                     action_tokenizer.decode_token_ids_to_actions(gt_sequences),
                                     device=action_gt.device
                                 ).clone().detach()
                             else:
                                 # Original flattened behavior
-                                continuous_actions_pred = torch.tensor(
+                                continuous_actions_pred = torch.as_tensor(
                                     action_tokenizer.decode_token_ids_to_actions(action_preds[action_mask].cpu().numpy()),
                                     device=action_preds.device
                                 ).clone().detach()
-                                continuous_actions_gt = torch.tensor(
+                                continuous_actions_gt = torch.as_tensor(
                                     action_tokenizer.decode_token_ids_to_actions(action_gt[action_mask].cpu().numpy()),
                                     device=action_gt.device
                                 ).clone().detach()
@@ -643,13 +644,14 @@ class TrainingStrategy(ABC):
                 status = metrics.push()
 
                 # Check for Save Interval or Max Steps & Save Checkpoint
-                if (terminate := (self.max_steps is not None and metrics.global_step >= self.max_steps)) or (
-                    (metrics.global_step % save_interval) == 0
-                ):
-                    self.save_checkpoint(
-                        metrics.run_dir, metrics.global_step, epoch, loss.item(), only_trainable=not save_full_model
-                    )
-                    dist.barrier()
+                terminate = self.max_steps is not None and metrics.global_step >= self.max_steps
+                save_on_interval = (metrics.global_step % save_interval) == 0
+                if terminate or save_on_interval:
+                    if save_on_interval or save_final_checkpoint:
+                        self.save_checkpoint(
+                            metrics.run_dir, metrics.global_step, epoch, loss.item(), only_trainable=not save_full_model
+                        )
+                        dist.barrier()
 
                     if terminate:
                         return

@@ -4,6 +4,10 @@ The dataset is recorded in `dataset/manifest.csv`; see `dataset/README.md`
 for its composition. The archive preserves the relative `mg/` and `human/`
 paths.
 
+The repository manifest is an inventory until the portable archive is fully
+staged. Follow the staging gate in `dataset/README.md`; never distribute the
+collection-machine tree or a partially staged archive.
+
 Retained episode metadata replaces installation prefixes with `<ROBOCASA>/`.
 This token preserves asset-relative paths without exposing or depending on the
 original collection machine. The frozen condition bundles store the exact

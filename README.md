@@ -20,6 +20,10 @@ This repository contains:
 The simulation HDF5 files use a separate data archive; see
 [`dataset/README.md`](dataset/README.md) for its composition and preparation.
 
+Public model and dataset artifacts are hosted in the
+[BARX Hugging Face collections](https://huggingface.co/collections/ajaysri/barx-pretraining-models-joint-reps-and-no-reps).
+They are ungated and do not require a Hugging Face token.
+
 ## Repository layout
 
 | Path | Purpose |
@@ -39,7 +43,7 @@ compatibility wrappers and the locked PyPI robomimic dependency.
 ## Quick start
 
 The supported release platform is Linux x86-64 with Python 3.10 and CUDA 12.1.
-Install [uv](https://docs.astral.sh/uv/), then run:
+Install [uv](https://docs.astral.sh/uv/) 0.11.11 or newer, then run:
 
 ```bash
 uv sync --locked --no-dev
@@ -52,6 +56,19 @@ bundle (about 5.8 GiB) through its standard distribution workflow:
 ```bash
 uv run --locked python robocasa_x/robocasa/scripts/download_kitchen_assets.py
 ```
+
+Download the base VLM, XP-900 PnP RLDS data, and its VQ tokenizer into the
+runtime-compatible directory names:
+
+```bash
+uv run --locked python scripts/download_public_artifacts.py \
+  --data-root /data/barx-rlds \
+  --base-vlm-dir /models/barx-base
+```
+
+Plan for at least 60 GiB of free space for that training walkthrough and the
+environment/cache. Add `--include-pretrain-checkpoint` to also download the
+released Joint Reps source-prior run.
 
 For training with FlashAttention and a CUDA development toolkit:
 

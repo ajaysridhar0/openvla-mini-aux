@@ -64,7 +64,7 @@ class GenerateConfig:
     """Command-line configuration for one BARX evaluation run."""
 
     model_family: str = "prismatic"
-    hf_token: Path = Path(".hf_token")
+    hf_token: str | Path | None = None
     pretrained_checkpoint: str | Path = ""
     load_in_8bit: bool = False
     load_in_4bit: bool = False

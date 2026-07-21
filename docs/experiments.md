@@ -4,6 +4,11 @@ The machine-readable constants are in `configs/experiments.toml`. Full
 training starts by training the task-specific VQ tokenizer from the released
 RLDS data.
 
+For the public XP-900 PnP walkthrough, download the already prepared RLDS data,
+VQ tokenizer, and base VLM with `scripts/download_public_artifacts.py` as shown
+in the root README. No Hugging Face token is required. The manual VQ procedure
+below is for rebuilding that tokenizer or preparing another dataset.
+
 ## Methods
 
 - **No Reps** predicts actions only.
@@ -57,20 +62,21 @@ uses 7 action dimensions, an 8-action chunk (`future_action_horizon=7`), 256
 codes, 7 residual groups, and 512 latent dimensions. For XP-900 PnP:
 
 ```bash
-cd policy
-uv run --locked python vla-scripts/pretrain_vq.py \
+uv run --locked python policy/vla-scripts/pretrain_vq.py \
   --data_dir /data/barx-rlds --data_mix xp_900_pnp \
   --save_folder /tmp/barx-vq --action_dim 7 \
   --future_action_horizon 7 --vqvae_n_embed 256 \
   --vqvae_groups 7 --n_latent_dims 512
 
-mkdir -p vq/mg_pnp_lite/checkpoints
+mkdir -p policy/vq/mg_pnp_lite/checkpoints
 cp /tmp/barx-vq/pretrain_vq+mx-xp_900_pnp+fach-7+ng-7+nemb-256+nlatent-512/checkpoints/model.pt \
-  vq/mg_pnp_lite/checkpoints/model.pt
+  policy/vq/mg_pnp_lite/checkpoints/model.pt
 ```
 
 The destination names are the stored identifiers in the root README table.
 Checkpoint paths are ignored by Git.
+VQ training writes `metrics.jsonl` locally. Add `--use_wandb` only when you
+explicitly want to mirror those metrics to Weights & Biases.
 
 ## Training protocol
 
@@ -115,6 +121,16 @@ starting a distributed job.
 Training writes JSONL metrics and checkpoints locally by default. To mirror a
 run to Weights & Biases, add `--use-wandb` and optionally `--wandb-project` and
 `--wandb-entity`; no account or project name is embedded in the default run.
+
+For a disposable one-GPU A40 initialization and optimizer smoke test, append:
+
+```bash
+--gpus 1 --global-batch-size 1 --per-device-batch-size 1 \
+  --max-steps 1 --save-interval 100 --skip-final-checkpoint
+```
+
+This does not reproduce the paper batch, but it verifies the complete training
+path without writing a roughly 5.6 GiB final checkpoint.
 
 ## Evaluation protocol
 

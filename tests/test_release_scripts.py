@@ -82,6 +82,10 @@ class TrainingLauncherTest(unittest.TestCase):
             "max_steps": 3_000,
             "save_interval": 1_000,
             "gpus": 8,
+            "global_batch_size": 256,
+            "per_device_batch_size": None,
+            "skip_final_checkpoint": False,
+            "hf_token_env": None,
             "use_wandb": False,
             "wandb_project": "barx",
             "wandb_entity": None,
@@ -111,8 +115,20 @@ class TrainingLauncherTest(unittest.TestCase):
             train.build_command(self.args(checkpoint=None))
 
     def test_global_batch_size_cannot_silently_change(self):
-        with self.assertRaisesRegex(ValueError, "divisor"):
+        with self.assertRaisesRegex(ValueError, "divisible"):
             train.build_command(self.args(gpus=7))
+
+    def test_reduced_one_gpu_smoke_batch_is_explicit(self):
+        command = train.build_command(
+            self.args(
+                gpus=1,
+                global_batch_size=1,
+                per_device_batch_size=1,
+                skip_final_checkpoint=True,
+            )
+        )
+        self.assertEqual(command[command.index("--vla.global_batch_size") + 1], "1")
+        self.assertIn("--save_final_checkpoint", command)
 
     def test_training_logging_is_local_unless_wandb_is_explicit(self):
         local_command = train.build_command(self.args())

@@ -62,6 +62,8 @@ def command(args: argparse.Namespace) -> list[str]:
     ]
     if args.inference_representation != "none":
         result.extend(["--inference_representation", args.inference_representation])
+    if getattr(args, "hf_token_env", None):
+        result.extend(["--hf_token", args.hf_token_env])
     if args.use_wandb:
         result.extend(
             [
@@ -98,6 +100,10 @@ def main() -> None:
     parser.add_argument("--max-steps", type=int)
     parser.add_argument("--rollout-dir", type=Path)
     parser.add_argument("--conditions-dir", type=Path)
+    parser.add_argument(
+        "--hf-token-env",
+        help="Name of an environment variable containing a token for gated artifacts",
+    )
     parser.add_argument("--use-wandb", action="store_true")
     parser.add_argument("--wandb-project", default="barx")
     parser.add_argument("--wandb-entity")

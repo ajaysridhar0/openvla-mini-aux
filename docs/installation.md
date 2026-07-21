@@ -2,7 +2,8 @@
 
 BARX uses uv for the public release. The original experiments ran in a Conda
 environment named `robocasa`; that environment remains the provenance
-reference but is not required by users.
+reference but is not required by users. Use uv 0.11.11 or newer; older uv
+versions do not understand every lock and source field used by this project.
 
 ## Supported platform
 
@@ -10,6 +11,8 @@ reference but is not required by users.
 - Python 3.10 (uv selects 3.10 from `.python-version`)
 - NVIDIA driver compatible with CUDA 12.1 for policy training/evaluation
 - MuJoCo 3.1.1
+- at least 60 GiB free for the XP-900 PnP walkthrough (70 GiB when retaining
+  the released pretraining checkpoint)
 
 From the repository root:
 
@@ -40,8 +43,10 @@ uv sync --locked --extra train --no-dev
 ```
 
 FlashAttention 2.5.5 must compile against the locked Torch 2.2.0+cu121. A CUDA
-development toolkit and compatible compiler are required. Simulation and the
-dependency-light compatibility tests do not require this extra.
+development toolkit, Ninja, a compatible C/C++ compiler, and a compatible
+NVIDIA driver are required. Policy evaluation loads the same attention
+implementation, so install the `train` extra for both training and policy
+evaluation. Simulation-only and compatibility tests do not require it.
 
 ## Historical environment differences
 

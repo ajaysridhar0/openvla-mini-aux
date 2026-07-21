@@ -1,8 +1,10 @@
 # BARX simulation dataset
 
 The normalized HDF5 dataset is 283.13 GiB and uses a separate data archive.
-`manifest.csv` lists every file, its size, SHA-256 checksum, embodiment, task,
-demonstration count, seed, relative path, and paper dataset membership.
+`manifest.csv` lists every intended file, its source-tree size, embodiment,
+task, demonstration count, seed, relative path, and paper dataset membership.
+The checked-in manifest is an inventory template: its SHA-256 fields are
+deliberately empty until the complete portable archive is staged and hashed.
 
 ## Contents
 
@@ -19,6 +21,24 @@ All four RoboCasa-X tasks are present: pick-and-place counter-to-sink,
 pick-and-place sink-to-counter, turn-on-sink-faucet, and flip-mug-upright.
 The manifest selects the final rendered and annotated simulation files used by
 the paper's XP-900, XP-3K, SP-900, and target-50 experiments.
+
+## Release staging gate
+
+Do not publish the archival collection tree directly. Stage all files into a
+different directory, which scrubs private paths and normalizes metadata while
+leaving the source untouched:
+
+```bash
+uv run --locked python scripts/stage_release_data.py \
+  /data/barx-archive /data/barx-public
+uv run --locked python scripts/build_data_manifest.py \
+  /data/barx-public --output dataset/manifest.csv
+```
+
+The second command refuses incomplete trees and fills every SHA-256 field from
+the staged bytes. The data release is not ready while any of the 240 files is
+missing or any checksum is blank. Sources already marked with the canonical
+action layout are metadata-scrubbed without reordering their actions again.
 
 ## Data format
 

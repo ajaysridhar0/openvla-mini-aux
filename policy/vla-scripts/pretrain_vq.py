@@ -36,7 +36,8 @@ def main():
     p.add_argument("--dataset_statistics_map", type=json.loads, default=None)
 
     # train arguments
-    p.add_argument("--wandb_project", type=str, default="prismatic-vq-vla")
+    p.add_argument("--use_wandb", action="store_true")
+    p.add_argument("--wandb_project", type=str, default="barx-vq")
     p.add_argument("--wandb_entity", type=str, default=None)
     p.add_argument("--batch_size", type=int, default=1028)
     p.add_argument("--epochs", type=int, default=10)
@@ -100,12 +101,12 @@ def main():
 
     vqvae_model = VqVae(**vq_config)
 
-    wandb.init(name=exp_name, project=args.wandb_project, entity=args.wandb_entity, config=vars(args))
-
     # make all required directories.
     save_path = Path(args.save_folder) / exp_name
     save_path.mkdir(parents=True, exist_ok=False)
     (save_path / "checkpoints").mkdir()
+    if args.use_wandb:
+        wandb.init(name=exp_name, project=args.wandb_project, entity=args.wandb_entity, config=vars(args))
 
     # save to experiment
     with open(save_path / "config.json", "w") as f:
@@ -136,11 +137,18 @@ def main():
                 act
             )  # N T D
 
-            wandb.log({"pretrain/n_different_codes": len(torch.unique(vq_code))})
-            wandb.log({"pretrain/n_different_combinations": len(torch.unique(vq_code, dim=0))})
-            wandb.log({"pretrain/encoder_loss": encoder_loss})
-            wandb.log({"pretrain/vq_loss_state": vq_loss_state})
-            wandb.log({"pretrain/vqvae_recon_loss": vqvae_recon_loss})
+            metrics = {
+                "step": step_count + 1,
+                "pretrain/n_different_codes": len(torch.unique(vq_code)),
+                "pretrain/n_different_combinations": len(torch.unique(vq_code, dim=0)),
+                "pretrain/encoder_loss": float(encoder_loss.detach().cpu()),
+                "pretrain/vq_loss_state": float(vq_loss_state.detach().cpu()),
+                "pretrain/vqvae_recon_loss": float(vqvae_recon_loss.detach().cpu()),
+            }
+            with (save_path / "metrics.jsonl").open("a") as stream:
+                stream.write(json.dumps(metrics) + "\n")
+            if args.use_wandb:
+                wandb.log(metrics)
 
             step_count += 1
 
@@ -153,9 +161,12 @@ def main():
                 os.path.join(save_path, f"checkpoints/step-{step_count}-epoch-{epoch + 1}.pt"),
             )
 
-    # SAVE AT THE END
+    # SAVE AT THE END, including runs shorter than the interval.
     print("Saving last checkpoint...")
+    state_dict = vqvae_model.state_dict()
     torch.save(state_dict, os.path.join(save_path, "checkpoints/model.pt"))
+    if args.use_wandb:
+        wandb.finish()
     print("Done.")
 
 

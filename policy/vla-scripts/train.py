@@ -20,21 +20,22 @@ import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional, Tuple, Union, Dict, List
+from typing import Dict, List, Optional, Tuple, Union
 
 import draccus
 import torch
 import torch.distributed as dist
 import yaml
 
+from barx.auth import resolve_hf_token
 from prismatic.conf import VLAConfig, VLARegistry
 from prismatic.models import load, load_vla
 from prismatic.overwatch import initialize_overwatch
 from prismatic.training import VLAMetrics, get_train_strategy
 from prismatic.util import set_global_seed
 from prismatic.vla import get_vla_dataset_and_collator
-from prismatic.vla.datasets.rlds.utils.data_utils import save_dataset_statistics
 from prismatic.vla.action_tokenizer import FastActionTokenizer
+from prismatic.vla.datasets.rlds.utils.data_utils import save_dataset_statistics
 
 # Sane Defaults
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -76,13 +77,14 @@ class TrainConfig:
     run_id: Optional[str] = None                                    # Run ID for logging, Weights & Biases
     run_id_note: Optional[str] = None                               # Extra note for logging, Weights & Biases
     save_interval: int = 10000                                       # Interval for saving checkpoints (in steps)
+    save_final_checkpoint: bool = True                              # Save solely because max_steps was reached
     image_aug: bool = False                                         # Whether to enable image augmentations
     seed: int = 7                                                   # Random seed (for reproducibility)
     dataset_statistics_map: Dict[str, str] = None                   # Dict for action norm using other dataset stats
     non_action_datasets: Optional[List] = None
 
     # HF Hub Credentials (for any gated models)
-    hf_token: Union[str, Path] = Path(".hf_token")                  # Environment variable or Path to HF Token
+    hf_token: Optional[Union[str, Path]] = None                     # Optional environment variable or token-file Path
 
     # Tracking Parameters
     trackers: Tuple[str, ...] = ("jsonl",)                          # Local logging unless W&B is explicitly enabled
@@ -154,7 +156,7 @@ def train(cfg: TrainConfig) -> None:
 
     # Start =>> Build Directories and Set Randomness
     overwatch.info('"Do or do not; there is no try."', ctx_level=1)
-    hf_token = cfg.hf_token.read_text().strip() if isinstance(cfg.hf_token, Path) else os.environ[cfg.hf_token]
+    hf_token = resolve_hf_token(cfg.hf_token)
     worker_init_fn = set_global_seed(cfg.seed, get_worker_init_fn=True)
     os.makedirs(run_dir := (cfg.run_root_dir / cfg.run_id), exist_ok=True)
     os.makedirs(cfg.run_root_dir / cfg.run_id / "checkpoints", exist_ok=True)
@@ -359,6 +361,7 @@ def train(cfg: TrainConfig) -> None:
         action_tokenizer,
         metrics,
         save_interval=cfg.save_interval,
+        save_final_checkpoint=cfg.save_final_checkpoint,
         sequence_level_decoding=isinstance(action_tokenizer, FastActionTokenizer),
     )
 

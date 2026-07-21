@@ -62,8 +62,19 @@ def build_command(args: argparse.Namespace) -> list[str]:
         raise ValueError("Source-prior training supports xp_900 or xp_3k.")
     if args.stage == "adapt" and args.prior in {"xp_900", "xp_3k"} and args.checkpoint is None:
         raise ValueError("XP adaptation requires --checkpoint from the selected prior run.")
-    if args.gpus < 1 or 256 % args.gpus:
-        raise ValueError("--gpus must be a positive divisor of the paper batch size (256).")
+    if args.gpus < 1:
+        raise ValueError("--gpus must be positive.")
+    global_batch_size = getattr(args, "global_batch_size", None) or 256
+    per_device_batch_size = getattr(args, "per_device_batch_size", None)
+    if per_device_batch_size is None:
+        if global_batch_size % args.gpus:
+            raise ValueError("--global-batch-size must be divisible by --gpus.")
+        per_device_batch_size = global_batch_size // args.gpus
+    if global_batch_size != per_device_batch_size * args.gpus:
+        raise ValueError(
+            "VLA training has no gradient accumulation: global batch must equal "
+            "per-device batch times GPU count."
+        )
     if args.max_steps < 1 or (args.save_interval is not None and args.save_interval < 1):
         raise ValueError("--max-steps and --save-interval must be positive.")
     save_interval = args.save_interval or (10_000 if args.stage == "prior" else 1_000)
@@ -96,9 +107,9 @@ def build_command(args: argparse.Namespace) -> list[str]:
         "--vla.expected_world_size",
         str(args.gpus),
         "--vla.global_batch_size",
-        "256",
+        str(global_batch_size),
         "--vla.per_device_batch_size",
-        str(256 // args.gpus),
+        str(per_device_batch_size),
         "--vla.learning_rate",
         "2e-5",
         "--vla.lr_scheduler_type",
@@ -120,6 +131,10 @@ def build_command(args: argparse.Namespace) -> list[str]:
         "--save_interval",
         str(save_interval),
     ]
+    if getattr(args, "skip_final_checkpoint", False):
+        command.extend(["--save_final_checkpoint", "False"])
+    if getattr(args, "hf_token_env", None):
+        command.extend(["--hf_token", args.hf_token_env])
     if args.checkpoint is not None:
         command.extend(["--pretrained_checkpoint", str(args.checkpoint), "--is_resume", "False"])
     if args.stage == "adapt":
@@ -162,6 +177,17 @@ def main() -> None:
         help="Defaults to 10000 for source priors and 1000 for target training",
     )
     parser.add_argument("--gpus", type=int, default=8)
+    parser.add_argument("--global-batch-size", type=int, default=256)
+    parser.add_argument("--per-device-batch-size", type=int)
+    parser.add_argument(
+        "--skip-final-checkpoint",
+        action="store_true",
+        help="Skip a checkpoint written solely because max_steps was reached",
+    )
+    parser.add_argument(
+        "--hf-token-env",
+        help="Name of an environment variable containing a token for gated artifacts",
+    )
     parser.add_argument("--use-wandb", action="store_true")
     parser.add_argument("--wandb-project", default="barx")
     parser.add_argument("--wandb-entity")

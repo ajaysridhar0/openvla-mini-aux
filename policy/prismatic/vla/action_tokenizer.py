@@ -5,6 +5,7 @@ Extension class; wraps base LLM/VLM tokenizer with logic to discretize and token
 """
 
 import json
+import os
 from functools import partial
 from pathlib import Path
 from typing import List, Union
@@ -22,6 +23,19 @@ import pickle
 
 
 overwatch = initialize_overwatch(__name__)
+
+POLICY_ROOT = Path(__file__).resolve().parents[2]
+VQ_ROOT = Path(os.environ.get("BARX_VQ_ROOT", POLICY_ROOT / "vq")).expanduser().resolve()
+
+
+def resolve_vq_path(value: str | Path) -> Path:
+    """Resolve historical ``vq/...`` paths independently of the current directory."""
+
+    path = Path(value).expanduser()
+    if path.is_absolute():
+        return path
+    parts = path.parts[1:] if path.parts and path.parts[0] == "vq" else path.parts
+    return VQ_ROOT.joinpath(*parts)
 
 
 def load_universal_action_processor(tokenizer_path):
@@ -162,7 +176,7 @@ class VQActionTokenizer(ActionTokenizer):
         # NOTE: if this errors, you need to install vqvae, source: https://github.com/jayLEE0301/vq_bet_official
         from vqvae.vqvae import VqVae
 
-        self.vq_path = Path(vq_vae_path)
+        self.vq_path = resolve_vq_path(vq_vae_path)
         assert self.vq_path.exists(), f"Missing VQ VAE path: {self.vq_path}"
         vq_model_path = self.vq_path / "checkpoints" / "model.pt"
         vq_config_path = self.vq_path / "config.json"
@@ -195,7 +209,10 @@ class VQActionTokenizer(ActionTokenizer):
 
     def __call__(self, action: np.ndarray) -> Union[str, List[str]]:
         # make sure shape matches (1 x T x A)
-        action = torch.from_numpy(action).to(self.device).reshape((1, self.vq_vae.input_dim_h, self.vq_vae.input_dim_w))
+        # TFDS may expose a read-only NumPy view. Copy before sharing its
+        # storage with PyTorch to avoid undefined behavior on mutation.
+        action = torch.from_numpy(np.array(action, copy=True)).to(self.device)
+        action = action.reshape((1, self.vq_vae.input_dim_h, self.vq_vae.input_dim_w))
         # action is (1 x T x A), codes will be (1 x GROUPS) each between 0 and BINS-1
         _, vq_code = self.vq_vae.get_code(action)
         assert torch.all(vq_code >= 0) and torch.all(vq_code < self.n_bins)
