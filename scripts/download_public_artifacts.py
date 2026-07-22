@@ -6,7 +6,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import time
 from dataclasses import dataclass
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Optional
 
@@ -129,8 +132,40 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="do not prefetch the pinned DINOv2, SigLIP, and Qwen runtime dependencies",
     )
+    parser.add_argument(
+        "--max-workers",
+        type=_positive_int,
+        default=1,
+        help="maximum concurrent Hugging Face file downloads (default: 1)",
+    )
+    parser.add_argument(
+        "--etag-timeout",
+        type=_positive_int,
+        default=60,
+        help="seconds to wait for Hugging Face metadata (default: 60)",
+    )
+    parser.add_argument(
+        "--retries",
+        type=_nonnegative_int,
+        default=6,
+        help="download retries after the first attempt (default: 6)",
+    )
     parser.add_argument("--dry-run", action="store_true")
     return parser
+
+
+def _positive_int(value: str) -> int:
+    parsed = int(value)
+    if parsed < 1:
+        raise argparse.ArgumentTypeError("must be at least 1")
+    return parsed
+
+
+def _nonnegative_int(value: str) -> int:
+    parsed = int(value)
+    if parsed < 0:
+        raise argparse.ArgumentTypeError("must be nonnegative")
+    return parsed
 
 
 def _sha256(path: Path) -> str:
@@ -154,6 +189,84 @@ def verify_files(spec: DownloadSpec) -> None:
             raise RuntimeError(f"SHA-256 mismatch for {path}")
 
 
+def _retry_after_seconds(error: Exception) -> Optional[float]:
+    """Find a Retry-After header on an exception or its causal chain."""
+
+    pending = [error]
+    visited = set()
+    while pending:
+        current = pending.pop()
+        if id(current) in visited:
+            continue
+        visited.add(id(current))
+        response = getattr(current, "response", None)
+        headers = getattr(response, "headers", None)
+        retry_after = headers.get("Retry-After") if headers is not None else None
+        if retry_after:
+            try:
+                return max(0.0, float(retry_after))
+            except ValueError:
+                try:
+                    retry_at = parsedate_to_datetime(retry_after)
+                except (TypeError, ValueError, OverflowError):
+                    return None
+                if retry_at.tzinfo is None:
+                    retry_at = retry_at.replace(tzinfo=timezone.utc)
+                return max(0.0, (retry_at - datetime.now(timezone.utc)).total_seconds())
+        for linked in (
+            getattr(current, "__cause__", None),
+            getattr(current, "__context__", None),
+        ):
+            if linked is not None:
+                pending.append(linked)
+    return None
+
+
+def _snapshot_kwargs(
+    spec: DownloadSpec, hf_home: Path, args: argparse.Namespace
+) -> dict:
+    kwargs = {
+        "repo_id": spec.repo_id,
+        "repo_type": spec.repo_type,
+        "revision": spec.revision,
+        "allow_patterns": list(spec.allow_patterns) or None,
+        "token": False,
+        "max_workers": args.max_workers,
+        "etag_timeout": args.etag_timeout,
+    }
+    if spec.cache_only:
+        kwargs["cache_dir"] = hf_home / "hub"
+    else:
+        kwargs["local_dir"] = spec.local_dir
+    return kwargs
+
+
+def download_snapshot(
+    spec: DownloadSpec, hf_home: Path, args: argparse.Namespace, snapshot_download
+) -> None:
+    kwargs = _snapshot_kwargs(spec, hf_home, args)
+    for attempt in range(args.retries + 1):
+        try:
+            snapshot_download(**kwargs)
+            return
+        except Exception as error:
+            if attempt == args.retries:
+                raise
+            exponential_delay = min(2**attempt, 60)
+            delay = max(exponential_delay, _retry_after_seconds(error) or 0)
+            print(
+                f"Download failed ({error}); retrying in {delay:g}s [{attempt + 1}/{args.retries}]"
+            )
+            time.sleep(delay)
+
+
+def download_and_verify(
+    spec: DownloadSpec, hf_home: Path, args: argparse.Namespace, snapshot_download
+) -> None:
+    download_snapshot(spec, hf_home, args, snapshot_download)
+    verify_files(spec)
+
+
 def main() -> None:
     args = build_parser().parse_args()
     specs, hf_home = downloads(args)
@@ -167,19 +280,7 @@ def main() -> None:
 
         from huggingface_hub import snapshot_download
 
-        kwargs = {
-            "repo_id": spec.repo_id,
-            "repo_type": spec.repo_type,
-            "revision": spec.revision,
-            "allow_patterns": list(spec.allow_patterns) or None,
-            "token": False,
-        }
-        if spec.cache_only:
-            kwargs["cache_dir"] = hf_home / "hub"
-        else:
-            kwargs["local_dir"] = spec.local_dir
-        snapshot_download(**kwargs)
-        verify_files(spec)
+        download_and_verify(spec, hf_home, args, snapshot_download)
 
 
 if __name__ == "__main__":

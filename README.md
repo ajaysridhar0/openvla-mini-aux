@@ -23,7 +23,17 @@ They are ungated and do not require a Hugging Face token.
 ## Quick start
 
 The supported release platform is Linux x86-64 with Python 3.10 and CUDA 12.1.
-Install [uv](https://docs.astral.sh/uv/) 0.11.11 or newer, then run:
+The walkthrough with the released checkpoint requires about 70 GiB of free
+space. Install [uv](https://docs.astral.sh/uv/) 0.11.11 or newer and check that
+CMake is available:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv --version
+cmake --version
+```
+
+Then install BARX and run its tests:
 
 ```bash
 uv sync --locked --no-dev
@@ -70,6 +80,7 @@ To evaluate the released Joint Reps checkpoint, first add
 run one simulator trial:
 
 ```bash
+MUJOCO_GL=egl PYOPENGL_PLATFORM=egl \
 uv run --locked --extra train --no-dev python scripts/evaluate.py \
   --checkpoint "$BARX_ARTIFACT_ROOT/runs/xp900-pnp-joint-reps/checkpoints/step-050000-epoch-15-loss=0.2577.pt" \
   --embodiment panda --task pnp_counter_to_sink --unnorm-key mg_pnp_lite \

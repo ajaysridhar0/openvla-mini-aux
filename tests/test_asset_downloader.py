@@ -15,6 +15,7 @@ SCRIPT = (
     / "scripts"
     / "download_kitchen_assets.py"
 )
+FIXTURE_ROOT = SCRIPT.parents[1] / "models" / "assets" / "fixtures"
 SPEC = importlib.util.spec_from_file_location("barx_download_kitchen_assets", SCRIPT)
 ASSETS = importlib.util.module_from_spec(SPEC)
 
@@ -47,6 +48,16 @@ with mock.patch.dict(
 
 
 class KitchenAssetDownloaderTest(unittest.TestCase):
+    def test_fixture_descriptions_are_not_executable(self):
+        fixtures = (
+            sorted(FIXTURE_ROOT.rglob("*.xml"))
+            + sorted(FIXTURE_ROOT.rglob("*.yaml"))
+            + sorted(FIXTURE_ROOT.rglob("*.yml"))
+        )
+        self.assertTrue(fixtures)
+        executable = [path for path in fixtures if path.stat().st_mode & 0o111]
+        self.assertEqual(executable, [])
+
     def test_all_release_archives_have_sizes_and_sha256(self):
         self.assertEqual(len(ASSETS.DOWNLOAD_ASSET_REGISTRY), 4)
         for config in ASSETS.DOWNLOAD_ASSET_REGISTRY.values():
