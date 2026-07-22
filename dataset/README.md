@@ -1,10 +1,9 @@
-# BARX simulation dataset
+# BARX raw HDF5 dataset
 
-The normalized HDF5 dataset is 283.13 GiB and uses a separate data archive.
-`manifest.csv` lists every intended file, its source-tree size, embodiment,
-task, demonstration count, seed, relative path, and paper dataset membership.
-The checked-in manifest is an inventory template: its SHA-256 fields are
-deliberately empty until the complete portable archive is staged and hashed.
+The normalized HDF5 dataset is 284.03 GiB and uses a separate data archive.
+`manifest.csv` lists all 240 files with their size, SHA-256 checksum,
+embodiment, task, demonstration count, seed, relative path, and paper dataset
+membership. The archive contains 23,400 demonstrations in total.
 
 ## Contents
 
@@ -22,31 +21,36 @@ pick-and-place sink-to-counter, turn-on-sink-faucet, and flip-mug-upright.
 The manifest selects the final rendered and annotated simulation files used by
 the paper's XP-900, XP-3K, SP-900, and target-50 experiments.
 
-## Release staging gate
+## Verify the archive
 
-Do not publish the archival collection tree directly. Stage all files into a
-different directory, which scrubs private paths and normalizes metadata while
-leaving the source untouched:
+Run the full size, structure, metadata, and SHA-256 verification before using
+or repackaging a downloaded archive:
 
 ```bash
-uv run --locked --no-dev python scripts/stage_release_data.py \
-  /data/barx-archive /data/barx-public
-uv run --locked --no-dev python scripts/build_data_manifest.py \
-  /data/barx-public --output dataset/manifest.csv
+uv run --locked --no-dev python scripts/verify_raw_data.py /data/barx
 ```
 
-The second command refuses incomplete trees and fills every SHA-256 field from
-the staged bytes. The data release is not ready while any of the 240 files is
-missing or any checksum is blank. Sources already marked with the canonical
-action layout are metadata-scrubbed without reordering their actions again.
+For a faster preflight that does not read every byte, add `--skip-checksums`.
+This still validates every path, byte size, demonstration count, action shape,
+environment, and portable metadata.
 
 ## Data format
 
-All actions use
-`[arm(6), gripper(1), base(3), torso(1), mode(1)]`, independent of
-embodiment. Stored episode metadata uses `<ROBOCASA>/` package-relative asset
-paths instead of collection-machine paths. Exact evaluation replay uses the
-XML and settled states in `evaluation/conditions/`.
+Each file is a standard HDF5 container with demonstrations under
+`data/demo_*`. The main fields are:
+
+- `actions`: `[T, 12]` canonical simulator actions;
+- `states`: simulator states for replay and data generation;
+- `obs/agentview_rgb`: `[T, 180, 320, 3]` RGB observations;
+- `obs/ee_states` and `obs/gripper_states`: policy state inputs;
+- `aux_info/eef_normalized_image_pts` and `aux_info/bboxes_2d/*`: BARX
+  representation annotations; and
+- `ep_meta`: JSON episode metadata including the language instruction.
+
+Actions use `[arm(6), gripper(1), base(3), torso(1), mode(1)]`, independent of
+embodiment. Stored metadata uses `<ROBOCASA>/` package-relative asset paths.
+Users can read these files directly with `h5py` to build another training
+format; conversion to RLDS is optional.
 
 ## RLDS conversion
 
@@ -73,3 +77,28 @@ The public action schema is
 `[dx, dy, dz, droll, dpitch, dyaw, gripper]`. Legacy RLDS fields such as
 `ee_pose_2D`, `obj_bboxes`, and `language_motions` remain unchanged to preserve
 training compatibility.
+
+## Extending the demonstrations with MimicGen
+
+The `human/` files retain actions, simulator states, environment metadata, and
+50 demonstrations per target/task, so they preserve the information needed to
+prepare MimicGen source datasets. The BARX repository does not currently ship
+the customized MimicGen generator and task configs used for the paper. Those
+must be published and pinned separately before BARX can claim a reproducible
+end-to-end synthesis workflow; the raw HDF5 release alone supports inspection
+and conversion, but not regeneration.
+
+## Rebuilding a portable archive
+
+Maintainers starting from an older collection tree can scrub private paths and
+normalize action metadata into a separate output tree, then rebuild the
+manifest:
+
+```bash
+uv run --locked --no-dev python scripts/stage_release_data.py \
+  /data/barx-archive /data/barx-public
+uv run --locked --no-dev python scripts/build_data_manifest.py \
+  /data/barx-public --output dataset/manifest.csv
+```
+
+Never stage in place: the source and output roots must differ.

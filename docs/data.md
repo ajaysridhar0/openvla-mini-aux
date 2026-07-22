@@ -1,12 +1,8 @@
 # Data format and conversion
 
-The dataset is recorded in `dataset/manifest.csv`; see `dataset/README.md`
-for its composition. The archive preserves the relative `mg/` and `human/`
-paths.
-
-The repository manifest is an inventory until the portable archive is fully
-staged. Follow the staging gate in `dataset/README.md`; never distribute the
-collection-machine tree or a partially staged archive.
+The raw HDF5 dataset is recorded and checksummed in `dataset/manifest.csv`; see
+`dataset/README.md` for its composition, verification command, and schema. The
+archive preserves the relative `mg/` and `human/` paths.
 
 Retained episode metadata replaces installation prefixes with `<ROBOCASA>/`.
 This token preserves asset-relative paths without exposing or depending on the
@@ -30,7 +26,8 @@ The training registry accepts paper-facing aliases such as `xp_900_pnp`,
 original RLDS directory identifiers; users do not need to rename previously
 converted datasets.
 
-Build those training-compatible directories through the manifest-driven
+The HDF5 files can be consumed directly with `h5py` or another HDF5 reader.
+To build BARX's training-compatible RLDS directories, use the manifest-driven
 launcher rather than invoking the TFDS builder directly:
 
 ```bash
@@ -43,3 +40,8 @@ Valid paper datasets are `xp_900`, `xp_3k`, `sp_900`, and `target_50`.
 `sp_900` and `target_50` additionally require `--target panda`, `panda_og`, or
 `jaco`. The launcher validates every selected file against the byte size in
 `dataset/manifest.csv` before conversion.
+
+The `human/` files retain the simulator states and metadata needed to prepare
+new MimicGen source datasets. Reproducing BARX synthesis also requires the
+custom MimicGen code and task configs, which are not yet part of this public
+repository.

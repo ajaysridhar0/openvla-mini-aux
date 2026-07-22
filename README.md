@@ -15,7 +15,9 @@ This repository contains:
 - dataset conversion tools; and
 - reproducible experiment configurations.
 
-Simulation data is documented in [`dataset/README.md`](dataset/README.md).
+The raw HDF5 demonstrations can be read directly, converted to RLDS, or used
+as the basis for new data-generation pipelines; see
+[`dataset/README.md`](dataset/README.md).
 Public models and datasets are available from the
 [BARX Hugging Face collections](https://huggingface.co/collections/ajaysri/barx-pretraining-models-joint-reps-and-no-reps).
 They are ungated and do not require a Hugging Face token.

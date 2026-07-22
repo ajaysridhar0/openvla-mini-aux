@@ -1,241 +1,241 @@
 release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
-cross-embodiment prior,XP-3K;XP-900,IIWA,Flip Mug Upright,100,20,958542321,,mg/IIWAOmron/FlipMugUpright/100demos_seed20/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,IIWA,Flip Mug Upright,100,21,949761526,,mg/IIWAOmron/FlipMugUpright/100demos_seed21/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,IIWA,Flip Mug Upright,100,22,977777888,,mg/IIWAOmron/FlipMugUpright/100demos_seed22/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,Flip Mug Upright,100,23,941671739,,mg/IIWAOmron/FlipMugUpright/100demos_seed23/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,Flip Mug Upright,100,24,1001928643,,mg/IIWAOmron/FlipMugUpright/100demos_seed24/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,Flip Mug Upright,100,25,1005572272,,mg/IIWAOmron/FlipMugUpright/100demos_seed25/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,Flip Mug Upright,100,26,1009356811,,mg/IIWAOmron/FlipMugUpright/100demos_seed26/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,Flip Mug Upright,100,27,939829011,,mg/IIWAOmron/FlipMugUpright/100demos_seed27/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,Flip Mug Upright,100,28,1044726185,,mg/IIWAOmron/FlipMugUpright/100demos_seed28/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,Flip Mug Upright,100,29,994103901,,mg/IIWAOmron/FlipMugUpright/100demos_seed29/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,IIWA,PnP Counter to Sink,100,20,1417271230,,mg/IIWAOmron/PnPCounterToSink/100demos_seed20/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,IIWA,PnP Counter to Sink,100,21,1431260450,,mg/IIWAOmron/PnPCounterToSink/100demos_seed21/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,IIWA,PnP Counter to Sink,100,22,1371871408,,mg/IIWAOmron/PnPCounterToSink/100demos_seed22/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,PnP Counter to Sink,100,23,1369907497,,mg/IIWAOmron/PnPCounterToSink/100demos_seed23/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,PnP Counter to Sink,100,24,1438228341,,mg/IIWAOmron/PnPCounterToSink/100demos_seed24/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,PnP Counter to Sink,100,25,1431527671,,mg/IIWAOmron/PnPCounterToSink/100demos_seed25/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,PnP Counter to Sink,100,26,1420666089,,mg/IIWAOmron/PnPCounterToSink/100demos_seed26/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,PnP Counter to Sink,100,27,1306268042,,mg/IIWAOmron/PnPCounterToSink/100demos_seed27/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,PnP Counter to Sink,100,28,1314876453,,mg/IIWAOmron/PnPCounterToSink/100demos_seed28/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,PnP Counter to Sink,100,29,1371925556,,mg/IIWAOmron/PnPCounterToSink/100demos_seed29/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,IIWA,PnP Sink to Counter,100,20,1655595241,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed20/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,IIWA,PnP Sink to Counter,100,21,1609813989,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed21/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,IIWA,PnP Sink to Counter,100,22,1669106111,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed22/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,PnP Sink to Counter,100,23,1621308616,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed23/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,PnP Sink to Counter,100,24,1684437231,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed24/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,PnP Sink to Counter,100,25,1605279170,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed25/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,PnP Sink to Counter,100,26,1593606836,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed26/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,PnP Sink to Counter,100,27,1687604593,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed27/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,PnP Sink to Counter,100,28,1632089931,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed28/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,PnP Sink to Counter,100,29,1678704266,,mg/IIWAOmron/PnPSinkToCounter/100demos_seed29/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,IIWA,Turn On Sink Faucet,100,20,1267587748,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed20/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,IIWA,Turn On Sink Faucet,100,21,1288797051,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed21/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,IIWA,Turn On Sink Faucet,100,22,1282531292,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed22/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,Turn On Sink Faucet,100,23,1366425195,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed23/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,Turn On Sink Faucet,100,24,1313382273,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed24/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,Turn On Sink Faucet,100,25,1222474476,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed25/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,Turn On Sink Faucet,100,26,1249426082,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed26/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,Turn On Sink Faucet,100,27,1268950676,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed27/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,Turn On Sink Faucet,100,28,1281254514,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed28/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,IIWA,Turn On Sink Faucet,100,29,1296969037,,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed29/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,Kinova 3,Flip Mug Upright,100,10,893506243,,mg/Kinova3Omron/FlipMugUpright/100demos_seed10/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,Kinova 3,Flip Mug Upright,100,11,926021625,,mg/Kinova3Omron/FlipMugUpright/100demos_seed11/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,Kinova 3,Flip Mug Upright,100,12,878810125,,mg/Kinova3Omron/FlipMugUpright/100demos_seed12/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,Flip Mug Upright,100,13,907716604,,mg/Kinova3Omron/FlipMugUpright/100demos_seed13/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,Flip Mug Upright,100,14,884230290,,mg/Kinova3Omron/FlipMugUpright/100demos_seed14/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,Flip Mug Upright,100,15,904563949,,mg/Kinova3Omron/FlipMugUpright/100demos_seed15/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,Flip Mug Upright,100,16,904011579,,mg/Kinova3Omron/FlipMugUpright/100demos_seed16/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,Flip Mug Upright,100,17,883819978,,mg/Kinova3Omron/FlipMugUpright/100demos_seed17/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,Flip Mug Upright,100,18,908818433,,mg/Kinova3Omron/FlipMugUpright/100demos_seed18/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,Flip Mug Upright,100,19,875923502,,mg/Kinova3Omron/FlipMugUpright/100demos_seed19/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,Kinova 3,PnP Counter to Sink,100,10,1260645877,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed10/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,Kinova 3,PnP Counter to Sink,100,11,1229601444,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed11/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,Kinova 3,PnP Counter to Sink,100,12,1185241748,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed12/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,PnP Counter to Sink,100,13,1239353940,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed13/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,PnP Counter to Sink,100,14,1233050917,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed14/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,PnP Counter to Sink,100,15,1231229096,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed15/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,PnP Counter to Sink,100,16,1213007215,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed16/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,PnP Counter to Sink,100,17,1218401134,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed17/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,PnP Counter to Sink,100,18,1241299349,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed18/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,PnP Counter to Sink,100,19,1194323278,,mg/Kinova3Omron/PnPCounterToSink/100demos_seed19/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,Kinova 3,PnP Sink to Counter,100,10,1494927075,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed10/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,Kinova 3,PnP Sink to Counter,100,11,1511952071,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed11/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,Kinova 3,PnP Sink to Counter,100,12,1535587571,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed12/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,PnP Sink to Counter,100,13,1554399718,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed13/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,PnP Sink to Counter,100,14,1514421162,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed14/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,PnP Sink to Counter,100,15,1510511338,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed15/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,PnP Sink to Counter,100,16,1541091594,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed16/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,PnP Sink to Counter,100,17,1551708201,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed17/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,PnP Sink to Counter,100,18,1495822452,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed18/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,PnP Sink to Counter,100,19,1511077778,,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed19/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,Kinova 3,Turn On Sink Faucet,100,10,1431244491,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed10/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,Kinova 3,Turn On Sink Faucet,100,11,1428608328,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed11/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,Kinova 3,Turn On Sink Faucet,100,12,1402702551,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed12/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,Turn On Sink Faucet,100,13,1436263003,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed13/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,Turn On Sink Faucet,100,14,1415877849,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed14/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,Turn On Sink Faucet,100,15,1460704354,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed15/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,Turn On Sink Faucet,100,16,1417304911,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed16/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,Turn On Sink Faucet,100,17,1471421348,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed17/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,Turn On Sink Faucet,100,18,1413008037,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed18/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,Kinova 3,Turn On Sink Faucet,100,19,1450290562,,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed19/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,UR5e,Flip Mug Upright,100,0,932143578,,mg/UR5eOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,UR5e,Flip Mug Upright,100,1,876208236,,mg/UR5eOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,UR5e,Flip Mug Upright,100,2,884823648,,mg/UR5eOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,Flip Mug Upright,100,3,958062451,,mg/UR5eOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,Flip Mug Upright,100,4,905616665,,mg/UR5eOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,Flip Mug Upright,100,5,918607024,,mg/UR5eOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,Flip Mug Upright,100,6,924397749,,mg/UR5eOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,Flip Mug Upright,100,7,893169893,,mg/UR5eOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,Flip Mug Upright,100,8,893269852,,mg/UR5eOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,Flip Mug Upright,100,9,935230564,,mg/UR5eOmron/FlipMugUpright/100demos_seed9/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,UR5e,PnP Counter to Sink,100,0,1315281661,,mg/UR5eOmron/PnPCounterToSink/100demos_seed0/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,UR5e,PnP Counter to Sink,100,1,1321314537,,mg/UR5eOmron/PnPCounterToSink/100demos_seed1/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,UR5e,PnP Counter to Sink,100,2,1265309263,,mg/UR5eOmron/PnPCounterToSink/100demos_seed2/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,PnP Counter to Sink,100,3,1269653491,,mg/UR5eOmron/PnPCounterToSink/100demos_seed3/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,PnP Counter to Sink,100,4,1292436858,,mg/UR5eOmron/PnPCounterToSink/100demos_seed4/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,PnP Counter to Sink,100,5,1274566479,,mg/UR5eOmron/PnPCounterToSink/100demos_seed5/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,PnP Counter to Sink,100,6,1292901881,,mg/UR5eOmron/PnPCounterToSink/100demos_seed6/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,PnP Counter to Sink,100,7,1284798868,,mg/UR5eOmron/PnPCounterToSink/100demos_seed7/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,PnP Counter to Sink,100,8,1280370492,,mg/UR5eOmron/PnPCounterToSink/100demos_seed8/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,PnP Counter to Sink,100,9,1280256524,,mg/UR5eOmron/PnPCounterToSink/100demos_seed9/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,UR5e,PnP Sink to Counter,100,0,1541712006,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed0/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,UR5e,PnP Sink to Counter,100,1,1509725273,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed1/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,UR5e,PnP Sink to Counter,100,2,1490444167,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed2/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,PnP Sink to Counter,100,3,1533608904,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed3/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,PnP Sink to Counter,100,4,1564888663,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed4/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,PnP Sink to Counter,100,5,1504357844,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed5/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,PnP Sink to Counter,100,6,1514305787,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed6/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,PnP Sink to Counter,100,7,1509219292,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed7/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,PnP Sink to Counter,100,8,1554558463,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed8/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,PnP Sink to Counter,100,9,1550084625,,mg/UR5eOmron/PnPSinkToCounter/100demos_seed9/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,UR5e,Turn On Sink Faucet,100,0,1433397024,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,UR5e,Turn On Sink Faucet,100,1,1391545663,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K;XP-900,UR5e,Turn On Sink Faucet,100,2,1387998803,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,Turn On Sink Faucet,100,3,1389047567,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,Turn On Sink Faucet,100,4,1398597702,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,Turn On Sink Faucet,100,5,1447047617,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,Turn On Sink Faucet,100,6,1409602881,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,Turn On Sink Faucet,100,7,1363373198,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,Turn On Sink Faucet,100,8,1416961294,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5
-cross-embodiment prior,XP-3K,UR5e,Turn On Sink Faucet,100,9,1372494484,,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed9/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,0,704212453,,mg/JacoOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,1,701785071,,mg/JacoOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,2,711291070,,mg/JacoOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,3,726661577,,mg/JacoOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,4,715446244,,mg/JacoOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,5,741420097,,mg/JacoOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,6,734360781,,mg/JacoOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,7,699737133,,mg/JacoOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,8,708190122,,mg/JacoOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,0,915311193,,mg/JacoOmron/PnPCounterToSink/100demos_seed0/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,1,917885020,,mg/JacoOmron/PnPCounterToSink/100demos_seed1/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,2,938008038,,mg/JacoOmron/PnPCounterToSink/100demos_seed2/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,3,908264880,,mg/JacoOmron/PnPCounterToSink/100demos_seed3/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,4,904041284,,mg/JacoOmron/PnPCounterToSink/100demos_seed4/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,5,925539986,,mg/JacoOmron/PnPCounterToSink/100demos_seed5/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,6,901922955,,mg/JacoOmron/PnPCounterToSink/100demos_seed6/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,7,922132403,,mg/JacoOmron/PnPCounterToSink/100demos_seed7/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,8,925897573,,mg/JacoOmron/PnPCounterToSink/100demos_seed8/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,0,1146982770,,mg/JacoOmron/PnPSinkToCounter/100demos_seed0/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,1,1102228640,,mg/JacoOmron/PnPSinkToCounter/100demos_seed1/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,2,1132582969,,mg/JacoOmron/PnPSinkToCounter/100demos_seed2/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,3,1086900751,,mg/JacoOmron/PnPSinkToCounter/100demos_seed3/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,4,1090497101,,mg/JacoOmron/PnPSinkToCounter/100demos_seed4/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,5,1153366276,,mg/JacoOmron/PnPSinkToCounter/100demos_seed5/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,6,1125172333,,mg/JacoOmron/PnPSinkToCounter/100demos_seed6/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,7,1110382189,,mg/JacoOmron/PnPSinkToCounter/100demos_seed7/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,8,1093273399,,mg/JacoOmron/PnPSinkToCounter/100demos_seed8/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,0,1152023428,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,1,1144743340,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,2,1151980633,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,3,1153510353,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,4,1147989391,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,5,1164133191,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,6,1165771879,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,7,1148094156,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,8,1175269020,,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,0,1020291385,,mg/PandaOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,1,987186662,,mg/PandaOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,2,1007036266,,mg/PandaOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,3,1036639931,,mg/PandaOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,4,968371100,,mg/PandaOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,5,1011914083,,mg/PandaOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,6,972233353,,mg/PandaOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,7,970201758,,mg/PandaOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,8,980068730,,mg/PandaOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,0,1396606779,,mg/PandaOmron/PnPCounterToSink/100demos_seed0/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,1,1454874794,,mg/PandaOmron/PnPCounterToSink/100demos_seed1/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,2,1424888285,,mg/PandaOmron/PnPCounterToSink/100demos_seed2/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,3,1429273055,,mg/PandaOmron/PnPCounterToSink/100demos_seed3/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,4,1401058758,,mg/PandaOmron/PnPCounterToSink/100demos_seed4/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,5,1401751719,,mg/PandaOmron/PnPCounterToSink/100demos_seed5/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,6,1423616188,,mg/PandaOmron/PnPCounterToSink/100demos_seed6/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,7,1418661539,,mg/PandaOmron/PnPCounterToSink/100demos_seed7/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,8,1418879006,,mg/PandaOmron/PnPCounterToSink/100demos_seed8/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,0,1759735906,,mg/PandaOmron/PnPSinkToCounter/100demos_seed0/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,1,1781381843,,mg/PandaOmron/PnPSinkToCounter/100demos_seed1/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,2,1776300515,,mg/PandaOmron/PnPSinkToCounter/100demos_seed2/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,3,1750166029,,mg/PandaOmron/PnPSinkToCounter/100demos_seed3/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,4,1796763317,,mg/PandaOmron/PnPSinkToCounter/100demos_seed4/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,5,1766509579,,mg/PandaOmron/PnPSinkToCounter/100demos_seed5/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,6,1799380218,,mg/PandaOmron/PnPSinkToCounter/100demos_seed6/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,7,1783250961,,mg/PandaOmron/PnPSinkToCounter/100demos_seed7/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,8,1750109930,,mg/PandaOmron/PnPSinkToCounter/100demos_seed8/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,0,1555590803,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,1,1567578600,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,2,1521362519,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,3,1581607629,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,4,1592253167,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,5,1579727988,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,6,1579977741,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,7,1602820320,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,8,1562222276,,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,0,1238461474,,mg/PandaOGOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,1,1207629594,,mg/PandaOGOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,2,1189788370,,mg/PandaOGOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,3,1207548319,,mg/PandaOGOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,4,1172715494,,mg/PandaOGOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,5,1183634434,,mg/PandaOGOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,6,1202470533,,mg/PandaOGOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,7,1193729255,,mg/PandaOGOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,8,1172056829,,mg/PandaOGOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,0,1502019660,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed0/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,1,1487221799,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed1/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,2,1498028730,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed2/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,3,1563396052,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed3/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,4,1544632808,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed4/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,5,1497246445,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed5/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,6,1514699097,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed6/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,7,1509680602,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed7/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,8,1528408612,,mg/PandaOGOmron/PnPCounterToSink/100demos_seed8/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,0,1784729807,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed0/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,1,1810488831,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed1/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,2,1761729515,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed2/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,3,1802374340,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed3/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,4,1798397999,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed4/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,5,1813317192,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed5/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,6,1808416098,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed6/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,7,1855866037,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed7/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,8,1833409287,,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed8/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,0,1702109441,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,1,1671746276,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,2,1678897049,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,3,1724423095,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,4,1685430519,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,5,1748832467,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,6,1607501244,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,7,1729916988,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
-same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,8,1699929382,,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5
-target demonstrations,target-50,Jaco,Flip Mug Upright,50,,291402031,,human/JacoOmron/FlipMugUpright/demo_gentex_im320.hdf5
-target demonstrations,target-50,Jaco,PnP Counter to Sink,50,,287365504,,human/JacoOmron/PnPCounterToSink/demo_gentex_im320.hdf5
-target demonstrations,target-50,Jaco,PnP Sink to Counter,50,,391719161,,human/JacoOmron/PnPSinkToCounter/demo_gentex_im320.hdf5
-target demonstrations,target-50,Jaco,Turn On Sink Faucet,50,,429466351,,human/JacoOmron/TurnOnSinkFaucet/demo_gentex_im320.hdf5
-target demonstrations,target-50,Panda,Flip Mug Upright,50,,370728978,,human/PandaOmron/FlipMugUpright/demo_gentex_im320.hdf5
-target demonstrations,target-50,Panda,PnP Counter to Sink,50,,563706560,,human/PandaOmron/PnPCounterToSink/demo_gentex_im320.hdf5
-target demonstrations,target-50,Panda,PnP Sink to Counter,50,,715856083,,human/PandaOmron/PnPSinkToCounter/demo_gentex_im320.hdf5
-target demonstrations,target-50,Panda,Turn On Sink Faucet,50,,667871239,,human/PandaOmron/TurnOnSinkFaucet/demo_gentex_im320.hdf5
-target demonstrations,target-50,Panda-OG,Flip Mug Upright,50,,471721992,,human/PandaOGGripperOmron/FlipMugUpright/demo_gentex_im320.hdf5
-target demonstrations,target-50,Panda-OG,PnP Counter to Sink,50,,511829535,,human/PandaOGGripperOmron/PnPCounterToSink/demo_gentex_im320.hdf5
-target demonstrations,target-50,Panda-OG,PnP Sink to Counter,50,,727411698,,human/PandaOGGripperOmron/PnPSinkToCounter/demo_gentex_im320.hdf5
-target demonstrations,target-50,Panda-OG,Turn On Sink Faucet,50,,658220545,,human/PandaOGGripperOmron/TurnOnSinkFaucet/demo_gentex_im320.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,Flip Mug Upright,100,20,1005982977,e18712e0a705719edeb26d63bbf259e04af7d25b9c985a74dc8e68029a6d9c95,mg/IIWAOmron/FlipMugUpright/100demos_seed20/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,Flip Mug Upright,100,21,997146990,b330c91a4b96caffdb607cbc33a434ec1369a7759621eda81d38ac2a70a80ff4,mg/IIWAOmron/FlipMugUpright/100demos_seed21/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,Flip Mug Upright,100,22,1025219984,008b49f3a5088d7843d6741fbc718c725850834c6dd4a67b4cb0fb8e427713ec,mg/IIWAOmron/FlipMugUpright/100demos_seed22/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,Flip Mug Upright,100,23,989169339,d876b1ded87a7a24111e0e1a7db1b28507a0b8bfca87c7216682c5abfe93253d,mg/IIWAOmron/FlipMugUpright/100demos_seed23/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,Flip Mug Upright,100,24,1048923235,5984a3929f030299813e04496558983ffb815dab8a837a02b906b235528c832b,mg/IIWAOmron/FlipMugUpright/100demos_seed24/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,Flip Mug Upright,100,25,1053825256,1aa0ea2b3ae05575a872a38dfaf5a49672d8a4799947179381a5228750d99041,mg/IIWAOmron/FlipMugUpright/100demos_seed25/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,Flip Mug Upright,100,26,1057288163,b88c6e4b8c3a45ac2549747518651ff2c03c14abae8afca3e9b667cd7a3ed798,mg/IIWAOmron/FlipMugUpright/100demos_seed26/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,Flip Mug Upright,100,27,987161155,becb8643e26cfd507f22c5b0779c1e6d0fad61df7b617e506f230f26f37d8f6d,mg/IIWAOmron/FlipMugUpright/100demos_seed27/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,Flip Mug Upright,100,28,1091172337,0d06ebf030f827ff711ac927cb1b97638b453ffb653dcffa582a422c3e0963b6,mg/IIWAOmron/FlipMugUpright/100demos_seed28/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,Flip Mug Upright,100,29,1041835045,e1949b202ea8049d88c87fcb840e57c1d3ee5cd40a3ef92a2cf61017400e3c59,mg/IIWAOmron/FlipMugUpright/100demos_seed29/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,PnP Counter to Sink,100,20,1465874374,74504670f0e48a56f54dfee1315608f9909b11f5c2ae5c0ad1290e9212768d9c,mg/IIWAOmron/PnPCounterToSink/100demos_seed20/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,PnP Counter to Sink,100,21,1478912482,45cb58b3d57cd958bd3c283845586358fab951a3cae450704110a54b9eed2f1e,mg/IIWAOmron/PnPCounterToSink/100demos_seed21/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,PnP Counter to Sink,100,22,1420684872,e389a90263a1a680c1464ad4434d38205e0c89e17646597294b875a4cc46bd09,mg/IIWAOmron/PnPCounterToSink/100demos_seed22/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,PnP Counter to Sink,100,23,1417931585,5ed78f45a656dbd0bd8cf251f5babbdb08e2606090ffe45e04a2280b3959167c,mg/IIWAOmron/PnPCounterToSink/100demos_seed23/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,PnP Counter to Sink,100,24,1485818885,9efeb46950c7575b0db078627d90fcfe073ba1fab1ca6f6c9d3724afe4c96ac2,mg/IIWAOmron/PnPCounterToSink/100demos_seed24/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,PnP Counter to Sink,100,25,1479698055,27a7ec9449e246254c94584e6613afa67c0ede918bfe969ee73aaab7155c18d0,mg/IIWAOmron/PnPCounterToSink/100demos_seed25/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,PnP Counter to Sink,100,26,1421572193,be3a3803b24d40204581b0415ad59f564f77c1408c2963f7640dd2299f1fc9e2,mg/IIWAOmron/PnPCounterToSink/100demos_seed26/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,PnP Counter to Sink,100,27,1307174770,9f5c5196d8149cf022ee6ba5b757929a32da6ad6ec742d862d8335fb46410395,mg/IIWAOmron/PnPCounterToSink/100demos_seed27/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,PnP Counter to Sink,100,28,1315745589,0dcb416089fac53fefe516e1d8b98bdfdafc4322b85c09d67414a4c2cc20d94b,mg/IIWAOmron/PnPCounterToSink/100demos_seed28/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,PnP Counter to Sink,100,29,1372828908,0f018408b46bbaf488953796bed03b3ae0dc631fd138bdfb3b84ecf00e9af24a,mg/IIWAOmron/PnPCounterToSink/100demos_seed29/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,PnP Sink to Counter,100,20,1656478785,ec0a0c61b4e8eda0940d9f9fa80e19e34fa699473325c2268feb84ae3e9a5477,mg/IIWAOmron/PnPSinkToCounter/100demos_seed20/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,PnP Sink to Counter,100,21,1610709741,439cde8786f512fb8b32a897de957a0dd8bcf0a7ba8661eeb99232b954da7d65,mg/IIWAOmron/PnPSinkToCounter/100demos_seed21/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,PnP Sink to Counter,100,22,1670028455,f7239a3cdd02bbe181ab7d9c0dc2680eb2a50c71cad789ec3744a324930c816e,mg/IIWAOmron/PnPSinkToCounter/100demos_seed22/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,PnP Sink to Counter,100,23,1622224032,9b50b23dee83964fe2398c40ab8b8e1dfc4e95416a9634db7c7bcee6c1185545,mg/IIWAOmron/PnPSinkToCounter/100demos_seed23/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,PnP Sink to Counter,100,24,1685310727,a9a05748ac6a3eebf2bcfc32acec330e6f86091aac97fbfb44915c9447cbfcc9,mg/IIWAOmron/PnPSinkToCounter/100demos_seed24/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,PnP Sink to Counter,100,25,1606177194,598c84e2658c045932d25291deef15e7b1d1fbd90c631b1292c74f33d725c075,mg/IIWAOmron/PnPSinkToCounter/100demos_seed25/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,PnP Sink to Counter,100,26,1594492388,1878173c0c859766c892ee39eddac71eb45ab370ad68d81e12f425952c50ba85,mg/IIWAOmron/PnPSinkToCounter/100demos_seed26/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,PnP Sink to Counter,100,27,1688519289,4a62a2e3c0572d5cf0bdc9f4a73db74e9bfcc515bbf50bf5bf5f945989db1fd8,mg/IIWAOmron/PnPSinkToCounter/100demos_seed27/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,PnP Sink to Counter,100,28,1633003699,8e092c63d15c572bb745057bf3fadb048116b1e1185fa4b47d94d1e261057be2,mg/IIWAOmron/PnPSinkToCounter/100demos_seed28/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,PnP Sink to Counter,100,29,1679619346,62715f8f4cb2321dc0a00a6ded5126f51c80fabcb1cfa087d5adbce089f88872,mg/IIWAOmron/PnPSinkToCounter/100demos_seed29/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,Turn On Sink Faucet,100,20,1268468492,98d93bbac2249cff53edb0105f89abe420ef1583d34008bdc4ff0129a504a3cc,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed20/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,Turn On Sink Faucet,100,21,1289693843,bc5bc798dd2868a2661962803f6c202afe1108e72eaee49107af843bd15c1512,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed21/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,Turn On Sink Faucet,100,22,1283454396,1d52acfc98c51b610ca09ecbe9cde68961e36c30ce33e22cbebabae4afac03cf,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed22/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,Turn On Sink Faucet,100,23,1367305443,7652fba68ff7fa15b8f3874b41b53a5683bcd79a6d15dbe3c91db0492cf9a47b,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed23/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,Turn On Sink Faucet,100,24,1314291913,eab7e9abd354b5743bc896c11aa51b17cfea96e48166e2fb0ee2801c22741be2,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed24/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,Turn On Sink Faucet,100,25,1223364492,8a5c1d7aa308cd0d287e5bff9391118e0fa154872e4fde29da20b6a9d3c0b938,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed25/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,Turn On Sink Faucet,100,26,1250325402,a786ddaafc07704011a0a1a6264033bfe8486bb39a881142d79107a977d03524,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed26/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,Turn On Sink Faucet,100,27,1269853948,66c0d4b966344bc6f748cdb97e98826ddeb4cb6d12910bd23f08ab02aa40bb87,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed27/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,Turn On Sink Faucet,100,28,1282144498,c929fda3544205a4585f7bb9f51c2d701cc7afad970b82c7f5f1b1d85fc7c876,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed28/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,IIWA,Turn On Sink Faucet,100,29,1297881477,bae624acc34de39f380f6a0dd1f268dbc5b42c5996fe33c1e4b182f813eb09e3,mg/IIWAOmron/TurnOnSinkFaucet/100demos_seed29/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,Flip Mug Upright,100,10,894421027,f5b2c2c42cf21c38bfb516c1e5e1abb5c6ec8c8b3fb2546d00d88fcc3e7d8bd3,mg/Kinova3Omron/FlipMugUpright/100demos_seed10/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,Flip Mug Upright,100,11,926934345,ba0daeb7aca8726802ac53086ef9aec1fc4d4c374e266fe6e65b78fadd7dd85b,mg/Kinova3Omron/FlipMugUpright/100demos_seed11/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,Flip Mug Upright,100,12,879731605,017e9da41e4b2c552e4b518f86c2a1c3f6db2aaf8947330d68640d3ed77523fb,mg/Kinova3Omron/FlipMugUpright/100demos_seed12/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,Flip Mug Upright,100,13,908656044,d64c483fce557976891fd710874d8f9a6acecc6932050aa900107d4e8a63b67f,mg/Kinova3Omron/FlipMugUpright/100demos_seed13/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,Flip Mug Upright,100,14,885173306,752f87fc7ad0be6e4550cef0aa8278f325c5ce6b6e714ae233fabeec8b960fdc,mg/Kinova3Omron/FlipMugUpright/100demos_seed14/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,Flip Mug Upright,100,15,905469909,b3cb95f125e26947aaf99348ac70498dc4dcb66f752e190094080ba6a3715e36,mg/Kinova3Omron/FlipMugUpright/100demos_seed15/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,Flip Mug Upright,100,16,904934195,e8927854af6e9cc4ee6ceb0f9c001ff1ebfb25d2e4c2d8745618ce6ad0e215fa,mg/Kinova3Omron/FlipMugUpright/100demos_seed16/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,Flip Mug Upright,100,17,884724866,1be31c6fc26716b3fdb09b4eed9801f6a2266b9abb89f67f8f0c085cb27d3bca,mg/Kinova3Omron/FlipMugUpright/100demos_seed17/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,Flip Mug Upright,100,18,909752513,eb711763ce2dbe78c0de3b91fae6d8a4e26ef885b205932b21ff35cf0a997cfc,mg/Kinova3Omron/FlipMugUpright/100demos_seed18/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,Flip Mug Upright,100,19,876860670,5d38a087179f757532788b14f1f04053f7024d1817ba7437aec0b151bdc9815d,mg/Kinova3Omron/FlipMugUpright/100demos_seed19/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,PnP Counter to Sink,100,10,1261543269,b883cf12d27fc02f635a41f8ae610193f0d898f3a980afbdf8f4866d81daaab7,mg/Kinova3Omron/PnPCounterToSink/100demos_seed10/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,PnP Counter to Sink,100,11,1230474668,3353b5ff37b91ed6eff37979e831a20902fd2b195e90c586d158880eba36e214,mg/Kinova3Omron/PnPCounterToSink/100demos_seed11/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,PnP Counter to Sink,100,12,1186144428,f6909dd93734deb9431b36a7dcad7e6891474ebd2f8c694a7af187bfc5f075bf,mg/Kinova3Omron/PnPCounterToSink/100demos_seed12/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,PnP Counter to Sink,100,13,1240251956,4777ce0c918c9dd14172dcb9be9734a6e28745313d5c10d3f17d75eba400b885,mg/Kinova3Omron/PnPCounterToSink/100demos_seed13/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,PnP Counter to Sink,100,14,1233960533,2d9fa0aabedb5559bd13643bd069be67e7b216f47cf9c664cb49ea88bda4d55f,mg/Kinova3Omron/PnPCounterToSink/100demos_seed14/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,PnP Counter to Sink,100,15,1232135464,3b4a8be7f791872bd880c00f65d383b6be593c7eb804cb046b6e5c5432538b37,mg/Kinova3Omron/PnPCounterToSink/100demos_seed15/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,PnP Counter to Sink,100,16,1213885135,114e0bd0e02b1efef0f67d2bc2e262951b7a0c9af069070c2a336478b392c1d9,mg/Kinova3Omron/PnPCounterToSink/100demos_seed16/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,PnP Counter to Sink,100,17,1219281670,2ca1dd509001c19c8a5c94dbd9161f6314a27403b6f0517ca4c6c7d2a798c1c3,mg/Kinova3Omron/PnPCounterToSink/100demos_seed17/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,PnP Counter to Sink,100,18,1242191301,e7921731c2bca6ae0386432aa8a1ba1b826e9d226a71dcda3204585e410593e4,mg/Kinova3Omron/PnPCounterToSink/100demos_seed18/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,PnP Counter to Sink,100,19,1195224702,47e6f4c18083a2ca1f9396203b627523ca32e5c07e85658f694e79f745891651,mg/Kinova3Omron/PnPCounterToSink/100demos_seed19/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,PnP Sink to Counter,100,10,1495828867,26308b8d0c69b07d60e481e38dd2a523dd43f7ca166a0604f2b15e91c4537397,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed10/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,PnP Sink to Counter,100,11,1512845287,6cc43c20c0497a86610efd0b2c273fb27af97d6a2bc3ee7dac0616f89b21883d,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed11/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,PnP Sink to Counter,100,12,1536491907,e37d45b84677e5586ae3b1dfaf76c19ab7ed0ab5b701c2dd749505e989694dd4,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed12/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,PnP Sink to Counter,100,13,1555289030,b333ea2256c7c27fc605760305e9f7d6cfea0edd6f71c45a8214529c2faa02b1,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed13/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,PnP Sink to Counter,100,14,1515329658,9be3f0b5bd3481a230ad14bcf5d93edb8c1c61dfbd8852a9177d94908f464f59,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed14/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,PnP Sink to Counter,100,15,1511412298,bc4964772b57e9da6388cd8ced89ea921e33f75167190cccf667c8867bec24e8,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed15/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,PnP Sink to Counter,100,16,1541995210,e2bb1e9a0a61ca676b67cd7f1cbd5140b0eccea5f6c7b95afb72e50d238afdf4,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed16/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,PnP Sink to Counter,100,17,1552608201,521c47f4bc99c7640e4d04c0c47f3a9fbb8cc9ffc552f414c28fbd46d6fbd340,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed17/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,PnP Sink to Counter,100,18,1496710180,4b9b81e91517e0f5741a18f151b2a99be5b1df9f5947db50296ac8d21c436482,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed18/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,PnP Sink to Counter,100,19,1511968706,4bff76ea7722d1e2d3941bdaa1dd714f4011e2113d67b6f8f2a269294eb41229,mg/Kinova3Omron/PnPSinkToCounter/100demos_seed19/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,Turn On Sink Faucet,100,10,1432154731,a67fe180a9641dd86ffc209734e49db66f9b0c85826195d82f8b1b58ba35ffb5,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed10/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,Turn On Sink Faucet,100,11,1429488968,5b8ba0da84729e0c3363378be384b6537c40153993b3fc3941e47f6a9b90a4d2,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed11/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,Turn On Sink Faucet,100,12,1403610447,68d838d39b072a3b12e7cab358c1348e2a6ef5a549b26b0a923ad23e61246377,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed12/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,Turn On Sink Faucet,100,13,1437142299,231aeca51d3d5bde60fb0aa26beb0569abbf64932578fdae70037781819d86d3,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed13/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,Turn On Sink Faucet,100,14,1416783113,0f437fbeadc9841708c067fd4febff4690a5b02cc60f0d84360625c2bfcb181c,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed14/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,Turn On Sink Faucet,100,15,1461597026,726f2006f3122326c777441f51671b9cac48f7ef8edc12ca35a50eb5eb32a7a2,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed15/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,Turn On Sink Faucet,100,16,1418195551,15827d43ff1926a6ddc7a7e705a2b73d36de144547a3ae3f120a6e8cf1a5051c,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed16/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,Turn On Sink Faucet,100,17,1472306228,78ed8a48737e35e538ca30c85fbafc4374c0d4fe8e75b1685df5c418db5c3f93,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed17/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,Turn On Sink Faucet,100,18,1413905573,74bfa43835500e62cfc6a5bda311669052e463834497ad8157772087286dbff0,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed18/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,Kinova3,Turn On Sink Faucet,100,19,1451196618,dc6952cdc6b1ee121e87ee8680be290a43f75878d5a4f47ab44769d78393ff0c,mg/Kinova3Omron/TurnOnSinkFaucet/100demos_seed19/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,Flip Mug Upright,100,0,933084810,3d214a04ff57b4a89b129180195a62c586eabebb43fb2ebe118821b29de0e0bf,mg/UR5eOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,Flip Mug Upright,100,1,877146836,608350ee0cf0bb3b9abbebef2737ea58623768c864d397304268ab083ec4e506,mg/UR5eOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,Flip Mug Upright,100,2,885757552,ea5c6d3d6b6db8cc0dcc959b19363a27897c3b389c9bfc4fd63c8e9caa65cbe2,mg/UR5eOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,Flip Mug Upright,100,3,958979851,1fb73d94a5285a7e51dd08ba65e7e6d723dfcc5d859bedca7f757baab199f5fa,mg/UR5eOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,Flip Mug Upright,100,4,906539777,6c355854e1ece11cf364afdbd3686ef7f185562c745b6578f99208fc31c808cf,mg/UR5eOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,Flip Mug Upright,100,5,919513344,dc1f1087b3616d8d2200a5b457e5fc015526e9cfa43227b85a36973a98e50993,mg/UR5eOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,Flip Mug Upright,100,6,925319797,cedb87f02e75cf3bd9d8f3f8f4490104987c9861a4fd2dc35c448cec4e5ab6bf,mg/UR5eOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,Flip Mug Upright,100,7,894076029,1696f02bc6cfa20187def20d8bbafd995863c0a774a381fde5367a0e68ec82bb,mg/UR5eOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,Flip Mug Upright,100,8,894187604,32827cce3a05fe3ab06501bd7b3addfbd8c7bfb1a809598b06d48ac3d225aade,mg/UR5eOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,Flip Mug Upright,100,9,936150828,07a81952dffcbc85eeef8aec5212b29fc11ed2b9c2ee37b4cd1413692e0e6803,mg/UR5eOmron/FlipMugUpright/100demos_seed9/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,PnP Counter to Sink,100,0,1316175117,809d2df7698f64c645a499a0d05ac6d4b0dc857913049f2110d6fded1615d938,mg/UR5eOmron/PnPCounterToSink/100demos_seed0/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,PnP Counter to Sink,100,1,1322198857,8dbf66425a24c5d360c3158b6aae229f5e97a3940e44d5f71479c10a9f2ea914,mg/UR5eOmron/PnPCounterToSink/100demos_seed1/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,PnP Counter to Sink,100,2,1266208095,1141c84301152e25f1aa480e8c77f7b450d4a41a55f8bb7dbca5b237cf4a6038,mg/UR5eOmron/PnPCounterToSink/100demos_seed2/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,PnP Counter to Sink,100,3,1270534595,6672a1c9c2f4470d39ba303807c01eaee035a164d32a52c09c6479f8fa96a3e5,mg/UR5eOmron/PnPCounterToSink/100demos_seed3/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,PnP Counter to Sink,100,4,1293340458,eb244617c21fe109b1aa3cb9560874c42708be8fc99074001bbe1b9ab1f711df,mg/UR5eOmron/PnPCounterToSink/100demos_seed4/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,PnP Counter to Sink,100,5,1275453327,dfb9e688148b787bd655fa05e3e711d8736879d12374416a544dec2c57b3f61a,mg/UR5eOmron/PnPCounterToSink/100demos_seed5/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,PnP Counter to Sink,100,6,1293803945,10cbef435e256d0111856c820f2d2ba22e165eb91226d8507ba4edffeafabb43,mg/UR5eOmron/PnPCounterToSink/100demos_seed6/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,PnP Counter to Sink,100,7,1285686996,1eddb901d438c712c487a6b6aece09ff0b667532c643dfceb21c14c809f18b5d,mg/UR5eOmron/PnPCounterToSink/100demos_seed7/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,PnP Counter to Sink,100,8,1281248364,05a3684e60af1be3152fd4c99b1f2f219b00169d620e663581f528e4e17986f7,mg/UR5eOmron/PnPCounterToSink/100demos_seed8/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,PnP Counter to Sink,100,9,1281147572,be5857162f238ca580d750a995d7dfb499054b954886b36a9c2c98236df66e3a,mg/UR5eOmron/PnPCounterToSink/100demos_seed9/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,PnP Sink to Counter,100,0,1542598534,4da925ca3c6dcc92b0d31df981fbac576d1db5b871bad421451e56ac36543efd,mg/UR5eOmron/PnPSinkToCounter/100demos_seed0/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,PnP Sink to Counter,100,1,1510615977,361d791d7c3536e3883e6a7a9840ea695ac8a5ad4d216ea006befce692525c5e,mg/UR5eOmron/PnPSinkToCounter/100demos_seed1/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,PnP Sink to Counter,100,2,1491350951,830a6e5542739d374b29ae8198ee7afdac65b2688210ec63765d6fe9ec9d1ee7,mg/UR5eOmron/PnPSinkToCounter/100demos_seed2/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,PnP Sink to Counter,100,3,1534527448,e926881eb138299046f025488ce6841b9e47c40f2051f491646360156eed5146,mg/UR5eOmron/PnPSinkToCounter/100demos_seed3/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,PnP Sink to Counter,100,4,1565791031,33fed6c912a1d7df2a752ac076975bcfef9cb0e434af7b850bfdd892deedfd6a,mg/UR5eOmron/PnPSinkToCounter/100demos_seed4/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,PnP Sink to Counter,100,5,1505233996,5e166dad646499e2f0341d49a2cb3e6befe40ad1547e204a4542a1edabbe43ea,mg/UR5eOmron/PnPSinkToCounter/100demos_seed5/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,PnP Sink to Counter,100,6,1515194875,f34f7c07d12e232c6ad94de65468f235f6c489ab296583c75fa737cab8b0f50f,mg/UR5eOmron/PnPSinkToCounter/100demos_seed6/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,PnP Sink to Counter,100,7,1510106300,c2b6d70a3da9f659cc9ce32b0cd9c226959a1390380fd4d891f06e8598371d5c,mg/UR5eOmron/PnPSinkToCounter/100demos_seed7/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,PnP Sink to Counter,100,8,1555449519,e7e2c4dd072ec83a69b18de85722449489278e05df3e18cd56d1819155300a76,mg/UR5eOmron/PnPSinkToCounter/100demos_seed8/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,PnP Sink to Counter,100,9,1550978097,8702ced5d166d719752bf2a60583978b8cee9bd8477dee27a4e7095c614ded87,mg/UR5eOmron/PnPSinkToCounter/100demos_seed9/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,Turn On Sink Faucet,100,0,1434304120,9428c07103bdcfb80e5e81e50c57d62cc2add1216fd052736e7263348e4d287e,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,Turn On Sink Faucet,100,1,1392444911,b7e7fb635d32f0dfc8fd3924b553ff1f4309fc2528d7e05247cea414634c708d,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,Turn On Sink Faucet,100,2,1388923939,932fbe6492ebb5a8b79a9dff20fa3cddd0f5f76e096cd563a83b8e43e5b1d156,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,Turn On Sink Faucet,100,3,1389954879,e09f8b1879715a79721fcc86c879aebd4c8c54e6b897c3271c3cc6719de34279,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,Turn On Sink Faucet,100,4,1399498150,9c06f37631e2c712a3fbb1c7272b6987398734c4a10af378d52e7ab008465d31,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,Turn On Sink Faucet,100,5,1447956137,932dfd1ba0bd1901eb727529995bc80a5a197bb8abb484c88ad66769aa06362e,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,Turn On Sink Faucet,100,6,1410496985,61c6182df7ebec9dca6efcdc1784839f03494fe9e1710b12479f6509789123d8,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,Turn On Sink Faucet,100,7,1364271934,137aa8f7ed8e087d955022562be8ce7ce162527fbc18c5660e1e5870a3603e81,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,Turn On Sink Faucet,100,8,1417885622,e80548aa11e22d663e5e4ae747cdd0d432ce2055029f003d8c53d13d29d3cae6,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K,UR5e,Turn On Sink Faucet,100,9,1373408092,ef746a8001a0d1eb303b09f0f44ba0b0c564d5c2488edf1d895ac40253d37eda,mg/UR5eOmron/TurnOnSinkFaucet/100demos_seed9/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,0,705129109,8cf1bcedf6afccb1a14cf7651c40d51c5ed601978580f1a4cf62a23b2b3628e4,mg/JacoOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,1,702727247,4d45d0c6e51cedbe91fc644729b93b56977d806dd1366e5694403658f37a6bd1,mg/JacoOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,2,712208966,8d46b2edf65c2d46bcb55e8f7b1705e7eaa0051d125b00d92d644f57944fbb8e,mg/JacoOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,3,727616665,993b7b8ddb9b1479d6dcab2cea6ca86368c0bd1b13d84a638bd7c8f6506339eb,mg/JacoOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,4,716361980,f1243699c05c8440ea3c3f8297acfed25dbfc2fc1dc163bfdb811abe30124d0d,mg/JacoOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,5,742341225,1a0954e743602ddea2cac090fc6ab4c074941a351f17d2b69f8971842ab055cb,mg/JacoOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,6,735299405,430b1fca93f2046a28722cfd544a596462e87b426c7ad617e74c6f210190df57,mg/JacoOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,7,700631469,7ec4b69399aca8766ed9c4f46e3e1093cd2667327a404525968b80c7c311b885,mg/JacoOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,8,709108226,1c5b02642acf22cc2eb3e211a08cf7b53cb092c82e06ae73f4941dd843fd6260,mg/JacoOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,0,916241065,cbce0cceaf9796880a889a2c70ce91e7b1c91a07a2f3090e8a9a58c391bfe422,mg/JacoOmron/PnPCounterToSink/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,1,918814220,d1a28957d1f4e47d982c42b58624f8c3187e27a7d8822f9e66b0aab2843c345d,mg/JacoOmron/PnPCounterToSink/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,2,938899222,5fdba936708f834b649d1890fa3a0027b2deb3f25841dc14560030787fe29b66,mg/JacoOmron/PnPCounterToSink/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,3,909206736,962a8328a07fbdcaa5ab50b543fc32ffb6ee3ed998772dcdb9ff591877e8cb8b,mg/JacoOmron/PnPCounterToSink/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,4,904941924,e0bda6c4b90ca2656c7fcb9ca13d3481b7b02986769bbd2f809a076d09788d0f,mg/JacoOmron/PnPCounterToSink/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,5,926455138,8bfb67444951f7e60c3490724c3baa714c4383c617ee5bfd7c478ec87488ad86,mg/JacoOmron/PnPCounterToSink/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,6,902838203,c0170964ace5332c556044c16daf8ef0ce53fdac52d4629a1886088668c3c868,mg/JacoOmron/PnPCounterToSink/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,7,923044435,3d690861d711cad42740c3d77fe0f7001c3b5ccd8aaae1d24bd7155e7b0a40de,mg/JacoOmron/PnPCounterToSink/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,8,926823077,daa05f704b1618af70456fc0e91587479bfd5a63b3884899ccd6a901393fa84b,mg/JacoOmron/PnPCounterToSink/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,0,1147921506,4a586f96c477f442210703e16ffcb5347be2c009bbf893b68da95eef5977a587,mg/JacoOmron/PnPSinkToCounter/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,1,1103178848,737c96a9b27c7f75e6236118da6f80270e91f09f7abfd3fb3c251c2a876926da,mg/JacoOmron/PnPSinkToCounter/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,2,1133487913,ac1e9e09b12748da1e16ddaf1242a897fd7350dbd7bd5b306fab55a8d01940fa,mg/JacoOmron/PnPSinkToCounter/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,3,1087825791,e2842eb8420f7a065cb06dcbfa78fb30e9db768dac046d7d6ee167144b70d50e,mg/JacoOmron/PnPSinkToCounter/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,4,1091417165,35e45e4e15089881e8dad7e489e1a87f787929a0856d6b550a397a3144c124c3,mg/JacoOmron/PnPSinkToCounter/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,5,1154311012,d641a49d219477499508c1ef74df6eeb8ade18eb834dbf1e01d88a0053d2d514,mg/JacoOmron/PnPSinkToCounter/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,6,1126102557,2de03f968447b5e0da2ab4b7ca3a46e3e1fd9f4fa99e2b023159fc674501bc0e,mg/JacoOmron/PnPSinkToCounter/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,7,1111286301,67c9a60a1edd0fbf46dfbfd6c425fe31c3152b1edc521d72ecc7006f1115e120,mg/JacoOmron/PnPSinkToCounter/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,8,1094188479,2214602bbdc0570d3742158bfa6b3c3c3b722e3d6cf98ddb158f27dce16f1999,mg/JacoOmron/PnPSinkToCounter/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,0,1152933412,89bb8472611329881f8ba6a891332e791d113490ea0780bd416af125c3880da9,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,1,1145646940,87abd7fa5002140d2ec61ecdeb9cc6b69b8379816c6ea32ddbe2ae3c0a815c2d,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,2,1152884425,8de13534d9ad05a76a842ddb977616dd4d1d072fe3610f365cf5286237ccaf9c,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,3,1154422177,cffa422663a70872b9b909cbbb56d6a333a6f23f6f56c0636cbb74506d1daf28,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,4,1148910047,110707476d3004c268e70face74ec8cfe075c0dd96087c4b7a4e66d3f45c661e,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,5,1165047239,230b50f9122816ebcd8fbeaad9a52e7c691f00bc6ef37c7aa8f3277844efba9e,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,6,1166660599,639edd1144873b7ad828219efb9e5be0937b28cfa3fa02520303d3ca28233bd8,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,7,1148979308,f5d0b64c71413373bb05466cd5242b77ef542b7ac87d86a876a9d0f34f243ec9,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,8,1176200332,331a47d2c92de5946d9070198741c8b71cba573e374f029c1945e2ec6b094ea7,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,0,1021184937,0c5349ebdcf16702407bd222d965b3b3621d88c84f72bdbbe422e8ae1b76a35e,mg/PandaOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,1,988117942,a4ddd7b55d972b5ba6d01c426999ed28e8c3a975c76fd3e60318a6fd071fb4b6,mg/PandaOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,2,1007953026,7163d16eeaa3078b91103057ecff2fc1a71b7c77bafa7a9a509a64bb72cf2035,mg/PandaOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,3,1037557179,2f44d513a7e3db2cb283aed98957adde0360570d7a447327685f1ec89370164b,mg/PandaOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,4,969303972,8d15fc183aebd2eb1d9571ea037c08cc6b76f92a9ed56d99491809aa1e322dd3,mg/PandaOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,5,1012835203,304af2fad83b43328d51672bacda7b3c0fe50891c2d381a636e449cb690023ea,mg/PandaOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,6,973174553,ce5de9eff611109044d6d491d68d488584012108c0ba992f7b322efd765ab503,mg/PandaOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,7,971132222,c11ebdcca4b511973482939548f1a1c61d175215cc4076029be5a13bce5bf175,mg/PandaOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,8,980992890,da95568f245749b2a94b6c0952d5f742975442fc8821df7d2c9baba1261d3850,mg/PandaOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,0,1397537571,adca44cdf64b87adf0bf858ce633aaa1372332b88fe872cf05e75e4bd2dc9fdd,mg/PandaOmron/PnPCounterToSink/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,1,1455783914,336e696a54fd89b3f05c9069e46aadd0f5c2b71423ef6c437f35c3f44450da83,mg/PandaOmron/PnPCounterToSink/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,2,1425805077,455253d58b28d58fcfc841c16ed0eeee0bca4c7919cd6f8bfa1cdfb09bac8462,mg/PandaOmron/PnPCounterToSink/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,3,1430175423,7b7da88bd8d821705648a2e01e9c6697d5ef8ff8d957f95e519afb90e32baa5f,mg/PandaOmron/PnPCounterToSink/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,4,1401982934,be23bfdeb0f7981d0466c1e4575693df03381196b9d29a17c4545b472de30d8c,mg/PandaOmron/PnPCounterToSink/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,5,1402675287,5486b8bc472be37e1f049579f89739d9bb1506e88c18969915eb3b0e0d62c9a8,mg/PandaOmron/PnPCounterToSink/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,6,1424549516,1a5020dc32fbf273b16eb55622ce6c39b90042e68452486f07bfd041ac374047,mg/PandaOmron/PnPCounterToSink/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,7,1419605507,040c3b107033adf5a1612af4527e5f893ab172e9bac17e1b8ae7782a0d3123b9,mg/PandaOmron/PnPCounterToSink/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,8,1419785526,d8551f3962ad00a67952d1a752b9c1ae2e48ccab348c25462ba2a5b884dd0ff6,mg/PandaOmron/PnPCounterToSink/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,0,1760644002,cf35dd7973a21668f8489545c2d684781c57fdec6953537fd50beb65d4e06edc,mg/PandaOmron/PnPSinkToCounter/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,1,1782279427,8ab177b3e1fc667c4d417ff5320df5fddca2a68333f2754d24d06b917d9f9d24,mg/PandaOmron/PnPSinkToCounter/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,2,1777225331,78ca3ca14021d8d2012bc14f8c371473873ea459bcb1cec648ee0358633c6916,mg/PandaOmron/PnPSinkToCounter/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,3,1751066989,d6e302b78852696f14421151b252d16f30394d013f3684cf417b72250dd48020,mg/PandaOmron/PnPSinkToCounter/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,4,1797661781,97195576bff51c1174df4ce859ea982438eaaa9dfb4a25b7962356bca5d7de14,mg/PandaOmron/PnPSinkToCounter/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,5,1767414115,762b61d49d93148b59511ddf93f2320b507d247ea204041630f02d47ba32381c,mg/PandaOmron/PnPSinkToCounter/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,6,1800283370,1caf29e70a3cf488427d891923792e870d8ae571e8c3f9f8426f15ee7887e324,mg/PandaOmron/PnPSinkToCounter/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,7,1784141345,0e08096caca55a29622c3bcd45ad74c41c7df158b379e982155a9e7bfd79dbe0,mg/PandaOmron/PnPSinkToCounter/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,8,1751020970,3c93f9bc78a07d81d7730ce8673e4df1efb1e4df50cc34b97a7803d78689ac1a,mg/PandaOmron/PnPSinkToCounter/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,0,1556523107,ea109516b6a4ff6dd06cfc2761e2dc7797073f65d6d8884fb0f6cfdf39cf80fd,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,1,1568463048,381932f9a090e458472586badf31525b3d846ea3af3b10c66e4f3c9609adf8a5,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,2,1522272183,65b32fff7f26455d9bbec8935cf776d77d145466590e35ddd71384b859d4801b,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,3,1582527565,1596dd4bd2ff5cbf609c3736552ae9016d4cb877bf07a3d2c38ba5afd1bc5100,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,4,1593176895,68785c7f7ec494a0cf080d5b32732c0d78e7d031b0add7051abf535403812e4d,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,5,1580642996,afddf1a95375f4abaa5581986cd35c59b9628847761be111d0c42138e11d3a36,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,6,1580916509,2260cec559332a39fb41a253d7edb2f88677503ac1f58c0256cdd9cac9e46279,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,7,1603698080,ced6dd7e7042b3c339e1521d9478c5828e7392968288550ea8fc35781ff8c5b7,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,8,1563100372,92d1319149704a90f9ff6e4d72bed047da9bafaa1eb179d45977b043a4c25f75,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,0,1239369730,6b055dde544f4875c9d41393690739e20f94e2d4a8a57832df8971ab612c7f68,mg/PandaOGOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,1,1208544938,3abae92994762ea610801b680c76df2a49b4d36bfc6555fb5855062d018fd6c5,mg/PandaOGOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,2,1190730178,751d4fb394cd32fbe936911ca26b3f71a7e94a33480782d74768e895365e42a8,mg/PandaOGOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,3,1208480543,6aac5f74c71ed10ef6f8a12c19d23f205a905bf299e789a8cd5ecd35dde576a5,mg/PandaOGOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,4,1173627702,6a1540ecbd42f9505ae38017dd27a88d1ddcda220c7f6fb29b36b97a0de4246f,mg/PandaOGOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,5,1184575458,ee3df29fb8b968ac4fbc5dbcb7b27ff3548507986c321ce1b396ed253f29eacc,mg/PandaOGOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,6,1203394085,c5cd149a6c3fe6af3d34692ee878242175ecd44d492da17b12ca0ffc0e569175,mg/PandaOGOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,7,1194678439,a9e912c86bf8d509f4425329fa5513a1eb5e07506d373074eae79193d28fe813,mg/PandaOGOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,8,1172998109,3a8a60959d9a5d6cbc7a9e7b6026d24d00a3860810ddfde6b6d7fd2c96456149,mg/PandaOGOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,0,1502958772,d319df6c73269f70ad69a73636d4eca823316b9ef039a22a2ac395d987d97136,mg/PandaOGOmron/PnPCounterToSink/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,1,1488127751,2170cd7da55a6f5ebcf8a5d21d1c08c4cd9e89c136816641255c2c9a373cebbc,mg/PandaOGOmron/PnPCounterToSink/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,2,1498936858,63fff47914df88ea4fe70f3eb841d1fc3be931407e292decab994634b33b2d3d,mg/PandaOGOmron/PnPCounterToSink/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,3,1564331492,1d69b40d55f4b1864105f5fff056ab1fcd1d4c53ca74b9b7b3ef8110956741ca,mg/PandaOGOmron/PnPCounterToSink/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,4,1545564232,b02a1385456e42bc55ff1ff89d2e05607c9e3db38113afc32ec470397aebe27c,mg/PandaOGOmron/PnPCounterToSink/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,5,1498174285,ec0dd2f8fe7971a519e0d396ae7786a562ac42d44b8a8a56f4e856a03c3e41ab,mg/PandaOGOmron/PnPCounterToSink/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,6,1515628601,520d3007d903fbd3128b2b20ec2ca6f6fd413c3defb3fe000bbcc67c640c0231,mg/PandaOGOmron/PnPCounterToSink/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,7,1510574234,04f62a2758d88cf468b3622878d3aaf84ec64069d3f4670ac98956803c6cf12d,mg/PandaOGOmron/PnPCounterToSink/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Counter to Sink,100,8,1529349508,f45b934c8a2690060682a17a7bd6d9429d4fcf67a62b575010621ba5b5d1ad02,mg/PandaOGOmron/PnPCounterToSink/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,0,1785672783,ec50231438fe9ac1f8313096b5c3788038d6e5f6e3fc2633033e445a5f693cb0,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,1,1811397023,4ae5999e190d729f66c4e90b8215392e0008bd0e74a84976aa5bcb743c88e5de,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,2,1762639387,2f3ce7de308b531d68c6a319187ddbf5195eddee3c9c4a7abcd3a781431dfb53,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,3,1803286036,3af058bf797709e93ab718a68f51848baaed4225270385437a4625755faa2541,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,4,1799303423,77c0930f3340c30cb607becd2593f2fd3209268d557a581e3a7e1f601bdba984,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,5,1814249944,cb067018a605beb27ae6ab536cfc8a08c880ce2d59d804e9fab79726c5739c5f,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,6,1809347834,78088175229cc2667f2a5ecd499e8270053fcb79e7ca6e7333013441c0537670,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,7,1856798885,eb93b4698285c45ffcb7df880124d1b71f58fd2a4ffcb654e7b9e583167d4fd4,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,PnP Sink to Counter,100,8,1834352231,388d934a0050f0f49039e67855ac21b652265600ab441ad279da800f2ca63c53,mg/PandaOGOmron/PnPSinkToCounter/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,0,1703011761,5435c2a4e0fe27620c700fff3da0f2d94ac2df78995d20f2cd6be186551fd823,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,1,1672654292,fa484b6d3181b87b82c2c813d96de0c876de93a1c852d0164a2bba75db08555c,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,2,1679786569,530363dc53e8a913eae57fe7eb1acc75f920f232f0e1f5f1a7d4c16f910272cc,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,3,1725326303,b8cce63fdbafca22fa28c801ec690e7c78f13674ee5f567a1c51cb25d8b1e0e5,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,4,1686324423,e5bf01a03c49c9bb6522733aeeceef434f3d89be374bc245dee70b3262cefe17,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,5,1749759875,f4acfe870f40745c0032110358a1501e0a931a1d3578a6c43bb99e9b5202b06a,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,6,1608390748,0407c9623d94fb4f1dca39179132bf5200e47a3ac141e2d2bb01b34b546c1605,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,7,1730799036,04bbe7f57e746a9c59a74b8460958fdaefa45ac7282e651a66be885103f78bb5,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,8,1700825894,684a9bb268ccccaeca569f84e2533875dc47f38edef1ff6d39a69f965f7ba47c,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5
+target demonstrations,target-50,Jaco,Flip Mug Upright,50,,291837951,bea10992e6153dc39f50af5ebd7abf076fe5caf30acc1f2fa62bf769997fc3ad,human/JacoOmron/FlipMugUpright/demo_gentex_im320.hdf5
+target demonstrations,target-50,Jaco,PnP Counter to Sink,50,,287779920,8242625b5ddbdcb5ba3a858291061ae71cffc861571bc3c45022545931d7809d,human/JacoOmron/PnPCounterToSink/demo_gentex_im320.hdf5
+target demonstrations,target-50,Jaco,PnP Sink to Counter,50,,392159977,1488bd6c75873fff233084dbe087ee0dbe8a984feff69c4d5b1c18fb9376315a,human/JacoOmron/PnPSinkToCounter/demo_gentex_im320.hdf5
+target demonstrations,target-50,Jaco,Turn On Sink Faucet,50,,429872383,32c0be9b08bf43cb8695f32fbfd1ceae0c37086ab79baf4ea79fea4d4d51f090,human/JacoOmron/TurnOnSinkFaucet/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda,Flip Mug Upright,50,,371157330,e97ed28a32fe39642e5adbab62f80344f31bbf5916c54ab53df09d2c18f78296,human/PandaOmron/FlipMugUpright/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda,PnP Counter to Sink,50,,564120784,3afd1c433ae028c63fe99364ac951030f4a4f232c0102f42cf31c1a8dc1ab0d0,human/PandaOmron/PnPCounterToSink/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda,PnP Sink to Counter,50,,716265939,4874601734320497cc6effa4cb5d0bf64daa7ae517ce299a0130f108a033ca61,human/PandaOmron/PnPSinkToCounter/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda,Turn On Sink Faucet,50,,668293655,bf58d321906b9253265d533b32ecdba418ab04152949bd9a964227833dcba46d,human/PandaOmron/TurnOnSinkFaucet/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda-OG,Flip Mug Upright,50,,472149336,e7fee1da11a3e4f123c9ff9391278d155bfaeeb4bbe81b247395c56a558a4173,human/PandaOGGripperOmron/FlipMugUpright/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda-OG,PnP Counter to Sink,50,,512257327,3168fd530c368d69255195f44f72f9b31008c74eaf584edee4d53d6d63b830ab,human/PandaOGGripperOmron/PnPCounterToSink/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda-OG,PnP Sink to Counter,50,,727855762,ff14d126ae8d499f0687b311c2e4d48528f7a15aa40cfe9b1fb9b7c6e08ad457,human/PandaOGGripperOmron/PnPSinkToCounter/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda-OG,Turn On Sink Faucet,50,,658640353,db384c534cdc55dc13d3d47e2c345efd5b2a2670b6f80f7bfe75052658b938dc,human/PandaOGGripperOmron/TurnOnSinkFaucet/demo_gentex_im320.hdf5
