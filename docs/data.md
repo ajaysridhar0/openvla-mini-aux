@@ -4,6 +4,11 @@ The raw HDF5 dataset is recorded and checksummed in `dataset/manifest.csv`; see
 `dataset/README.md` for its composition, verification command, and schema. The
 archive preserves the relative `mg/` and `human/` paths.
 
+The public source archive is
+[`ajaysri/barx-raw-hdf5`](https://huggingface.co/datasets/ajaysri/barx-raw-hdf5).
+Use the immutable revision recorded in `configs/raw_dataset.json`; the exact
+download command is in `dataset/README.md`.
+
 Retained episode metadata replaces installation prefixes with `<ROBOCASA>/`.
 This token preserves asset-relative paths without exposing or depending on the
 original collection machine. The frozen condition bundles store the exact

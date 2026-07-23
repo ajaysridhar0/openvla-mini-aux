@@ -14,6 +14,7 @@ from scripts.verify_raw_data import verify_dataset
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "dataset" / "manifest.csv"
+PUBLIC_DATASET = ROOT / "configs" / "raw_dataset.json"
 
 
 class RawDataTest(unittest.TestCase):
@@ -40,6 +41,14 @@ class RawDataTest(unittest.TestCase):
         for row in rows:
             self.assertEqual(len(row["sha256"]), 64)
             int(row["sha256"], 16)
+
+    def test_public_dataset_is_immutable_and_versioned(self):
+        config = json.loads(PUBLIC_DATASET.read_text())
+        self.assertEqual(config["repo_id"], "ajaysri/barx-raw-hdf5")
+        self.assertEqual(config["repo_type"], "dataset")
+        self.assertEqual(config["tag"], "v1.0.0")
+        self.assertEqual(len(config["revision"]), 40)
+        int(config["revision"], 16)
 
     def test_verifier_accepts_a_matching_normalized_archive(self):
         with tempfile.TemporaryDirectory() as directory:

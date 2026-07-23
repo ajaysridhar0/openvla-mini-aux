@@ -21,6 +21,19 @@ pick-and-place sink-to-counter, turn-on-sink-faucet, and flip-mug-upright.
 The manifest selects the final rendered and annotated simulation files used by
 the paper's XP-900, XP-3K, SP-900, and target-50 experiments.
 
+## Download
+
+The public archive is pinned in `configs/raw_dataset.json`. Download that exact
+revision into a new directory:
+
+```bash
+hf download ajaysri/barx-raw-hdf5 --repo-type dataset \
+  --revision c8b3aba2dfbbfbafa67fa82466320945d560208f \
+  --local-dir /data/barx
+```
+
+The repository is public and the download requires no Hugging Face token.
+
 ## Verify the archive
 
 Run the full size, structure, metadata, and SHA-256 verification before using

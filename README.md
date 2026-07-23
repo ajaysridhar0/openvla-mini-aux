@@ -18,8 +18,10 @@ This repository contains:
 The raw HDF5 demonstrations can be read directly, converted to RLDS, or used
 as the basis for new data-generation pipelines; see
 [`dataset/README.md`](dataset/README.md).
-Public models and datasets are available from the
-[BARX Hugging Face collections](https://huggingface.co/collections/ajaysri/barx-pretraining-models-joint-reps-and-no-reps).
+Public artifacts are available from the
+[BARX model collections](https://huggingface.co/collections/ajaysri/barx-pretraining-models-joint-reps-and-no-reps),
+[processed RLDS collection](https://huggingface.co/collections/ajaysri/robocasa-x),
+and [raw HDF5 dataset](https://huggingface.co/datasets/ajaysri/barx-raw-hdf5).
 They are ungated and do not require a Hugging Face token.
 
 ## Quick start
@@ -93,7 +95,9 @@ The paper protocol uses 100 trials; omit `--episodes 1` to run the full set.
 
 See [`docs/installation.md`](docs/installation.md) for system requirements,
 [`docs/data.md`](docs/data.md) for dataset preparation, and
-[`docs/experiments.md`](docs/experiments.md) for training and evaluation.
+[`docs/experiments.md`](docs/experiments.md) for training and evaluation. The
+maintainer launch gates are tracked in
+[`docs/release_checklist.md`](docs/release_checklist.md).
 
 ## Citation
 
