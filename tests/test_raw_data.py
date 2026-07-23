@@ -47,6 +47,10 @@ class RawDataTest(unittest.TestCase):
         self.assertEqual(config["repo_id"], "ajaysri/barx-raw-hdf5")
         self.assertEqual(config["repo_type"], "dataset")
         self.assertEqual(config["tag"], "v1.0.0")
+        self.assertEqual(
+            config["collection"],
+            "ajaysri/barx-raw-hdf5-data-6a61b2d60e2a7ca90b75fb68",
+        )
         self.assertEqual(len(config["revision"]), 40)
         int(config["revision"], 16)
 

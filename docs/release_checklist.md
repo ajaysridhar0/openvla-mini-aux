@@ -10,7 +10,7 @@ and recorded in the release checkout.
 - [x] All 240 raw files match `dataset/manifest.csv` by path, size, and SHA-256.
 - [ ] Processed RLDS repositories are public, complete, and grouped in the
       labeled BARX RLDS collection.
-- [ ] The raw HDF5 repository is grouped in the labeled BARX HDF5 collection.
+- [x] The raw HDF5 repository is grouped in the labeled BARX HDF5 collection.
 - [ ] A fresh anonymous download passes `scripts/verify_raw_data.py`.
 
 ## Conversion and generation

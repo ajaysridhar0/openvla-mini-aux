@@ -20,8 +20,8 @@ as the basis for new data-generation pipelines; see
 [`dataset/README.md`](dataset/README.md).
 Public artifacts are available from the
 [BARX model collections](https://huggingface.co/collections/ajaysri/barx-pretraining-models-joint-reps-and-no-reps),
-[processed RLDS collection](https://huggingface.co/collections/ajaysri/robocasa-x),
-and [raw HDF5 dataset](https://huggingface.co/datasets/ajaysri/barx-raw-hdf5).
+[processed RLDS collection](https://huggingface.co/collections/ajaysri/barx-rlds-datasets-69cad164926390ebbc395496),
+and [raw HDF5 collection](https://huggingface.co/collections/ajaysri/barx-raw-hdf5-data-6a61b2d60e2a7ca90b75fb68).
 They are ungated and do not require a Hugging Face token.
 
 ## Quick start
