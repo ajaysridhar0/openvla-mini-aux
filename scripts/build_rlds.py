@@ -54,6 +54,12 @@ def selected_paths(
     return selected
 
 
+def named_builder_type(output_name: str, base_type: type) -> type:
+    """Return an importable TFDS builder with the requested dataset name."""
+    class_name = "".join(part.capitalize() for part in output_name.split("_"))
+    return type(class_name, (base_type,), {"__module__": base_type.__module__})
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", choices=PAPER_SET_NAMES, required=True)
@@ -101,8 +107,7 @@ def main() -> None:
     # while all splits share exactly one conversion implementation.
     from dataset.rlds.robocasa_x_dataset_builder import RobocasaXDataset
 
-    class_name = "".join(part.capitalize() for part in output_name.split("_"))
-    builder_type = type(class_name, (RobocasaXDataset,), {"__module__": __name__})
+    builder_type = named_builder_type(output_name, RobocasaXDataset)
     builder = builder_type(data_dir=str(args.rlds_root))
     if builder.name != output_name:
         raise RuntimeError(f"TFDS derived {builder.name!r}; expected {output_name!r}")

@@ -15,6 +15,18 @@ from scripts import build_rlds, evaluate, train
 
 
 class DatasetReleaseScriptTest(unittest.TestCase):
+    def test_dynamic_builder_uses_importable_base_module(self):
+        class ImportableBuilder:
+            pass
+
+        builder_type = build_rlds.named_builder_type(
+            "panda_flip_mug", ImportableBuilder
+        )
+
+        self.assertEqual(builder_type.__name__, "PandaFlipMug")
+        self.assertEqual(builder_type.__module__, ImportableBuilder.__module__)
+        self.assertNotEqual(builder_type.__module__, "__main__")
+
     def test_paper_sets_resolve_to_checkpoint_compatible_dataset_names(self):
         self.assertEqual(
             build_rlds.stored_dataset_name("xp_900", "pnp", None), "mg_pnp_lite"

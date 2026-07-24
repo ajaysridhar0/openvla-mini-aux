@@ -477,13 +477,12 @@ dataset_dir = info_paths[0].parent
 builder = tfds.builder_from_directory(str(dataset_dir))
 dataset = builder.as_dataset(split="train", shuffle_files=False)
 episode = next(iter(tfds.as_numpy(dataset.take(1))))
-steps = episode["steps"]
-first = {key: value[0] for key, value in steps.items()}
+first = next(iter(episode["steps"]))
 report = {
     "builder_name": builder.info.name,
     "version": str(builder.info.version),
     "examples": builder.info.splits["train"].num_examples,
-    "step_keys": sorted(steps),
+    "step_keys": sorted(first),
     "observation_keys": sorted(first["observation"]),
     "action_shape": list(first["action"].shape),
     "instruction": first["language_instruction"].decode(),
