@@ -1,0 +1,2 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+target demonstrations,target-50,Jaco,Flip Mug Upright,50,,291837951,bea10992e6153dc39f50af5ebd7abf076fe5caf30acc1f2fa62bf769997fc3ad,human/JacoOmron/FlipMugUpright/demo_gentex_im320.hdf5

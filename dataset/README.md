@@ -34,6 +34,34 @@ hf download ajaysri/barx-raw-hdf5 --repo-type dataset \
 
 The repository is public and the download requires no Hugging Face token.
 
+### Download one paper subset
+
+The 24 manifests under `dataset/subsets/` mirror the 24 repositories in the
+public RLDS collection. Download and fully verify only the raw files underlying
+one RLDS dataset with the paper-facing dataset, task, and target names:
+
+```bash
+uv run --locked --no-dev python scripts/download_raw_data.py \
+  --dataset xp_900 --task pnp --output-dir /data/barx-xp900-pnp
+
+uv run --locked --no-dev python scripts/download_raw_data.py \
+  --dataset target_50 --target panda --task pnp \
+  --output-dir /data/barx-target-panda-pnp
+```
+
+The downloader is anonymous, uses the pinned raw-data revision, and writes
+`subset-manifest.csv` beside the selected `human/` or `mg/` tree. By default it
+validates HDF5 structure, byte sizes, demonstration counts, and SHA-256 hashes.
+Add `--dry-run` to print the exact paths and size before downloading, or
+`--skip-checksums` to skip only the final full-byte hash pass.
+
+Regenerate the checked-in views after changing the master manifest:
+
+```bash
+uv run --locked --no-dev python scripts/build_raw_subsets.py
+uv run --locked --no-dev python scripts/build_raw_subsets.py --check
+```
+
 ## Verify the archive
 
 Run the full size, structure, metadata, and SHA-256 verification before using

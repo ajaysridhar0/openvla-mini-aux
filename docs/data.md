@@ -7,7 +7,10 @@ archive preserves the relative `mg/` and `human/` paths.
 The public source archive is
 [`ajaysri/barx-raw-hdf5`](https://huggingface.co/datasets/ajaysri/barx-raw-hdf5).
 Use the immutable revision recorded in `configs/raw_dataset.json`; the exact
-download command is in `dataset/README.md`.
+full-archive and selective subset commands are in `dataset/README.md`. The 24
+checked-in manifests under `dataset/subsets/` map one-to-one to the public RLDS
+repositories without duplicating the XP-900 files that are already part of
+XP-3K.
 
 Retained episode metadata replaces installation prefixes with `<ROBOCASA>/`.
 This token preserves asset-relative paths without exposing or depending on the

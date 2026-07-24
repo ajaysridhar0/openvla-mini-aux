@@ -1,0 +1,2 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+target demonstrations,target-50,Panda-OG,Turn On Sink Faucet,50,,658640353,db384c534cdc55dc13d3d47e2c345efd5b2a2670b6f80f7bfe75052658b938dc,human/PandaOGGripperOmron/TurnOnSinkFaucet/demo_gentex_im320.hdf5

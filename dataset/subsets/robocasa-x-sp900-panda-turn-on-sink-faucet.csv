@@ -1,0 +1,10 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,0,1556523107,ea109516b6a4ff6dd06cfc2761e2dc7797073f65d6d8884fb0f6cfdf39cf80fd,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,1,1568463048,381932f9a090e458472586badf31525b3d846ea3af3b10c66e4f3c9609adf8a5,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,2,1522272183,65b32fff7f26455d9bbec8935cf776d77d145466590e35ddd71384b859d4801b,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,3,1582527565,1596dd4bd2ff5cbf609c3736552ae9016d4cb877bf07a3d2c38ba5afd1bc5100,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,4,1593176895,68785c7f7ec494a0cf080d5b32732c0d78e7d031b0add7051abf535403812e4d,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,5,1580642996,afddf1a95375f4abaa5581986cd35c59b9628847761be111d0c42138e11d3a36,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,6,1580916509,2260cec559332a39fb41a253d7edb2f88677503ac1f58c0256cdd9cac9e46279,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,7,1603698080,ced6dd7e7042b3c339e1521d9478c5828e7392968288550ea8fc35781ff8c5b7,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Turn On Sink Faucet,100,8,1563100372,92d1319149704a90f9ff6e4d72bed047da9bafaa1eb179d45977b043a4c25f75,mg/PandaOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5

@@ -1,0 +1,10 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,0,1703011761,5435c2a4e0fe27620c700fff3da0f2d94ac2df78995d20f2cd6be186551fd823,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,1,1672654292,fa484b6d3181b87b82c2c813d96de0c876de93a1c852d0164a2bba75db08555c,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,2,1679786569,530363dc53e8a913eae57fe7eb1acc75f920f232f0e1f5f1a7d4c16f910272cc,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,3,1725326303,b8cce63fdbafca22fa28c801ec690e7c78f13674ee5f567a1c51cb25d8b1e0e5,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,4,1686324423,e5bf01a03c49c9bb6522733aeeceef434f3d89be374bc245dee70b3262cefe17,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,5,1749759875,f4acfe870f40745c0032110358a1501e0a931a1d3578a6c43bb99e9b5202b06a,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,6,1608390748,0407c9623d94fb4f1dca39179132bf5200e47a3ac141e2d2bb01b34b546c1605,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,7,1730799036,04bbe7f57e746a9c59a74b8460958fdaefa45ac7282e651a66be885103f78bb5,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Turn On Sink Faucet,100,8,1700825894,684a9bb268ccccaeca569f84e2533875dc47f38edef1ff6d39a69f965f7ba47c,mg/PandaOGOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5

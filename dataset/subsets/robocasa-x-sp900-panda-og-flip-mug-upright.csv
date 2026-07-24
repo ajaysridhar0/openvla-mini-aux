@@ -1,0 +1,10 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,0,1239369730,6b055dde544f4875c9d41393690739e20f94e2d4a8a57832df8971ab612c7f68,mg/PandaOGOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,1,1208544938,3abae92994762ea610801b680c76df2a49b4d36bfc6555fb5855062d018fd6c5,mg/PandaOGOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,2,1190730178,751d4fb394cd32fbe936911ca26b3f71a7e94a33480782d74768e895365e42a8,mg/PandaOGOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,3,1208480543,6aac5f74c71ed10ef6f8a12c19d23f205a905bf299e789a8cd5ecd35dde576a5,mg/PandaOGOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,4,1173627702,6a1540ecbd42f9505ae38017dd27a88d1ddcda220c7f6fb29b36b97a0de4246f,mg/PandaOGOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,5,1184575458,ee3df29fb8b968ac4fbc5dbcb7b27ff3548507986c321ce1b396ed253f29eacc,mg/PandaOGOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,6,1203394085,c5cd149a6c3fe6af3d34692ee878242175ecd44d492da17b12ca0ffc0e569175,mg/PandaOGOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,7,1194678439,a9e912c86bf8d509f4425329fa5513a1eb5e07506d373074eae79193d28fe813,mg/PandaOGOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda-OG,Flip Mug Upright,100,8,1172998109,3a8a60959d9a5d6cbc7a9e7b6026d24d00a3860810ddfde6b6d7fd2c96456149,mg/PandaOGOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5

@@ -1,0 +1,10 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,0,1152933412,89bb8472611329881f8ba6a891332e791d113490ea0780bd416af125c3880da9,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,1,1145646940,87abd7fa5002140d2ec61ecdeb9cc6b69b8379816c6ea32ddbe2ae3c0a815c2d,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,2,1152884425,8de13534d9ad05a76a842ddb977616dd4d1d072fe3610f365cf5286237ccaf9c,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,3,1154422177,cffa422663a70872b9b909cbbb56d6a333a6f23f6f56c0636cbb74506d1daf28,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,4,1148910047,110707476d3004c268e70face74ec8cfe075c0dd96087c4b7a4e66d3f45c661e,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,5,1165047239,230b50f9122816ebcd8fbeaad9a52e7c691f00bc6ef37c7aa8f3277844efba9e,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,6,1166660599,639edd1144873b7ad828219efb9e5be0937b28cfa3fa02520303d3ca28233bd8,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,7,1148979308,f5d0b64c71413373bb05466cd5242b77ef542b7ac87d86a876a9d0f34f243ec9,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Turn On Sink Faucet,100,8,1176200332,331a47d2c92de5946d9070198741c8b71cba573e374f029c1945e2ec6b094ea7,mg/JacoOmron/TurnOnSinkFaucet/100demos_seed8/demo_gentex_im320_randcams.hdf5

@@ -1,0 +1,19 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,0,916241065,cbce0cceaf9796880a889a2c70ce91e7b1c91a07a2f3090e8a9a58c391bfe422,mg/JacoOmron/PnPCounterToSink/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,1,918814220,d1a28957d1f4e47d982c42b58624f8c3187e27a7d8822f9e66b0aab2843c345d,mg/JacoOmron/PnPCounterToSink/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,2,938899222,5fdba936708f834b649d1890fa3a0027b2deb3f25841dc14560030787fe29b66,mg/JacoOmron/PnPCounterToSink/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,3,909206736,962a8328a07fbdcaa5ab50b543fc32ffb6ee3ed998772dcdb9ff591877e8cb8b,mg/JacoOmron/PnPCounterToSink/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,4,904941924,e0bda6c4b90ca2656c7fcb9ca13d3481b7b02986769bbd2f809a076d09788d0f,mg/JacoOmron/PnPCounterToSink/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,5,926455138,8bfb67444951f7e60c3490724c3baa714c4383c617ee5bfd7c478ec87488ad86,mg/JacoOmron/PnPCounterToSink/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,6,902838203,c0170964ace5332c556044c16daf8ef0ce53fdac52d4629a1886088668c3c868,mg/JacoOmron/PnPCounterToSink/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,7,923044435,3d690861d711cad42740c3d77fe0f7001c3b5ccd8aaae1d24bd7155e7b0a40de,mg/JacoOmron/PnPCounterToSink/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Counter to Sink,100,8,926823077,daa05f704b1618af70456fc0e91587479bfd5a63b3884899ccd6a901393fa84b,mg/JacoOmron/PnPCounterToSink/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,0,1147921506,4a586f96c477f442210703e16ffcb5347be2c009bbf893b68da95eef5977a587,mg/JacoOmron/PnPSinkToCounter/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,1,1103178848,737c96a9b27c7f75e6236118da6f80270e91f09f7abfd3fb3c251c2a876926da,mg/JacoOmron/PnPSinkToCounter/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,2,1133487913,ac1e9e09b12748da1e16ddaf1242a897fd7350dbd7bd5b306fab55a8d01940fa,mg/JacoOmron/PnPSinkToCounter/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,3,1087825791,e2842eb8420f7a065cb06dcbfa78fb30e9db768dac046d7d6ee167144b70d50e,mg/JacoOmron/PnPSinkToCounter/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,4,1091417165,35e45e4e15089881e8dad7e489e1a87f787929a0856d6b550a397a3144c124c3,mg/JacoOmron/PnPSinkToCounter/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,5,1154311012,d641a49d219477499508c1ef74df6eeb8ade18eb834dbf1e01d88a0053d2d514,mg/JacoOmron/PnPSinkToCounter/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,6,1126102557,2de03f968447b5e0da2ab4b7ca3a46e3e1fd9f4fa99e2b023159fc674501bc0e,mg/JacoOmron/PnPSinkToCounter/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,7,1111286301,67c9a60a1edd0fbf46dfbfd6c425fe31c3152b1edc521d72ecc7006f1115e120,mg/JacoOmron/PnPSinkToCounter/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,PnP Sink to Counter,100,8,1094188479,2214602bbdc0570d3742158bfa6b3c3c3b722e3d6cf98ddb158f27dce16f1999,mg/JacoOmron/PnPSinkToCounter/100demos_seed8/demo_gentex_im320_randcams.hdf5

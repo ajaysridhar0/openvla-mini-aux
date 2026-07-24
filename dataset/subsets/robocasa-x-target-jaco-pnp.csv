@@ -1,0 +1,3 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+target demonstrations,target-50,Jaco,PnP Counter to Sink,50,,287779920,8242625b5ddbdcb5ba3a858291061ae71cffc861571bc3c45022545931d7809d,human/JacoOmron/PnPCounterToSink/demo_gentex_im320.hdf5
+target demonstrations,target-50,Jaco,PnP Sink to Counter,50,,392159977,1488bd6c75873fff233084dbe087ee0dbe8a984feff69c4d5b1c18fb9376315a,human/JacoOmron/PnPSinkToCounter/demo_gentex_im320.hdf5

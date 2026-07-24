@@ -1,0 +1,10 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,0,705129109,8cf1bcedf6afccb1a14cf7651c40d51c5ed601978580f1a4cf62a23b2b3628e4,mg/JacoOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,1,702727247,4d45d0c6e51cedbe91fc644729b93b56977d806dd1366e5694403658f37a6bd1,mg/JacoOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,2,712208966,8d46b2edf65c2d46bcb55e8f7b1705e7eaa0051d125b00d92d644f57944fbb8e,mg/JacoOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,3,727616665,993b7b8ddb9b1479d6dcab2cea6ca86368c0bd1b13d84a638bd7c8f6506339eb,mg/JacoOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,4,716361980,f1243699c05c8440ea3c3f8297acfed25dbfc2fc1dc163bfdb811abe30124d0d,mg/JacoOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,5,742341225,1a0954e743602ddea2cac090fc6ab4c074941a351f17d2b69f8971842ab055cb,mg/JacoOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,6,735299405,430b1fca93f2046a28722cfd544a596462e87b426c7ad617e74c6f210190df57,mg/JacoOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,7,700631469,7ec4b69399aca8766ed9c4f46e3e1093cd2667327a404525968b80c7c311b885,mg/JacoOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Jaco,Flip Mug Upright,100,8,709108226,1c5b02642acf22cc2eb3e211a08cf7b53cb092c82e06ae73f4941dd843fd6260,mg/JacoOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5

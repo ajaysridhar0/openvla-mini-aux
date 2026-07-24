@@ -1,0 +1,19 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,0,1397537571,adca44cdf64b87adf0bf858ce633aaa1372332b88fe872cf05e75e4bd2dc9fdd,mg/PandaOmron/PnPCounterToSink/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,1,1455783914,336e696a54fd89b3f05c9069e46aadd0f5c2b71423ef6c437f35c3f44450da83,mg/PandaOmron/PnPCounterToSink/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,2,1425805077,455253d58b28d58fcfc841c16ed0eeee0bca4c7919cd6f8bfa1cdfb09bac8462,mg/PandaOmron/PnPCounterToSink/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,3,1430175423,7b7da88bd8d821705648a2e01e9c6697d5ef8ff8d957f95e519afb90e32baa5f,mg/PandaOmron/PnPCounterToSink/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,4,1401982934,be23bfdeb0f7981d0466c1e4575693df03381196b9d29a17c4545b472de30d8c,mg/PandaOmron/PnPCounterToSink/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,5,1402675287,5486b8bc472be37e1f049579f89739d9bb1506e88c18969915eb3b0e0d62c9a8,mg/PandaOmron/PnPCounterToSink/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,6,1424549516,1a5020dc32fbf273b16eb55622ce6c39b90042e68452486f07bfd041ac374047,mg/PandaOmron/PnPCounterToSink/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,7,1419605507,040c3b107033adf5a1612af4527e5f893ab172e9bac17e1b8ae7782a0d3123b9,mg/PandaOmron/PnPCounterToSink/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Counter to Sink,100,8,1419785526,d8551f3962ad00a67952d1a752b9c1ae2e48ccab348c25462ba2a5b884dd0ff6,mg/PandaOmron/PnPCounterToSink/100demos_seed8/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,0,1760644002,cf35dd7973a21668f8489545c2d684781c57fdec6953537fd50beb65d4e06edc,mg/PandaOmron/PnPSinkToCounter/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,1,1782279427,8ab177b3e1fc667c4d417ff5320df5fddca2a68333f2754d24d06b917d9f9d24,mg/PandaOmron/PnPSinkToCounter/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,2,1777225331,78ca3ca14021d8d2012bc14f8c371473873ea459bcb1cec648ee0358633c6916,mg/PandaOmron/PnPSinkToCounter/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,3,1751066989,d6e302b78852696f14421151b252d16f30394d013f3684cf417b72250dd48020,mg/PandaOmron/PnPSinkToCounter/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,4,1797661781,97195576bff51c1174df4ce859ea982438eaaa9dfb4a25b7962356bca5d7de14,mg/PandaOmron/PnPSinkToCounter/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,5,1767414115,762b61d49d93148b59511ddf93f2320b507d247ea204041630f02d47ba32381c,mg/PandaOmron/PnPSinkToCounter/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,6,1800283370,1caf29e70a3cf488427d891923792e870d8ae571e8c3f9f8426f15ee7887e324,mg/PandaOmron/PnPSinkToCounter/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,7,1784141345,0e08096caca55a29622c3bcd45ad74c41c7df158b379e982155a9e7bfd79dbe0,mg/PandaOmron/PnPSinkToCounter/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,PnP Sink to Counter,100,8,1751020970,3c93f9bc78a07d81d7730ce8673e4df1efb1e4df50cc34b97a7803d78689ac1a,mg/PandaOmron/PnPSinkToCounter/100demos_seed8/demo_gentex_im320_randcams.hdf5

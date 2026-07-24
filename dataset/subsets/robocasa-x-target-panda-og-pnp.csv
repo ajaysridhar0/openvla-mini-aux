@@ -1,0 +1,3 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+target demonstrations,target-50,Panda-OG,PnP Counter to Sink,50,,512257327,3168fd530c368d69255195f44f72f9b31008c74eaf584edee4d53d6d63b830ab,human/PandaOGGripperOmron/PnPCounterToSink/demo_gentex_im320.hdf5
+target demonstrations,target-50,Panda-OG,PnP Sink to Counter,50,,727855762,ff14d126ae8d499f0687b311c2e4d48528f7a15aa40cfe9b1fb9b7c6e08ad457,human/PandaOGGripperOmron/PnPSinkToCounter/demo_gentex_im320.hdf5

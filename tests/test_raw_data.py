@@ -8,6 +8,8 @@ from pathlib import Path
 import h5py
 import numpy as np
 
+from barx.raw_data import RawSubset, all_subsets, selected_rows
+from scripts import build_raw_subsets, download_raw_data
 from scripts.stage_release_data import LAYOUT_ATTRIBUTE, NORMALIZED_LAYOUT
 from scripts.verify_raw_data import verify_dataset
 
@@ -53,6 +55,57 @@ class RawDataTest(unittest.TestCase):
         )
         self.assertEqual(len(config["revision"]), 40)
         int(config["revision"], 16)
+
+    def test_raw_subsets_match_the_24_public_rlds_datasets(self):
+        with MANIFEST.open(newline="") as stream:
+            master_rows = list(csv.DictReader(stream))
+        subsets = all_subsets()
+        self.assertEqual(len(subsets), 24)
+        self.assertEqual(len({subset.slug for subset in subsets}), 24)
+        self.assertEqual(
+            sum(len(selected_rows(master_rows, subset)) for subset in subsets), 276
+        )
+        self.assertEqual(
+            {
+                row["relative_path"]
+                for subset in subsets
+                for row in selected_rows(master_rows, subset)
+            },
+            {row["relative_path"] for row in master_rows},
+        )
+
+    def test_checked_in_subset_manifests_are_current(self):
+        build_raw_subsets.build(check=True)
+
+    def test_selective_downloader_uses_pinned_anonymous_paths(self):
+        args = download_raw_data.build_parser().parse_args(
+            [
+                "--dataset",
+                "target_50",
+                "--target",
+                "panda",
+                "--task",
+                "pnp",
+                "--output-dir",
+                "/tmp/barx-target-panda-pnp",
+            ]
+        )
+        subset = download_raw_data.selection(args)
+        spec, manifest, rows = download_raw_data.download_spec(args, subset)
+        config = json.loads(PUBLIC_DATASET.read_text())
+        self.assertEqual(subset, RawSubset("target_50", "pnp", "panda"))
+        self.assertEqual(spec.repo_id, config["repo_id"])
+        self.assertEqual(spec.revision, config["revision"])
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(sum(int(row["demonstrations"]) for row in rows), 100)
+        self.assertEqual(manifest.name, "robocasa-x-target-panda-pnp.csv")
+        self.assertIn("manifest.csv", spec.allow_patterns)
+        self.assertTrue(
+            all(
+                row["relative_path"] in spec.allow_patterns
+                for row in rows
+            )
+        )
 
     def test_verifier_accepts_a_matching_normalized_archive(self):
         with tempfile.TemporaryDirectory() as directory:

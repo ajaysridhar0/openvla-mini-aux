@@ -1,0 +1,2 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+target demonstrations,target-50,Panda-OG,Flip Mug Upright,50,,472149336,e7fee1da11a3e4f123c9ff9391278d155bfaeeb4bbe81b247395c56a558a4173,human/PandaOGGripperOmron/FlipMugUpright/demo_gentex_im320.hdf5

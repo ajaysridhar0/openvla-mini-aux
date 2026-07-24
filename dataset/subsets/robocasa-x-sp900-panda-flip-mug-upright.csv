@@ -1,0 +1,10 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,0,1021184937,0c5349ebdcf16702407bd222d965b3b3621d88c84f72bdbbe422e8ae1b76a35e,mg/PandaOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,1,988117942,a4ddd7b55d972b5ba6d01c426999ed28e8c3a975c76fd3e60318a6fd071fb4b6,mg/PandaOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,2,1007953026,7163d16eeaa3078b91103057ecff2fc1a71b7c77bafa7a9a509a64bb72cf2035,mg/PandaOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,3,1037557179,2f44d513a7e3db2cb283aed98957adde0360570d7a447327685f1ec89370164b,mg/PandaOmron/FlipMugUpright/100demos_seed3/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,4,969303972,8d15fc183aebd2eb1d9571ea037c08cc6b76f92a9ed56d99491809aa1e322dd3,mg/PandaOmron/FlipMugUpright/100demos_seed4/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,5,1012835203,304af2fad83b43328d51672bacda7b3c0fe50891c2d381a636e449cb690023ea,mg/PandaOmron/FlipMugUpright/100demos_seed5/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,6,973174553,ce5de9eff611109044d6d491d68d488584012108c0ba992f7b322efd765ab503,mg/PandaOmron/FlipMugUpright/100demos_seed6/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,7,971132222,c11ebdcca4b511973482939548f1a1c61d175215cc4076029be5a13bce5bf175,mg/PandaOmron/FlipMugUpright/100demos_seed7/demo_gentex_im320_randcams.hdf5
+same-embodiment prior,SP-900,Panda,Flip Mug Upright,100,8,980992890,da95568f245749b2a94b6c0952d5f742975442fc8821df7d2c9baba1261d3850,mg/PandaOmron/FlipMugUpright/100demos_seed8/demo_gentex_im320_randcams.hdf5

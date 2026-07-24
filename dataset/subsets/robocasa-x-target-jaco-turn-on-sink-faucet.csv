@@ -1,0 +1,2 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+target demonstrations,target-50,Jaco,Turn On Sink Faucet,50,,429872383,32c0be9b08bf43cb8695f32fbfd1ceae0c37086ab79baf4ea79fea4d4d51f090,human/JacoOmron/TurnOnSinkFaucet/demo_gentex_im320.hdf5

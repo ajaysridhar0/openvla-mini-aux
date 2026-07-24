@@ -6,30 +6,22 @@ from __future__ import annotations
 import argparse
 import csv
 import os
+import sys
 from pathlib import Path
-
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "dataset" / "manifest.csv"
-PAPER_SET_NAMES = {
-    "xp_900": "XP-900",
-    "xp_3k": "XP-3K",
-    "sp_900": "SP-900",
-    "target_50": "target-50",
-}
-TASK_NAMES = {
-    "pnp": {
-        "PnP Counter to Sink",
-        "PnP Sink to Counter",
-    },
-    "turn_on_sink": {"Turn On Sink Faucet"},
-    "flip_mug": {"Flip Mug Upright"},
-}
-TARGET_NAMES = {
-    "panda": "Panda",
-    "panda_og": "Panda-OG",
-    "jaco": "Jaco",
-}
+
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from barx.raw_data import (  # noqa: E402
+    PAPER_SET_NAMES,
+    TARGET_NAMES,
+    TASK_NAMES,
+    RawSubset,
+    selected_rows,
+)
 
 
 def stored_dataset_name(dataset: str, task: str, target: str | None) -> str:
@@ -48,26 +40,17 @@ def stored_dataset_name(dataset: str, task: str, target: str | None) -> str:
 def selected_paths(
     dataset: str, task: str, target: str | None, raw_root: Path
 ) -> list[Path]:
-    paper_set = PAPER_SET_NAMES[dataset]
-    target_name = TARGET_NAMES.get(target) if target else None
-    selected = []
+    subset = RawSubset(dataset, task, target)
     with MANIFEST.open(newline="") as manifest_file:
-        for row in csv.DictReader(manifest_file):
-            memberships = set(row["paper_sets"].split(";"))
-            if paper_set not in memberships or row["task"] not in TASK_NAMES[task]:
-                continue
-            if target_name is not None and row["embodiment"] != target_name:
-                continue
-            path = raw_root / row["relative_path"]
-            if not path.is_file():
-                raise FileNotFoundError(f"Manifest file is missing: {path}")
-            if path.stat().st_size != int(row["bytes"]):
-                raise ValueError(f"Size mismatch for {path}")
-            selected.append(path.resolve())
-    if not selected:
-        raise ValueError(
-            f"No manifest entries matched {dataset}/{target or 'source'}/{task}"
-        )
+        rows = list(selected_rows(csv.DictReader(manifest_file), subset))
+    selected = []
+    for row in rows:
+        path = raw_root / row["relative_path"]
+        if not path.is_file():
+            raise FileNotFoundError(f"Manifest file is missing: {path}")
+        if path.stat().st_size != int(row["bytes"]):
+            raise ValueError(f"Size mismatch for {path}")
+        selected.append(path.resolve())
     return selected
 
 

@@ -1,0 +1,10 @@
+release_group,paper_sets,embodiment,task,demonstrations,seed,bytes,sha256,relative_path
+cross-embodiment prior,XP-3K;XP-900,IIWA,Flip Mug Upright,100,20,1005982977,e18712e0a705719edeb26d63bbf259e04af7d25b9c985a74dc8e68029a6d9c95,mg/IIWAOmron/FlipMugUpright/100demos_seed20/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,Flip Mug Upright,100,21,997146990,b330c91a4b96caffdb607cbc33a434ec1369a7759621eda81d38ac2a70a80ff4,mg/IIWAOmron/FlipMugUpright/100demos_seed21/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,IIWA,Flip Mug Upright,100,22,1025219984,008b49f3a5088d7843d6741fbc718c725850834c6dd4a67b4cb0fb8e427713ec,mg/IIWAOmron/FlipMugUpright/100demos_seed22/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,Flip Mug Upright,100,10,894421027,f5b2c2c42cf21c38bfb516c1e5e1abb5c6ec8c8b3fb2546d00d88fcc3e7d8bd3,mg/Kinova3Omron/FlipMugUpright/100demos_seed10/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,Flip Mug Upright,100,11,926934345,ba0daeb7aca8726802ac53086ef9aec1fc4d4c374e266fe6e65b78fadd7dd85b,mg/Kinova3Omron/FlipMugUpright/100demos_seed11/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,Kinova3,Flip Mug Upright,100,12,879731605,017e9da41e4b2c552e4b518f86c2a1c3f6db2aaf8947330d68640d3ed77523fb,mg/Kinova3Omron/FlipMugUpright/100demos_seed12/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,Flip Mug Upright,100,0,933084810,3d214a04ff57b4a89b129180195a62c586eabebb43fb2ebe118821b29de0e0bf,mg/UR5eOmron/FlipMugUpright/100demos_seed0/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,Flip Mug Upright,100,1,877146836,608350ee0cf0bb3b9abbebef2737ea58623768c864d397304268ab083ec4e506,mg/UR5eOmron/FlipMugUpright/100demos_seed1/demo_gentex_im320_randcams.hdf5
+cross-embodiment prior,XP-3K;XP-900,UR5e,Flip Mug Upright,100,2,885757552,ea5c6d3d6b6db8cc0dcc959b19363a27897c3b389c9bfc4fd63c8e9caa65cbe2,mg/UR5eOmron/FlipMugUpright/100demos_seed2/demo_gentex_im320_randcams.hdf5
