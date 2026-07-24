@@ -49,7 +49,9 @@ Valid paper datasets are `xp_900`, `xp_3k`, `sp_900`, and `target_50`.
 `jaco`. The launcher validates every selected file against the byte size in
 `dataset/manifest.csv` before conversion.
 
-The `human/` files retain the simulator states and metadata needed to prepare
-new MimicGen source datasets. Reproducing BARX synthesis also requires the
-custom MimicGen code and task configs, which are not yet part of this public
-repository.
+The `human/` files retain the simulator states and portable metadata needed to
+prepare new MimicGen source datasets. Install the optional, separately licensed
+generator with `uv sync --locked --extra mg --no-dev`; the literal preparation,
+bounded generation, verification, and video commands are in Section 8 of
+`RELEASE_TEST_README.md`. The source-preparation wrapper always writes a new
+HDF5 and verifies that the downloaded source checksum did not change.

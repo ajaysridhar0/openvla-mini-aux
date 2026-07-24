@@ -93,6 +93,17 @@ uv run --locked --extra train --no-dev python scripts/evaluate.py \
 
 The paper protocol uses 100 trials; omit `--episodes 1` to run the full set.
 
+To regenerate data from the released human HDF5 demonstrations, install the
+separately licensed MimicGen extra:
+
+```bash
+uv sync --locked --extra mg --no-dev
+```
+
+The complete source-preparation, bounded one-success generation, HDF5
+verification, and video-review commands are in
+[Section 8 of the release walkthrough](RELEASE_TEST_README.md#8-mimicgen-regeneration-gate).
+
 See [`docs/installation.md`](docs/installation.md) for system requirements,
 [`docs/data.md`](docs/data.md) for dataset preparation, and
 [`docs/experiments.md`](docs/experiments.md) for training and evaluation. The

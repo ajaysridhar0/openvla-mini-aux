@@ -24,12 +24,9 @@ The acceptance run has two levels:
    evaluation conditions. It is expensive and is not implied by a one-step or
    one-trial smoke test.
 
-MimicGen regeneration is a hard public-release gate. At the time this document
-was added, the repository preserved the human source demonstrations but did not
-yet contain the customized BARX MimicGen fork, task configurations, or a public
-generation launcher. Section 8 must therefore be reported as **BLOCKED** until
-those files are integrated and its exact command is added here. Do not mark the
-release end-to-end ready while that section is blocked.
+MimicGen regeneration is a hard public-release gate. Section 8 installs the
+separately licensed compatibility snapshot, prepares public human
+demonstrations without modifying them, and runs one bounded generation smoke.
 
 ## Rules for the independent runner
 
@@ -61,6 +58,7 @@ export BARX_EVIDENCE="$BARX_ACCEPTANCE_ROOT/evidence"
 export BARX_RAW_XP900="$BARX_ACCEPTANCE_ROOT/raw-xp900-pnp"
 export BARX_RAW_HUMAN="$BARX_ACCEPTANCE_ROOT/raw-target-panda-flip-mug"
 export BARX_CONVERTED_RLDS="$BARX_ACCEPTANCE_ROOT/converted-rlds"
+export BARX_MG_ROOT="$BARX_ACCEPTANCE_ROOT/mimicgen"
 export HF_HOME="$BARX_ACCEPTANCE_ROOT/hf"
 export BARX_VQ_ROOT="$BARX_ARTIFACT_ROOT/vq"
 
@@ -730,52 +728,141 @@ following:
 - output that can be inspected with the same portable HDF5 structural checks
   used in Section 3.
 
-Check whether the public interface is present:
+Install the separately licensed optional dependency and verify its public
+interface:
 
 ```bash
-(
-  missing=0
-  for path in \
-    mimicgen \
-    scripts/prepare_mimicgen_source.py \
-    scripts/generate_mimicgen.py
-  do
-    if test -e "$path"; then
-      echo "PRESENT $path"
-    else
-      echo "MISSING $path"
-      missing=1
-    fi
-  done
-  if test "$missing" -eq 0; then
-    uv run --locked --no-dev python scripts/prepare_mimicgen_source.py --help
-    uv run --locked --no-dev python scripts/generate_mimicgen.py --help
-  fi
-  exit "$missing"
-) 2>&1 | tee "$BARX_EVIDENCE/08-mimicgen/interface.txt"
+uv sync --locked --extra mg --no-dev \
+  2>&1 | tee "$BARX_EVIDENCE/08-mimicgen/mg-sync.txt"
+
+{
+  test -f third_party/mimicgen/LICENSE
+  uv run --locked --extra mg --no-dev python \
+    scripts/prepare_mimicgen_source.py --help
+  uv run --locked --extra mg --no-dev python \
+    scripts/generate_mimicgen.py --help
+} 2>&1 | tee "$BARX_EVIDENCE/08-mimicgen/interface.txt"
 ```
 
-At the document's initial revision, this command is expected to fail because
-the public generator is not yet integrated. Record **BLOCKED — public BARX
-MimicGen interface absent** and stop. Do not install an arbitrary upstream
-MimicGen version and claim equivalence: BARX needs its task-specific interfaces
-and configurations.
+Prepare five source demonstrations in a new file. The script records the
+original SHA-256 before and after preparation and fails if the original
+changes:
 
-Once the interface is published, this section must be revised to include one
-literal command using the downloaded Panda human Flip Mug source. The required
-human-visible evidence is:
+```bash
+mkdir -p "$BARX_MG_ROOT"
+export BARX_MG_SOURCE="$BARX_RAW_HUMAN/human/PandaOmron/FlipMugUpright/demo_gentex_im320.hdf5"
+export BARX_MG_PREPARED="$BARX_MG_ROOT/panda-flip-mug-prepared.hdf5"
 
-- the resolved generation config and seed;
-- source-preparation and generation logs;
-- generated success and failed-attempt HDF5 files;
-- an inventory containing demonstration counts, action shape, simulator states,
-  environment name, and portable asset paths;
-- success/attempt counts; and
-- an MP4 of the generated trajectory.
+MUJOCO_GL=egl PYOPENGL_PLATFORM=egl \
+uv run --locked --extra mg --no-dev python \
+  scripts/prepare_mimicgen_source.py \
+  --source "$BARX_MG_SOURCE" \
+  --output "$BARX_MG_PREPARED" \
+  --task flip_mug_upright \
+  --demos 5 \
+  --summary "$BARX_EVIDENCE/08-mimicgen/preparation-summary.json" \
+  2>&1 | tee "$BARX_EVIDENCE/08-mimicgen/preparation.txt"
+```
 
-The generated file must pass a one-row manifest built from the output and the
-same HDF5 structural verifier. The source file's SHA-256 must be identical
-before and after preparation, proving that preparation wrote a separate file.
+Run one explicit, bounded generation job. The local graphics cache avoids slow
+shader-cache writes to a network-mounted home directory:
+
+```bash
+mkdir -p "$BARX_MG_ROOT/gl-cache" "$BARX_MG_ROOT/xdg-cache"
+
+MUJOCO_GL=egl PYOPENGL_PLATFORM=egl \
+__GL_SHADER_DISK_CACHE_PATH="$BARX_MG_ROOT/gl-cache" \
+XDG_CACHE_HOME="$BARX_MG_ROOT/xdg-cache" \
+uv run --locked --extra mg --no-dev python scripts/generate_mimicgen.py \
+  --source "$BARX_MG_PREPARED" \
+  --task flip_mug_upright \
+  --embodiment panda \
+  --seed 0 \
+  --successes 1 \
+  --max-attempts 25 \
+  --source-demos 5 \
+  --output-dir "$BARX_MG_ROOT/panda-flip-mug-seed0" \
+  --video "$BARX_MG_ROOT/panda-flip-mug-seed0.mp4" \
+  2>&1 | tee "$BARX_EVIDENCE/08-mimicgen/generation.txt"
+```
+
+Validate the generated evidence:
+
+```bash
+uv run --locked --no-dev python - \
+  > "$BARX_EVIDENCE/08-mimicgen/artifacts.json" <<'PY'
+import json
+import os
+from pathlib import Path
+
+evidence = Path(os.environ["BARX_EVIDENCE"]) / "08-mimicgen"
+root = Path(os.environ["BARX_MG_ROOT"])
+preparation = json.loads((evidence / "preparation-summary.json").read_text())
+generation = json.loads(
+    (root / "panda-flip-mug-seed0" / "generation-summary.json").read_text()
+)
+config = json.loads(
+    (root / "panda-flip-mug-seed0" / "resolved-config.json").read_text()
+)
+
+assert preparation["source_unchanged"] is True
+assert preparation["source_sha256_before"] == preparation["source_sha256_after"]
+assert preparation["output"]["prepared_demonstrations"] == 5
+assert preparation["output"]["action_widths"] == [12]
+assert generation["requested_successes"] == 1
+assert generation["stats"]["num_success"] == 1
+assert 1 <= generation["stats"]["num_attempts"] <= 25
+assert generation["generated_hdf5"]
+assert all(item["action_widths"] == [12] for item in generation["generated_hdf5"])
+assert all(
+    item["action_layout"] == "arm_gripper_base_torso_mode_v1"
+    for item in generation["generated_hdf5"]
+)
+video = root / "panda-flip-mug-seed0.mp4"
+assert video.is_file() and video.stat().st_size > 0
+
+print(
+    json.dumps(
+        {
+            "source_unchanged": preparation["source_unchanged"],
+            "prepared_demonstrations": 5,
+            "resolved_task": config["name"],
+            "resolved_robot": config["experiment"]["task"]["robot"],
+            "seed": generation["seed"],
+            "stats": generation["stats"],
+            "generated_hdf5": generation["generated_hdf5"],
+            "video": {"name": video.name, "bytes": video.stat().st_size},
+        },
+        indent=2,
+    )
+)
+PY
+```
+
+Machine pass criteria:
+
+- The vendored snapshot and its NVIDIA non-commercial license are present.
+- Five demonstrations receive datagen annotations in a separate HDF5.
+- The original human HDF5 SHA-256 is identical before and after preparation.
+- Generation reaches exactly one success within 25 attempts and exits zero.
+- Successful and retained-failure outputs, when present, have canonical 12-D
+  actions, simulator states, portable metadata, and the BARX layout marker.
+- `resolved-config.json`, `important_stats.json`,
+  `generation-summary.json`, and a nonempty MP4 exist.
+
+Human review:
+
+- Open the MP4 and confirm it shows a Panda attempting Flip Mug Upright, frames
+  advance normally, and at least one visibly successful trajectory appears.
+- Compare the visible attempt count with `generation-summary.json`. Do not
+  interpret this smoke result as a paper success-rate estimate.
+
+Human evidence:
+
+- `mg-sync.txt`, `interface.txt`, `preparation.txt`, and `generation.txt`
+- `preparation-summary.json` and `artifacts.json`
+- the resolved config, generator log, merged HDF5 files, and MP4 under
+  `$BARX_MG_ROOT`
 
 ## 9. Paper-scale reproduction extension
 

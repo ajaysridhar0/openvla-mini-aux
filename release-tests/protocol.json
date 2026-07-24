@@ -1,0 +1,18 @@
+{
+  "protocol_version": 1,
+  "walkthrough": "RELEASE_TEST_README.md",
+  "required_sections": [
+    "00-system",
+    "01-install",
+    "02-artifacts",
+    "03-hdf5",
+    "04-rlds",
+    "05-conversion",
+    "06-training",
+    "07-eval",
+    "08-mimicgen",
+    "09-final"
+  ],
+  "command_record": "release-tests/README.md",
+  "overall_pass_requires_one_exact_commit": true
+}

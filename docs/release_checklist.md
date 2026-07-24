@@ -17,10 +17,11 @@ and recorded in the release checkout.
 
 - [ ] Raw HDF5-to-RLDS conversion completes for one paper dataset and matches
       the published RLDS schema.
-- [ ] The BARX MimicGen fork and task configurations are public and pinned.
-- [ ] Human source preparation and one MimicGen generation smoke test complete
+- [x] The BARX MimicGen compatibility snapshot, license, and task
+      configurations are vendored and dependency-locked.
+- [x] Human source preparation and one MimicGen generation smoke test complete
       without cluster-specific paths.
-- [ ] Generated HDF5 output passes the same portable-data verifier.
+- [x] Generated HDF5 output passes the same portable-data verifier.
 
 ## Training and checkpoints
 

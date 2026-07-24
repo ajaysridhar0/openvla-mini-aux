@@ -82,8 +82,9 @@ Do not run `uv lock --upgrade` when reproducing paper results.
 ## Expected first-run warnings and pauses
 
 RoboCasa/robosuite may warn that no private macro file exists, Mink whole-body
-IK is unavailable, or MimicGen is not installed. Those optional components are
-not used by the BARX walkthrough. TensorFlow may report duplicate CUDA plugin
+IK is unavailable, or MimicGen is not installed. MimicGen is required only for
+the Section 8 regeneration workflow and is installed with the `mg` extra.
+TensorFlow may report duplicate CUDA plugin
 registration, missing TensorRT, and a Transformers cache migration; an absent
 `OpenGL_accelerate` module is also optional. These messages are non-fatal if
 the command continues and ultimately exits zero.

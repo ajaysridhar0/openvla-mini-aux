@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools==75.8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mimicgen-barx"
+version = "1.0.1+barx.1"
+description = "Minimal BARX-compatible MimicGen distribution"
+readme = "README.md"
+requires-python = ">=3.10,<3.11"
+license = {file = "LICENSE"}
+dependencies = [
+    "h5py",
+    "huggingface-hub",
+    "imageio",
+    "imageio-ffmpeg",
+    "numpy",
+    "robomimic",
+    "robosuite",
+    "six",
+    "tqdm",
+]
+
+[tool.setuptools.packages.find]
+include = ["mimicgen*"]

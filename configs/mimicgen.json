@@ -1,0 +1,42 @@
+{
+  "source_revision": "62aca464ee14edeac48769c6be82464a7337a5d3",
+  "license": "NVIDIA Source Code License (non-commercial research or evaluation)",
+  "tasks": {
+    "pnp_counter_to_sink": {
+      "config_name": "PnPCounterToSink",
+      "interface": "MG_PnPCounterToSink"
+    },
+    "pnp_sink_to_counter": {
+      "config_name": "PnPSinkToCounter",
+      "interface": "MG_PnPSinkToCounter"
+    },
+    "turn_on_sink_faucet": {
+      "config_name": "TurnOnSinkFaucet",
+      "interface": "MG_TurnOnSinkFaucet"
+    },
+    "flip_mug_upright": {
+      "config_name": "FlipMugUpright",
+      "interface": "MG_FlipMugUpright"
+    }
+  },
+  "embodiments": {
+    "iiwa": {
+      "robot": "IIWAOmron"
+    },
+    "kinova3": {
+      "robot": "Kinova3Omron"
+    },
+    "ur5e": {
+      "robot": "UR5eOmron"
+    },
+    "panda": {
+      "robot": "PandaOmron"
+    },
+    "panda_og": {
+      "robot": "PandaOGOmron"
+    },
+    "jaco": {
+      "robot": "JacoOmron"
+    }
+  }
+}
