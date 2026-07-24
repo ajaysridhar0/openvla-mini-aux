@@ -371,7 +371,9 @@ from pathlib import Path
 root = Path(os.environ["BARX_ARTIFACT_ROOT"]) / "data" / "mg_pnp_lite"
 info_paths = list(root.rglob("dataset_info.json"))
 feature_paths = list(root.rglob("features.json"))
-tfrecords = list(root.rglob("*.tfrecord-*"))
+tfrecords = [
+    path for path in root.rglob("*.tfrecord-*") if ".cache" not in path.parts
+]
 assert len(info_paths) == 1, info_paths
 assert len(feature_paths) == 1, feature_paths
 assert len(tfrecords) == 256, len(tfrecords)
