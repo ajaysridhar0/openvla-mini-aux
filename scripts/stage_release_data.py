@@ -96,7 +96,9 @@ def private_attribute_hits(file: h5py.File) -> list[str]:
     return hits
 
 
-def normalize_hdf5(path: Path, embodiment: str) -> int:
+def normalize_hdf5(
+    path: Path, embodiment: str, *, actions_are_canonical: bool = False
+) -> int:
     """Normalize an unmarked copied file; never call this on a marked source."""
     with h5py.File(path, "r+") as output:
         data = output.get("data")
@@ -111,7 +113,10 @@ def normalize_hdf5(path: Path, embodiment: str) -> int:
             actions = demo["actions"]
             if actions.ndim < 1 or actions.shape[-1] != 12:
                 raise ValueError(f"{path}:{name}/actions has shape {actions.shape}, expected (..., 12)")
-            if embodiment in LEGACY_NON_PANDA_EMBODIMENTS:
+            if (
+                embodiment in LEGACY_NON_PANDA_EMBODIMENTS
+                and not actions_are_canonical
+            ):
                 actions[...] = actions[...][..., LEGACY_TO_NORMALIZED]
             demos += 1
         if not demos:

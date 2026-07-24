@@ -68,6 +68,25 @@ class StageReleaseDataTest(unittest.TestCase):
                 np.testing.assert_array_equal(archival["data/demo_0/actions"][...], normalized)
             verify_hdf5(destination, 1)
 
+    def test_canonical_non_panda_actions_are_not_permuted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "jaco-generated.hdf5"
+            canonical = np.arange(24, dtype=np.float32).reshape(2, 12)
+            self.make_file(path, canonical)
+            self.assertEqual(
+                normalize_hdf5(
+                    path,
+                    "JacoOmron",
+                    actions_are_canonical=True,
+                ),
+                1,
+            )
+            with h5py.File(path) as staged:
+                np.testing.assert_array_equal(
+                    staged["data/demo_0/actions"][...],
+                    canonical,
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

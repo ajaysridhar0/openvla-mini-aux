@@ -21,22 +21,34 @@
   },
   "embodiments": {
     "iiwa": {
-      "robot": "IIWAOmron"
+      "robot": "IIWAOmron",
+      "gripper": "default",
+      "normalization_embodiment": "IIWAOmron"
     },
     "kinova3": {
-      "robot": "Kinova3Omron"
+      "robot": "Kinova3Omron",
+      "gripper": "default",
+      "normalization_embodiment": "Kinova3Omron"
     },
     "ur5e": {
-      "robot": "UR5eOmron"
+      "robot": "UR5eOmron",
+      "gripper": "default",
+      "normalization_embodiment": "UR5eOmron"
     },
     "panda": {
-      "robot": "PandaOmron"
+      "robot": "PandaOmron",
+      "gripper": "Robotiq85Gripper",
+      "normalization_embodiment": "PandaOmron"
     },
     "panda_og": {
-      "robot": "PandaOGOmron"
+      "robot": "PandaOmron",
+      "gripper": "PandaGripper",
+      "normalization_embodiment": "PandaOGOmron"
     },
     "jaco": {
-      "robot": "JacoOmron"
+      "robot": "JacoOmron",
+      "gripper": "default",
+      "normalization_embodiment": "JacoOmron"
     }
   }
 }

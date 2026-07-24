@@ -6,6 +6,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 
+from barx.benchmark import EMBODIMENTS
 from barx.mimicgen_release import (
     embodiment_names,
     generated_inventory,
@@ -14,7 +15,6 @@ from barx.mimicgen_release import (
     source_inventory,
     task_names,
 )
-
 
 ROOT = Path(__file__).resolve().parents[1]
 MIMICGEN_ROOT = ROOT / "third_party" / "mimicgen"
@@ -62,6 +62,14 @@ class MimicGenReleaseTest(unittest.TestCase):
                     self.assertEqual(
                         config["experiment"]["task"]["interface"],
                         registry()["tasks"][task]["interface"],
+                    )
+                    self.assertEqual(
+                        config["experiment"]["task"]["robot"],
+                        EMBODIMENTS[embodiment].robot,
+                    )
+                    self.assertEqual(
+                        config["experiment"]["task"]["gripper"],
+                        EMBODIMENTS[embodiment].gripper,
                     )
 
     def test_invalid_generation_bounds_are_rejected(self):
@@ -120,6 +128,7 @@ class MimicGenReleaseTest(unittest.TestCase):
         self.assertEqual(hits, [])
 
     def test_vendored_generator_is_bounded_and_uses_canonical_layout(self):
+        wrapper = (ROOT / "scripts" / "generate_mimicgen.py").read_text()
         generator = (
             MIMICGEN_ROOT / "mimicgen" / "scripts" / "generate_dataset.py"
         ).read_text()
@@ -136,6 +145,8 @@ class MimicGenReleaseTest(unittest.TestCase):
         self.assertIn("num_attempts >= max_attempts", generator)
         self.assertIn("return action[6:7]", interface)
         self.assertNotIn('if "panda" in robot_type.lower()', waypoint)
+        self.assertIn("actions_are_canonical=True", wrapper)
+        self.assertIn('"normalization_embodiment"', wrapper)
 
 
 if __name__ == "__main__":

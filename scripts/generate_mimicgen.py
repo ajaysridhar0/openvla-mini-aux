@@ -18,6 +18,7 @@ if str(ROOT) not in sys.path:
 from barx.mimicgen_release import (  # noqa: E402
     embodiment_names,
     generated_inventory,
+    registry,
     resolved_config,
     source_inventory,
     task_names,
@@ -104,13 +105,19 @@ def main() -> None:
 
     from scripts.stage_release_data import normalize_hdf5, verify_hdf5
 
-    robot = config["experiment"]["task"]["robot"]
+    normalization_embodiment = registry()["embodiments"][args.embodiment][
+        "normalization_embodiment"
+    ]
     generated = []
     for name in ("demo.hdf5", "demo_failed.hdf5"):
         path = run_dir / name
         if not path.is_file():
             continue
-        demos = normalize_hdf5(path, robot)
+        demos = normalize_hdf5(
+            path,
+            normalization_embodiment,
+            actions_are_canonical=True,
+        )
         verify_hdf5(path, demos)
         generated.append(generated_inventory(path))
     if not generated:

@@ -99,6 +99,7 @@ def resolved_config(
             },
             "task": {
                 "robot": embodiment_config["robot"],
+                "gripper": embodiment_config["gripper"],
                 "interface": task_config["interface"],
                 "interface_type": "robosuite",
             },
