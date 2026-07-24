@@ -97,7 +97,10 @@ See [`docs/installation.md`](docs/installation.md) for system requirements,
 [`docs/data.md`](docs/data.md) for dataset preparation, and
 [`docs/experiments.md`](docs/experiments.md) for training and evaluation. The
 maintainer launch gates are tracked in
-[`docs/release_checklist.md`](docs/release_checklist.md).
+[`docs/release_checklist.md`](docs/release_checklist.md). Independent release
+testers should use
+[`RELEASE_TEST_README.md`](RELEASE_TEST_README.md) to capture machine-checkable
+and human-reviewable evidence for the complete paper-facing workflow.
 
 ## Citation
 
