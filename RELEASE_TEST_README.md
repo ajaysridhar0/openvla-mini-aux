@@ -116,10 +116,14 @@ Human evidence:
 
 ## 1. Install, assets, and unit tests
 
-Install the documented `uv` release if it is not already available:
+Use `uv` 0.11.11 or newer. Check the version already on `PATH`; if it is
+missing or older, run the official installer before synchronizing:
 
 ```bash
-if ! command -v uv >/dev/null; then
+uv --version || true
+barx_uv_version="$(uv --version 2>/dev/null | awk '{print $2}' || true)"
+if test -z "$barx_uv_version" ||
+  test "$(printf '%s\n' 0.11.11 "$barx_uv_version" | sort -V | head -n1)" != "0.11.11"; then
   curl -LsSf https://astral.sh/uv/install.sh | sh
   export PATH="$HOME/.local/bin:$PATH"
 fi

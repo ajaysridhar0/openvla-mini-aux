@@ -54,6 +54,7 @@ torchvision = {index = "pytorch-cu121"}
 torchaudio = {index = "pytorch-cu121"}
 
 [tool.uv]
+required-version = ">=0.11.11"
 environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
 # Tianshou 0.4.10's metadata predates Protobuf 3.20, but the working BARX
 # environment used 3.20.3 (also required by TensorFlow 2.15) successfully.

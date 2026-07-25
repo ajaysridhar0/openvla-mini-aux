@@ -111,7 +111,11 @@ maintainer launch gates are tracked in
 [`docs/release_checklist.md`](docs/release_checklist.md). Independent release
 testers should use
 [`RELEASE_TEST_README.md`](RELEASE_TEST_README.md) to capture machine-checkable
-and human-reviewable evidence for the complete paper-facing workflow.
+and human-reviewable evidence for the complete paper-facing workflow. The
+latest independent result is summarized in
+[`RELEASE_ACCEPTANCE_REPORT.md`](RELEASE_ACCEPTANCE_REPORT.md), with every
+sanitized command, attempt, exit code, duration, and output hash in
+[`RELEASE_TEST_COMMAND_LOG.md`](RELEASE_TEST_COMMAND_LOG.md).
 
 ## Citation
 
