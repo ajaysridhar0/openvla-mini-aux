@@ -12,7 +12,9 @@ This repository contains:
 
 - MiniVLA policy training and RoboCasa-X evaluation code;
 - the RoboCasa-X simulation benchmark;
-- dataset conversion tools; and
+- dataset conversion tools;
+- a separately licensed MimicGen compatibility snapshot with BARX task
+  preparation and bounded generation commands; and
 - reproducible experiment configurations.
 
 The raw HDF5 demonstrations can be read directly, converted to RLDS, or used
@@ -34,8 +36,13 @@ CMake is available:
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 uv --version
+command -v cmake
 cmake --version
 ```
+
+If `command -v cmake` selects a broken user-local launcher, repair `PATH` or
+select a working system CMake before running `uv sync`. Merely having a file
+named `cmake` on `PATH` is not sufficient.
 
 Then install BARX and run its tests:
 
@@ -61,6 +68,10 @@ uv run --locked --no-dev python scripts/download_public_artifacts.py \
   --artifact-root "$BARX_ARTIFACT_ROOT"
 ```
 
+The downloader defaults to one worker for conservative public operation and
+resumes partial Hugging Face downloads. On a reliable connection, add
+`--max-workers 8` to download independent RLDS shards concurrently.
+
 Install the training dependencies:
 
 ```bash
@@ -81,7 +92,14 @@ uv run --locked --extra train --no-dev python scripts/train.py prior \
 
 To evaluate the released Joint Reps checkpoint, first add
 `--include-pretrain-checkpoint` to the artifact download command above. Then
-run one simulator trial:
+verify the model and VQ paths before paying model-loading cost:
+
+```bash
+test -f "$BARX_ARTIFACT_ROOT/runs/xp900-pnp-joint-reps/checkpoints/step-050000-epoch-15-loss=0.2577.pt"
+test -f "$BARX_VQ_ROOT/mg_pnp_lite/checkpoints/model.pt"
+```
+
+Run one simulator trial:
 
 ```bash
 MUJOCO_GL=egl PYOPENGL_PLATFORM=egl \
@@ -130,5 +148,14 @@ sanitized command, attempt, exit code, duration, and output hash in
 
 ## Licenses
 
-New BARX code is MIT licensed. Vendored upstream components retain their own
-license files. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+- New BARX code is MIT licensed.
+- BARX raw HDF5 and processed RLDS datasets are released under CC BY 4.0.
+- BARX base-model, VQ-tokenizer, and policy-checkpoint artifacts are released
+  under Apache 2.0, subject to the separately identified upstream components
+  and their terms.
+- The vendored MimicGen source retains NVIDIA's non-commercial research and
+  evaluation license; it is not covered by BARX's MIT license.
+
+See [`docs/artifact_licenses.md`](docs/artifact_licenses.md) for artifact
+scope, provenance, attribution, and reuse guidance, and
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for bundled software.

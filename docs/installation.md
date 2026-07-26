@@ -17,9 +17,15 @@ versions do not understand every lock and source field used by this project.
 From the repository root:
 
 ```bash
+command -v cmake
+cmake --version
 uv sync --locked --no-dev
 uv run --locked --no-dev python -m unittest discover -s tests -v
 ```
+
+Confirm that `cmake --version` actually executes. A broken user-local shim can
+shadow a healthy system installation; repair `PATH` before retrying the locked
+sync rather than treating the resulting build error as a dependency conflict.
 
 uv installs `policy` and `robocasa_x` editably from this repository.
 robosuite, dlimp, and VQ-BeT are pinned to immutable Git commits in `uv.lock`.
@@ -95,3 +101,11 @@ while multi-gigabyte checkpoints are read from a network filesystem. Treat an
 exception, nonzero exit, checksum failure, CUDA out-of-memory error, or missing
 asset/checkpoint message as actionable. `hf_xet` is optional and only speeds
 Hugging Face transfers.
+
+On clusters or network-mounted home directories, place `UV_CACHE_DIR`,
+`HF_HOME`, and graphics caches such as `XDG_CACHE_HOME` on fast local storage
+when available. Detached shells and schedulers must export the same
+`BARX_ARTIFACT_ROOT`, `BARX_VQ_ROOT`, cache, and EGL variables as the
+interactive shell. Before evaluation, assert that the selected model and VQ
+checkpoint files exist; this catches configuration mistakes before loading a
+multi-gigabyte model.

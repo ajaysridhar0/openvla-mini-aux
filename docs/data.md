@@ -12,6 +12,12 @@ checked-in manifests under `dataset/subsets/` map one-to-one to the public RLDS
 repositories without duplicating the XP-900 files that are already part of
 XP-3K.
 
+The raw HDF5 archive and all 24 processed RLDS repositories are released under
+CC BY 4.0. Dataset cards record the source variant, task, embodiment, episode
+count, conversion provenance, and attribution. See
+[`artifact_licenses.md`](artifact_licenses.md) before redistributing or
+deriving another format.
+
 Retained episode metadata replaces installation prefixes with `<ROBOCASA>/`.
 This token preserves asset-relative paths without exposing or depending on the
 original collection machine. The frozen condition bundles store the exact

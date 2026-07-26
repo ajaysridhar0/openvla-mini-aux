@@ -4,6 +4,13 @@ The machine-readable constants are in `configs/experiments.toml`. Full
 training starts by training the task-specific VQ tokenizer from the released
 RLDS data.
 
+The released BARX base VLM, VQ action tokenizer, and policy checkpoints are
+Apache 2.0 model artifacts with explicit model cards. Their cards identify the
+Qwen2.5, DINOv2, SigLIP, MiniVLA/OpenVLA, RoboCasa-X, and BARX provenance that
+must remain visible in downstream releases. The underlying datasets are CC BY
+4.0, and the vendored MimicGen source has separate non-commercial terms. See
+[`artifact_licenses.md`](artifact_licenses.md).
+
 For the public XP-900 PnP walkthrough, download the already prepared RLDS data,
 VQ tokenizer, and base VLM with `scripts/download_public_artifacts.py` as shown
 in the root README. No Hugging Face token is required. The manual VQ procedure

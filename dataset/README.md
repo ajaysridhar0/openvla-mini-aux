@@ -123,11 +123,23 @@ training compatibility.
 
 The `human/` files retain actions, simulator states, environment metadata, and
 50 demonstrations per target/task, so they preserve the information needed to
-prepare MimicGen source datasets. The BARX repository does not currently ship
-the customized MimicGen generator and task configs used for the paper. Those
-must be published and pinned separately before BARX can claim a reproducible
-end-to-end synthesis workflow; the raw HDF5 release alone supports inspection
-and conversion, but not regeneration.
+prepare MimicGen source datasets. BARX ships the compatibility snapshot under
+`third_party/mimicgen/`, pins its source revision in `configs/mimicgen.json`,
+and exposes path-independent preparation and bounded generation wrappers.
+
+Install the separately licensed generator and follow the complete regeneration
+gate:
+
+```bash
+uv sync --locked --extra mg --no-dev
+```
+
+See [Section 8 of the release walkthrough](../RELEASE_TEST_README.md#8-mimicgen-regeneration-gate)
+for source immutability checks, preparation, bounded generation, portable HDF5
+validation, and video review. MimicGen source code retains NVIDIA's
+non-commercial research/evaluation license. Released raw and processed BARX
+demonstration data are CC BY 4.0; see
+[`docs/artifact_licenses.md`](../docs/artifact_licenses.md).
 
 ## Rebuilding a portable archive
 

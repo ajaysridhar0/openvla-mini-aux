@@ -18,3 +18,7 @@ MimicGen was used to synthesize the rendered training data and is available as
 the optional `mg` dependency. It is not covered by BARX's MIT license. Training
 consumes its final HDF5 files through the unified converter. See `uv.lock` for
 the complete resolved dependency graph.
+
+Public BARX datasets and model artifacts have their own distribution terms and
+provenance, which do not replace the licenses above. See
+`docs/artifact_licenses.md`.
