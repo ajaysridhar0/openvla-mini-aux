@@ -91,8 +91,21 @@ ACTION_HORIZON = 8
 SETTLE_STEPS = 10
 IMAGE_WIDTH = 320
 IMAGE_HEIGHT = 180
+MIN_TARGET_VISIBLE_PIXELS = 25
 OBJECT_GROUP = "obj_set1"
 OBJECT_INSTANCE_SPLIT = "A"
+OBJECT_CATEGORIES = frozenset(
+    {
+        "apple",
+        "banana",
+        "can",
+        "carrot",
+        "cucumber",
+        "lemon",
+        "orange",
+        "sponge",
+    }
+)
 
 _PNP_LAYOUTS = (4, 7, 8)
 _PNP_STYLES = tuple(range(12))

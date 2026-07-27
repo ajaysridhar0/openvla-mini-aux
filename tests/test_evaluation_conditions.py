@@ -1,3 +1,4 @@
+import copy
 import json
 import tempfile
 import unittest
@@ -13,7 +14,10 @@ from barx.evaluation_conditions import (
     model_sha256,
     portable_ep_meta,
     portable_model_xml,
+    project_target_center,
     stable_replay_metadata,
+    validate_condition_bundle_for_evaluation,
+    validate_condition_semantics,
     write_bundle,
 )
 
@@ -38,9 +42,7 @@ class EvaluationConditionTest(unittest.TestCase):
                 "robosuite": Path("/new/robosuite"),
             },
         )
-        self.assertEqual(
-            restored["texture"], "/new/robosuite/models/texture.png"
-        )
+        self.assertEqual(restored["texture"], "/new/robosuite/models/texture.png")
 
     def entry(self, episode, seed, state):
         return make_entry(
@@ -58,10 +60,10 @@ class EvaluationConditionTest(unittest.TestCase):
 
     def test_round_trip_validates_metadata_and_states(self):
         states = [np.arange(5, dtype=np.float64), np.arange(5, dtype=np.float64) + 1]
-        entries = [self.entry(index, 1000 + index, state) for index, state in enumerate(states)]
-        models = [
-            '<mujoco><mesh file="/machine/robocasa/assets/a.stl"/></mujoco>'
-        ] * 2
+        entries = [
+            self.entry(index, 1000 + index, state) for index, state in enumerate(states)
+        ]
+        models = ['<mujoco><mesh file="/machine/robocasa/assets/a.stl"/></mujoco>'] * 2
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             write_bundle(
@@ -90,12 +92,9 @@ class EvaluationConditionTest(unittest.TestCase):
             np.arange(7, dtype=np.float64),
         ]
         entries = [
-            self.entry(index, 1000 + index, state)
-            for index, state in enumerate(states)
+            self.entry(index, 1000 + index, state) for index, state in enumerate(states)
         ]
-        models = [
-            '<mujoco><mesh file="/machine/robocasa/assets/a.stl"/></mujoco>'
-        ] * 2
+        models = ['<mujoco><mesh file="/machine/robocasa/assets/a.stl"/></mujoco>'] * 2
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             write_bundle(
@@ -162,6 +161,128 @@ class EvaluationConditionTest(unittest.TestCase):
         first = {"layout_id": 7, "object_cfgs": [{"placement": "sampled"}]}
         second = {"layout_id": 7, "object_cfgs": [{"placement": "resolved"}]}
         self.assertEqual(stable_replay_metadata(first), stable_replay_metadata(second))
+
+    def test_target_projection_detects_out_of_frame_object(self):
+        model_xml = """
+        <mujoco>
+          <worldbody>
+            <body name="camera_base">
+              <camera name="policy_camera" fovy="90"/>
+            </body>
+            <body name="obj_main">
+              <freejoint name="obj_joint0"/>
+            </body>
+          </worldbody>
+        </mujoco>
+        """
+        state = np.concatenate(
+            [
+                [0.0],
+                [0.0, 0.0, -1.0, 1.0, 0.0, 0.0, 0.0],
+                np.zeros(6),
+            ]
+        )
+        projection = project_target_center(
+            {"condition_id": "synthetic"},
+            state,
+            model_xml,
+            camera_name="policy_camera",
+            image_width=320,
+            image_height=180,
+        )
+        self.assertTrue(projection["center_in_frame"])
+        self.assertAlmostEqual(projection["pixel_x"], 160.0)
+        self.assertAlmostEqual(projection["pixel_y"], 90.0)
+
+        state[1] = 3.0
+        projection = project_target_center(
+            {"condition_id": "synthetic"},
+            state,
+            model_xml,
+            camera_name="policy_camera",
+            image_width=320,
+            image_height=180,
+        )
+        self.assertFalse(projection["center_in_frame"])
+
+    def test_checked_in_pnp_targets_use_the_paper_object_set(self):
+        conditions = Path(__file__).resolve().parents[1] / "evaluation" / "conditions"
+        for task in ("pnp_counter_to_sink", "pnp_sink_to_counter"):
+            for metadata_path in (conditions / task).glob("*.json"):
+                payload = json.loads(metadata_path.read_text())
+                for entry in payload["episodes"]:
+                    with self.subTest(
+                        task=task,
+                        embodiment=payload["embodiment"],
+                        seed=entry["seed"],
+                    ):
+                        validate_condition_semantics(entry, task=task)
+
+    def test_semantic_validation_rejects_wrong_object_category_and_split(self):
+        conditions = Path(__file__).resolve().parents[1] / "evaluation" / "conditions"
+        payload, _, _ = load_bundle(
+            conditions,
+            task="pnp_counter_to_sink",
+            embodiment="panda",
+        )
+        entry = copy.deepcopy(payload["episodes"][0])
+        target = next(
+            cfg for cfg in entry["ep_meta"]["object_cfgs"] if cfg["name"] == "obj"
+        )
+
+        target["info"]["cat"] = "potato"
+        entry["instruction"] = (
+            "pick the potato from the counter and place it in the sink"
+        )
+        with self.assertRaisesRegex(ValueError, "not in obj_set1"):
+            validate_condition_semantics(entry, task="pnp_counter_to_sink")
+
+        entry = copy.deepcopy(payload["episodes"][0])
+        target = next(
+            cfg for cfg in entry["ep_meta"]["object_cfgs"] if cfg["name"] == "obj"
+        )
+        target["info"]["split"] = "B"
+        with self.assertRaisesRegex(ValueError, "object split A"):
+            validate_condition_semantics(entry, task="pnp_counter_to_sink")
+
+    def test_evaluator_rejects_showcased_out_of_frame_seed(self):
+        conditions = Path(__file__).resolve().parents[1] / "evaluation" / "conditions"
+        payload, states, model_xmls = load_bundle(
+            conditions,
+            task="pnp_counter_to_sink",
+            embodiment="panda",
+        )
+        first = project_target_center(
+            payload["episodes"][0],
+            states[0],
+            model_xmls[0],
+            camera_name="barx_panda_agentview",
+            image_width=320,
+            image_height=180,
+        )
+        second = project_target_center(
+            payload["episodes"][1],
+            states[1],
+            model_xmls[1],
+            camera_name="barx_panda_agentview",
+            image_width=320,
+            image_height=180,
+        )
+        self.assertTrue(first["center_in_frame"])
+        self.assertFalse(second["center_in_frame"])
+        self.assertAlmostEqual(second["pixel_x"], -91.0, delta=0.1)
+        self.assertAlmostEqual(second["pixel_y"], 212.9, delta=0.1)
+        with self.assertRaisesRegex(ValueError, "invalid requested conditions"):
+            validate_condition_bundle_for_evaluation(
+                payload,
+                states,
+                model_xmls,
+                task="pnp_counter_to_sink",
+                camera_name="barx_panda_agentview",
+                image_width=320,
+                image_height=180,
+                count=2,
+            )
 
 
 if __name__ == "__main__":

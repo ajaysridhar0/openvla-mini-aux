@@ -13,11 +13,18 @@ from barx.benchmark import (
     EMBODIMENTS,
     EVALUATION_GLOBAL_SEED,
     EVALUATION_START_SEED,
+    IMAGE_HEIGHT,
+    IMAGE_WIDTH,
+    MIN_TARGET_VISIBLE_PIXELS,
     TASKS,
 )
-from barx.evaluation_conditions import load_bundle, restore_frozen_condition
+from barx.evaluation_conditions import (
+    load_bundle,
+    restore_frozen_condition,
+    target_visible_pixel_count,
+    validate_condition_bundle_for_evaluation,
+)
 from barx.simulation import build_environment_config, initialize_observation_utils
-
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -36,6 +43,16 @@ def verify(args: argparse.Namespace) -> None:
         raise ValueError(
             f"--episodes must be between 1 and {len(entries)}, received {count}"
         )
+    validate_condition_bundle_for_evaluation(
+        payload,
+        states,
+        model_xmls,
+        task=args.task,
+        camera_name=EMBODIMENTS[args.embodiment].camera,
+        image_width=IMAGE_WIDTH,
+        image_height=IMAGE_HEIGHT,
+        count=count,
+    )
 
     random.seed(EVALUATION_GLOBAL_SEED)
     np.random.seed(EVALUATION_GLOBAL_SEED)
@@ -63,10 +80,28 @@ def verify(args: argparse.Namespace) -> None:
                 raise RuntimeError(
                     f"Condition {entry['condition_id']} has no {camera_key} observation"
                 )
+            visible_pixels = None
+            if args.task != "turn_on_sink_faucet":
+                visible_pixels = target_visible_pixel_count(
+                    env,
+                    camera_name=EMBODIMENTS[args.embodiment].camera,
+                    image_width=IMAGE_WIDTH,
+                    image_height=IMAGE_HEIGHT,
+                )
+                if visible_pixels < MIN_TARGET_VISIBLE_PIXELS:
+                    raise RuntimeError(
+                        f"Condition {entry['condition_id']} exposes only "
+                        f"{visible_pixels} target pixels; expected at least "
+                        f"{MIN_TARGET_VISIBLE_PIXELS}"
+                    )
+            visibility = (
+                "" if visible_pixels is None else f", target_pixels={visible_pixels}"
+            )
             print(
                 f"Verified {args.task}/{args.embodiment} {index}/{count}: "
                 f"condition={entry['condition_id']}, seed={entry['seed']}, "
                 f"layout={metadata['layout_id']}, style={metadata['style_id']}"
+                f"{visibility}"
             )
     finally:
         env.env.close()

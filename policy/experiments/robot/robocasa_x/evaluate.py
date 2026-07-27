@@ -24,10 +24,18 @@ sys.path.insert(0, str(REPOSITORY_ROOT))
 sys.path.insert(0, str(POLICY_ROOT))
 
 # Core imports needed
-from barx.benchmark import EMBODIMENTS, TASK_BY_ENVIRONMENT
+from barx.benchmark import (
+    EMBODIMENTS,
+    IMAGE_HEIGHT,
+    IMAGE_WIDTH,
+    MIN_TARGET_VISIBLE_PIXELS,
+    TASK_BY_ENVIRONMENT,
+)
 from barx.evaluation_conditions import (
     load_bundle,
     restore_frozen_condition,
+    target_visible_pixel_count,
+    validate_condition_bundle_for_evaluation,
 )
 from barx.evaluation_logging import (
     EvaluationRun,
@@ -122,11 +130,21 @@ def draw_bbox_on_image(img, bbox_dict, color_map):
         y1, y2 = int(y1 * h), int(y2 * h)
 
         # Draw rectangle
-        cv2.rectangle(img_with_bbox, (x1, y1), (x2, y2), tuple(int(c * 255) for c in color), 2)
+        cv2.rectangle(
+            img_with_bbox, (x1, y1), (x2, y2), tuple(int(c * 255) for c in color), 2
+        )
 
         # Add label
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(img_with_bbox, obj_name, (x1, y1 - 5), font, 0.5, tuple(int(c * 255) for c in color), 1)
+        cv2.putText(
+            img_with_bbox,
+            obj_name,
+            (x1, y1 - 5),
+            font,
+            0.5,
+            tuple(int(c * 255) for c in color),
+            1,
+        )
 
     return img_with_bbox
 
@@ -146,7 +164,9 @@ def draw_trajectory_on_image(img, trajectory_points):
 
     # Draw lines connecting consecutive points
     for i in range(len(pixel_points) - 1):
-        cv2.line(img_with_traj, pixel_points[i], pixel_points[i + 1], (0, 255, 0), 2)  # Green color for trajectory
+        cv2.line(
+            img_with_traj, pixel_points[i], pixel_points[i + 1], (0, 255, 0), 2
+        )  # Green color for trajectory
 
     # Draw points
     for point in pixel_points:
@@ -200,7 +220,9 @@ def draw_motion_text_on_image(img, motion_text):
     # Get size of each line
     line_sizes = []
     for line in lines:
-        (text_width, text_height), _ = cv2.getTextSize(line, font, font_scale, font_thickness)
+        (text_width, text_height), _ = cv2.getTextSize(
+            line, font, font_scale, font_thickness
+        )
         line_sizes.append((text_width, text_height))
         total_height += text_height + line_spacing
 
@@ -214,12 +236,23 @@ def draw_motion_text_on_image(img, motion_text):
 
         # Draw background rectangle
         bg_pts = np.array(
-            [[x_pos - padding, y_pos - padding], [x_pos + text_width + padding, y_pos + text_height + padding]]
+            [
+                [x_pos - padding, y_pos - padding],
+                [x_pos + text_width + padding, y_pos + text_height + padding],
+            ]
         )
         cv2.rectangle(img_with_text, bg_pts[0], bg_pts[1], bg_color, -1)
 
         # Draw text
-        cv2.putText(img_with_text, line, (x_pos, y_pos + text_height), font, font_scale, text_color, font_thickness)
+        cv2.putText(
+            img_with_text,
+            line,
+            (x_pos, y_pos + text_height),
+            font,
+            font_scale,
+            text_color,
+            font_thickness,
+        )
 
         y_pos += text_height + line_spacing
 
@@ -255,7 +288,9 @@ def eval_single_task(cfg: GenerateConfig, model, run: EvaluationRun) -> dict:
     """Evaluate one task and return its aggregate result."""
 
     if cfg.model_family in ["openvla", "prismatic"]:
-        assert cfg.unnorm_key in model.norm_stats, f"Action un-norm key {cfg.unnorm_key} not found in VLA `norm_stats`!"
+        assert (
+            cfg.unnorm_key in model.norm_stats
+        ), f"Action un-norm key {cfg.unnorm_key} not found in VLA `norm_stats`!"
 
     processor = None
     if cfg.model_family == "openvla":
@@ -294,13 +329,37 @@ def _eval_single_task_in_env(cfg, model, processor, env, run: EvaluationRun) -> 
             embodiment=cfg.embodiment,
         )
         entries = condition_payload["episodes"]
-        requested_seeds = list(range(cfg.start_seed, cfg.start_seed + cfg.num_trials_per_task))
-        bundle_seeds = [entry["seed"] for entry in entries[: cfg.num_trials_per_task]]
-        if bundle_seeds != requested_seeds:
-            raise ValueError(
-                "Frozen condition seeds do not match the requested evaluation range: "
-                f"expected {requested_seeds[0]}..{requested_seeds[-1]}"
+        protocol = condition_payload.get("provenance", {}).get(
+            "condition_protocol", "historical-consecutive-seeds"
+        )
+        if protocol == "visible-target-v1":
+            if condition_payload["provenance"].get("start_seed") != cfg.start_seed:
+                raise ValueError(
+                    "Validated condition bundle start seed does not match the "
+                    "requested evaluation start seed"
+                )
+        else:
+            requested_seeds = list(
+                range(cfg.start_seed, cfg.start_seed + cfg.num_trials_per_task)
             )
+            bundle_seeds = [
+                entry["seed"] for entry in entries[: cfg.num_trials_per_task]
+            ]
+            if bundle_seeds != requested_seeds:
+                raise ValueError(
+                    "Frozen condition seeds do not match the requested evaluation "
+                    f"range: expected {requested_seeds[0]}..{requested_seeds[-1]}"
+                )
+        validate_condition_bundle_for_evaluation(
+            condition_payload,
+            condition_states,
+            condition_models,
+            task=task_name,
+            camera_name=cfg.camera,
+            image_width=IMAGE_WIDTH,
+            image_height=IMAGE_HEIGHT,
+            count=cfg.num_trials_per_task,
+        )
 
     log_file.write(f"Robocasa task: {cfg.task}\n")
 
@@ -325,6 +384,24 @@ def _eval_single_task_in_env(cfg, model, processor, env, run: EvaluationRun) -> 
                 condition_states[trial_idx],
                 condition_models[trial_idx],
             )
+            if task_name != "turn_on_sink_faucet":
+                visible_pixels = target_visible_pixel_count(
+                    env,
+                    camera_name=cfg.camera,
+                    image_width=IMAGE_WIDTH,
+                    image_height=IMAGE_HEIGHT,
+                )
+                if visible_pixels < MIN_TARGET_VISIBLE_PIXELS:
+                    raise ValueError(
+                        f"Frozen condition {entry['condition_id']} seed "
+                        f"{entry['seed']} exposes only {visible_pixels} target "
+                        f"pixels in {cfg.camera}; expected at least "
+                        f"{MIN_TARGET_VISIBLE_PIXELS}"
+                    )
+                log_file.write(
+                    f"Target visible pixels: {visible_pixels} "
+                    f"(minimum {MIN_TARGET_VISIBLE_PIXELS})\n"
+                )
             t = cfg.num_steps_wait
         else:
             env.env.rng = np.random.default_rng(current_seed)
@@ -387,21 +464,34 @@ def _eval_single_task_in_env(cfg, model, processor, env, run: EvaluationRun) -> 
             # buffering #obs_history images, optionally
             image_history = replay_images[-cfg.obs_history :]
             if len(image_history) < cfg.obs_history:
-                image_history.extend([replay_images[-1]] * (cfg.obs_history - len(image_history)))
+                image_history.extend(
+                    [replay_images[-1]] * (cfg.obs_history - len(image_history))
+                )
 
             # same but for optional wrist images
             if cfg.use_wrist_image:
                 wrist_image_history = replay_wrist_images[-cfg.obs_history :]
                 if len(wrist_image_history) < cfg.obs_history:
-                    wrist_image_history.extend([replay_wrist_images[-1]] * (cfg.obs_history - len(wrist_image_history)))
+                    wrist_image_history.extend(
+                        [replay_wrist_images[-1]]
+                        * (cfg.obs_history - len(wrist_image_history))
+                    )
                 # interleaved images [... image_t, wrist_t ...]
-                image_history = [val for tup in zip(image_history, wrist_image_history) for val in tup]
+                image_history = [
+                    val
+                    for tup in zip(image_history, wrist_image_history)
+                    for val in tup
+                ]
 
             # Prepare observations dict
             observation = {
                 "full_image": image_history,
                 "state": np.concatenate(
-                    (obs["robot0_eef_pos"], quat2axisangle(obs["robot0_eef_quat"]), obs["robot0_gripper_qpos"])
+                    (
+                        obs["robot0_eef_pos"],
+                        quat2axisangle(obs["robot0_eef_quat"]),
+                        obs["robot0_gripper_qpos"],
+                    )
                 ),
             }
 
@@ -437,7 +527,9 @@ def _eval_single_task_in_env(cfg, model, processor, env, run: EvaluationRun) -> 
             if "bounding_box" in output:
                 has_bbox_predictions = True
                 try:
-                    current_img = draw_bbox_on_image(current_img, output["bounding_box"], bbox_color_map)
+                    current_img = draw_bbox_on_image(
+                        current_img, output["bounding_box"], bbox_color_map
+                    )
                 except Exception as e:
                     print(f"Error drawing bounding boxes: {e}")
                     print(f"Output: {output['bounding_box']}")
@@ -446,7 +538,9 @@ def _eval_single_task_in_env(cfg, model, processor, env, run: EvaluationRun) -> 
             if "end_effector_trace" in output:
                 has_ee_pose_predictions = True
                 try:
-                    current_img = draw_trajectory_on_image(current_img, output["end_effector_trace"])
+                    current_img = draw_trajectory_on_image(
+                        current_img, output["end_effector_trace"]
+                    )
                 except Exception as e:
                     print(f"Error drawing trajectory: {e}")
                     print(f"Output: {output['end_effector_trace']}")
@@ -455,7 +549,9 @@ def _eval_single_task_in_env(cfg, model, processor, env, run: EvaluationRun) -> 
             if "language_motion" in output:
                 has_motion_predictions = True
                 try:
-                    current_img = draw_motion_text_on_image(current_img, output["language_motion"])
+                    current_img = draw_motion_text_on_image(
+                        current_img, output["language_motion"]
+                    )
                 except Exception as e:
                     print(f"Error drawing motion text: {e}")
                     print(f"Output: {output['language_motion']}")
@@ -534,7 +630,9 @@ def _eval_single_task_in_env(cfg, model, processor, env, run: EvaluationRun) -> 
                 "episode": trial_idx,
                 "seed": cfg.start_seed + trial_idx,
                 "condition_id": (
-                    condition_payload["episodes"][trial_idx]["condition_id"] if cfg.use_frozen_conditions else None
+                    condition_payload["episodes"][trial_idx]["condition_id"]
+                    if cfg.use_frozen_conditions
+                    else None
                 ),
                 "success": success,
                 "steps": t - cfg.num_steps_wait,
@@ -559,14 +657,20 @@ def _eval_single_task_in_env(cfg, model, processor, env, run: EvaluationRun) -> 
             # Only log videos for the first trial
             if trial_idx == 0:
                 group = "success" if success else "failure"
-                log_dict[f"{cfg.task}/{group}/trial_0"] = wandb.Video(np.array(replay_images).transpose(0, 3, 1, 2))
+                log_dict[f"{cfg.task}/{group}/trial_0"] = wandb.Video(
+                    np.array(replay_images).transpose(0, 3, 1, 2)
+                )
 
                 if cfg.use_wrist_image:
                     log_dict[f"{cfg.task}_wrist/{group}/trial_0"] = wandb.Video(
                         np.array(replay_wrist_images).transpose(0, 3, 1, 2)
                     )
 
-                if has_bbox_predictions or has_ee_pose_predictions or has_motion_predictions:
+                if (
+                    has_bbox_predictions
+                    or has_ee_pose_predictions
+                    or has_motion_predictions
+                ):
                     viz_suffix = "_with_" + "_".join(
                         x
                         for x in ["bbox", "ee_pose", "motion"]
@@ -597,28 +701,43 @@ def eval_robocasa(cfg: GenerateConfig) -> None:
         raise ValueError("cfg.pretrained_checkpoint must be provided")
     checkpoint = str(cfg.pretrained_checkpoint)
     if "image_aug" in checkpoint:
-        assert cfg.center_crop, "Expecting `center_crop==True` because model was trained with image augmentations!"
+        assert (
+            cfg.center_crop
+        ), "Expecting `center_crop==True` because model was trained with image augmentations!"
     if cfg.load_in_8bit and cfg.load_in_4bit:
         raise ValueError("Cannot use both 8-bit and 4-bit quantization")
 
     specified_inference_options = sum(
-        option is not None for option in (cfg.inference_representation, cfg.method, cfg.aux_task_types)
+        option is not None
+        for option in (cfg.inference_representation, cfg.method, cfg.aux_task_types)
     )
     if specified_inference_options > 1:
-        raise ValueError("Specify only one of --inference_representation, --method, or --aux_task_types.")
+        raise ValueError(
+            "Specify only one of --inference_representation, --method, or --aux_task_types."
+        )
     if cfg.inference_representation is not None:
-        cfg.aux_task_types = [internal_representation_name(cfg.inference_representation)]
+        cfg.aux_task_types = [
+            internal_representation_name(cfg.inference_representation)
+        ]
     if cfg.method is not None:
         cfg.aux_task_types = representations_for_method(cfg.method)
     elif cfg.aux_task_types is not None:
-        cfg.aux_task_types = [internal_representation_name(name) for name in cfg.aux_task_types.split("->") if name]
+        cfg.aux_task_types = [
+            internal_representation_name(name)
+            for name in cfg.aux_task_types.split("->")
+            if name
+        ]
 
     if cfg.num_trials_per_task <= 0:
         raise ValueError("num_trials_per_task must be positive")
 
     set_seed_everywhere(cfg.seed)
     rollout_template = cfg.rollout_dir or (
-        REPOSITORY_ROOT / "rollouts" / TASK_BY_ENVIRONMENT[cfg.task] / cfg.embodiment / "STEP"
+        REPOSITORY_ROOT
+        / "rollouts"
+        / TASK_BY_ENVIRONMENT[cfg.task]
+        / cfg.embodiment
+        / "STEP"
     )
     run_directory = create_run_directory(rollout_template, checkpoint)
     cfg.rollout_dir = str(run_directory)
@@ -658,7 +777,9 @@ def eval_robocasa(cfg: GenerateConfig) -> None:
             summary.update(
                 episodes=run.episode_count,
                 successes=run.success_count,
-                success_rate=(run.success_count / run.episode_count if run.episode_count else None),
+                success_rate=(
+                    run.success_count / run.episode_count if run.episode_count else None
+                ),
             )
             run.write(f"Evaluation failed: {type(error).__name__}: {error}\n")
             run.finalize(summary, status="failed", error=error)
