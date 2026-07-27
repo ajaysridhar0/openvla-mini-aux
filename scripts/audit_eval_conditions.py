@@ -5,9 +5,18 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections import Counter
 from pathlib import Path
 
-from barx.benchmark import EMBODIMENTS, IMAGE_HEIGHT, IMAGE_WIDTH, TASKS
+from barx.benchmark import (
+    EMBODIMENTS,
+    IMAGE_HEIGHT,
+    IMAGE_WIDTH,
+    OBJECT_CATEGORIES,
+    OBJECT_GROUP,
+    OBJECT_INSTANCE_SPLIT,
+    TASKS,
+)
 from barx.evaluation_conditions import (
     load_bundle,
     project_target_center,
@@ -31,9 +40,23 @@ def audit(args: argparse.Namespace) -> dict[str, object]:
                 embodiment=embodiment,
             )
             bundle_invalid = 0
+            target_categories: Counter[str] = Counter()
+            target_splits: Counter[str] = Counter()
             for entry, state, model_xml in zip(payload["episodes"], states, model_xmls):
                 projection = None
                 try:
+                    target = next(
+                        (
+                            cfg
+                            for cfg in entry["ep_meta"].get("object_cfgs", [])
+                            if cfg.get("name") == "obj"
+                        ),
+                        None,
+                    )
+                    if target is not None:
+                        target_info = target.get("info", {})
+                        target_categories[str(target_info.get("cat"))] += 1
+                        target_splits[str(target_info.get("split"))] += 1
                     validate_condition_semantics(entry, task=task)
                     projection = None
                     if task != "turn_on_sink_faucet":
@@ -67,9 +90,17 @@ def audit(args: argparse.Namespace) -> dict[str, object]:
                 {
                     "task": task,
                     "embodiment": embodiment,
+                    "condition_protocol": payload.get("provenance", {}).get(
+                        "condition_protocol", "historical-consecutive-seeds"
+                    ),
+                    "condition_repository_revision": payload.get("provenance", {}).get(
+                        "repository_revision"
+                    ),
                     "conditions": len(payload["episodes"]),
                     "valid": len(payload["episodes"]) - bundle_invalid,
                     "invalid": bundle_invalid,
+                    "target_categories": dict(sorted(target_categories.items())),
+                    "target_splits": dict(sorted(target_splits.items())),
                 }
             )
             print(
@@ -78,10 +109,19 @@ def audit(args: argparse.Namespace) -> dict[str, object]:
                 f"{len(payload['episodes'])} valid"
             )
 
+    resolved_conditions_dir = args.conditions_dir.resolve()
+    try:
+        conditions_label = str(resolved_conditions_dir.relative_to(ROOT))
+    except ValueError:
+        conditions_label = str(resolved_conditions_dir)
+
     report = {
         "status": "PASS" if not invalid else "FAIL",
-        "conditions_dir": str(args.conditions_dir),
+        "conditions_dir": conditions_label,
         "image_size": [IMAGE_WIDTH, IMAGE_HEIGHT],
+        "expected_pnp_target_group": OBJECT_GROUP,
+        "expected_target_split": OBJECT_INSTANCE_SPLIT,
+        "allowed_pnp_target_categories": sorted(OBJECT_CATEGORIES),
         "bundles": results,
         "invalid_conditions": invalid,
     }

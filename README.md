@@ -109,7 +109,11 @@ uv run --locked --extra train --no-dev python scripts/evaluate.py \
   --episodes 1 --rollout-dir "$BARX_ARTIFACT_ROOT/rollouts/one-trial"
 ```
 
-The paper protocol uses 100 trials; omit `--episodes 1` to run the full set.
+The release protocol uses 100 fixed, visibility-validated trials; omit
+`--episodes 1` to run the full set. Pick-and-place targets come from RoboCasa
+`obj_set1`, instance split `A`, and must be visible in the policy camera. See
+[`evaluation/README.md`](evaluation/README.md) for the correction to the
+historical consecutive-seed protocol.
 
 To regenerate data from the released human HDF5 demonstrations, install the
 separately licensed MimicGen extra:

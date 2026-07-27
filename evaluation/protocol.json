@@ -6,6 +6,13 @@
   "image_size": [320, 180],
   "condition_format": 3,
   "condition_contents": ["episode_metadata", "processed_mujoco_xml", "post_settling_state"],
+  "condition_protocol": "visible-target-v1",
+  "candidate_selection": {
+    "start_seed": 1000,
+    "sequential_scan": true,
+    "minimum_target_visible_pixels": 25,
+    "historical_protocol": "historical-consecutive-seeds"
+  },
   "object_group": "obj_set1",
   "object_instance_split": "A",
   "provenance": {

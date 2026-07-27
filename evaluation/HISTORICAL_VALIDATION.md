@@ -52,6 +52,25 @@ point precision in the inspected Panda scene. The mug exclusions and calibrated
 cameras are scoped to the `X*` benchmark tasks, so standard RoboCasa tasks keep
 their upstream behavior.
 
+A later failure-video review found a protocol flaw rather than a replay
+regression. In Panda counter-to-sink seed 1001, the requested lemon is placed on
+the counter but projects to approximately `(-91, 213)` in the 320×180 policy
+image. The visible sink object is a distractor. A static audit found the same
+problem in 34 of the 100 consecutive counter-to-sink seeds for every
+embodiment; the other three task sets pass the center-in-frame check.
+
+The release therefore distinguishes two protocols:
+
+- `historical-consecutive-seeds`: reconstructs the original 1000–1099 sequence
+  for provenance and is not suitable for public evaluation.
+- `visible-target-v1`: scans the same candidate stream, preserves the original
+  scene and object distribution, and accepts only targets visible in the policy
+  camera.
+
+This correction changes the selected counter-to-sink conditions, so results
+under `visible-target-v1` must not be described as using the exact historical
+100-seed set.
+
 ## Repeating the check
 
 Given access to a retained local rollout directory, repeat the check with:

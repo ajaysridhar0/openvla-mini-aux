@@ -218,6 +218,29 @@ class EvaluationConditionTest(unittest.TestCase):
                     ):
                         validate_condition_semantics(entry, task=task)
 
+    def test_embodiments_share_the_same_condition_seeds_per_task(self):
+        conditions = Path(__file__).resolve().parents[1] / "evaluation" / "conditions"
+        for task in (
+            "pnp_counter_to_sink",
+            "pnp_sink_to_counter",
+            "turn_on_sink_faucet",
+            "flip_mug_upright",
+        ):
+            seed_lists = {}
+            for metadata_path in sorted((conditions / task).glob("*.json")):
+                payload = json.loads(metadata_path.read_text())
+                seed_lists[payload["embodiment"]] = [
+                    entry["seed"] for entry in payload["episodes"]
+                ]
+            reference_embodiment, reference_seeds = next(iter(seed_lists.items()))
+            for embodiment, seeds in seed_lists.items():
+                with self.subTest(task=task, embodiment=embodiment):
+                    self.assertEqual(
+                        seeds,
+                        reference_seeds,
+                        f"{embodiment} differs from {reference_embodiment}",
+                    )
+
     def test_semantic_validation_rejects_wrong_object_category_and_split(self):
         conditions = Path(__file__).resolve().parents[1] / "evaluation" / "conditions"
         payload, _, _ = load_bundle(
@@ -245,44 +268,44 @@ class EvaluationConditionTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "object split A"):
             validate_condition_semantics(entry, task="pnp_counter_to_sink")
 
-    def test_evaluator_rejects_showcased_out_of_frame_seed(self):
-        conditions = Path(__file__).resolve().parents[1] / "evaluation" / "conditions"
+    def test_release_excludes_showcased_out_of_frame_seed(self):
+        evaluation = Path(__file__).resolve().parents[1] / "evaluation"
+        historical = json.loads(
+            (evaluation / "HISTORICAL_VISIBILITY_AUDIT.json").read_text()
+        )
+        bad_seed = next(
+            condition
+            for condition in historical["invalid_conditions"]
+            if condition["task"] == "pnp_counter_to_sink"
+            and condition["embodiment"] == "panda"
+            and condition["seed"] == 1001
+        )
+        self.assertEqual(
+            bad_seed["reason"], "target center is outside the policy camera"
+        )
+        self.assertAlmostEqual(bad_seed["projection"]["pixel_x"], -91.0, delta=0.1)
+        self.assertAlmostEqual(bad_seed["projection"]["pixel_y"], 212.9, delta=0.1)
+
+        conditions = evaluation / "conditions"
         payload, states, model_xmls = load_bundle(
             conditions,
             task="pnp_counter_to_sink",
             embodiment="panda",
         )
-        first = project_target_center(
-            payload["episodes"][0],
-            states[0],
-            model_xmls[0],
+        self.assertEqual(
+            payload["provenance"]["condition_protocol"], "visible-target-v1"
+        )
+        self.assertNotIn(1001, [entry["seed"] for entry in payload["episodes"]])
+        validate_condition_bundle_for_evaluation(
+            payload,
+            states,
+            model_xmls,
+            task="pnp_counter_to_sink",
             camera_name="barx_panda_agentview",
             image_width=320,
             image_height=180,
+            count=100,
         )
-        second = project_target_center(
-            payload["episodes"][1],
-            states[1],
-            model_xmls[1],
-            camera_name="barx_panda_agentview",
-            image_width=320,
-            image_height=180,
-        )
-        self.assertTrue(first["center_in_frame"])
-        self.assertFalse(second["center_in_frame"])
-        self.assertAlmostEqual(second["pixel_x"], -91.0, delta=0.1)
-        self.assertAlmostEqual(second["pixel_y"], 212.9, delta=0.1)
-        with self.assertRaisesRegex(ValueError, "invalid requested conditions"):
-            validate_condition_bundle_for_evaluation(
-                payload,
-                states,
-                model_xmls,
-                task="pnp_counter_to_sink",
-                camera_name="barx_panda_agentview",
-                image_width=320,
-                image_height=180,
-                count=2,
-            )
 
 
 if __name__ == "__main__":

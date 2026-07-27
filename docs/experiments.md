@@ -149,12 +149,19 @@ path without writing a roughly 5.6 GiB final checkpoint.
 ## Evaluation protocol
 
 Use `scripts/evaluate.py` for paper-facing task and embodiment names. Each
-task/embodiment setting uses 100 fixed held-out seeds, starting from seed 1000
-in the release evaluator, and executes all 8 predicted actions before
-replanning. The launcher loads a frozen condition bundle by default, including
-the exact processed MuJoCo model and post-settling simulator state. Robot,
-gripper, and calibrated agent camera are selected together from the embodiment;
-they are not independent command-line choices.
+task/embodiment setting uses 100 fixed held-out conditions selected from a
+candidate stream starting at seed 1000, and executes all 8 predicted actions
+before replanning. Pick-and-place targets must come from `obj_set1`, instance
+split `A`, and expose at least 25 segmentation pixels in the policy camera.
+The launcher loads a frozen condition bundle by default, including the exact
+processed MuJoCo model and post-settling simulator state. Robot, gripper, and
+calibrated agent camera are selected together from the embodiment; they are not
+independent command-line choices.
+
+The original consecutive 1000–1099 protocol placed 34 counter-to-sink targets
+outside the camera. The public `visible-target-v1` protocol skips those
+candidates, so its accepted counter-to-sink seed IDs are nonconsecutive. See
+[`evaluation/README.md`](../evaluation/README.md) for the protocol distinction.
 
 | Task | Maximum steps |
 | --- | ---: |
@@ -178,7 +185,7 @@ uv run --locked --extra train --no-dev python scripts/evaluate.py \
 ```
 
 One trial checks execution but is not a success-rate estimate. Omit
-`--episodes 1` for the 100-seed paper protocol. Both commands default to
+`--episodes 1` for the 100-condition release protocol. Both commands default to
 action-only inference, as used for the main results. For the inference
 ablation, add `--inference-representation bounding_box`,
 `language_motion`, or `end_effector_trace`. The launcher maps Panda-OG and Jaco

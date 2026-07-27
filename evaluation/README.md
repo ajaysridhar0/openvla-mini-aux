@@ -1,25 +1,35 @@
 # Frozen evaluation conditions
 
 BARX evaluates every method on the same 100 post-settling simulator states for
-each task/embodiment pair. A condition bundle consists of a JSON metadata file
-and a compressed archive containing the exact processed MuJoCo XML and settled
-state under `conditions/<task>/<embodiment>.*`. Asset paths are package-relative,
-so bundles are portable across installations.
+each task/embodiment pair. Each bundle under
+`conditions/<task>/<embodiment>.*` stores the episode metadata, processed
+MuJoCo XML, and settled state with integrity hashes.
 
-The bundles are regenerated from the frozen paper code and seeds 1000–1099.
-Historical paper runs did not retain their MuJoCo states, so the bundles should
-be described as reconstructed from the paper snapshot, not as extracted from
-the original rollouts. Each bundle records its source revision and verifies its
-complete metadata, model XML, and simulator-state hashes during evaluation.
-RoboCasa mutates resolved object-placement dictionaries while loading a scene;
-those redundant fields are left out of the post-load metadata comparison,
-while object identity and placement remain covered by the XML and state hashes.
+The public release uses the `visible-target-v1` protocol. Pick-and-place
+targets are sampled from RoboCasa `obj_set1`, instance split `A`:
+`apple`, `banana`, `can`, `carrot`, `cucumber`, `lemon`, `orange`, and
+`sponge`. Generation rejects a candidate unless the instruction, target
+category, source fixture, and target object agree and at least 25 target
+segmentation pixels are visible in the policy camera.
 
-Generation is sequential: episode 1 uses seed 1000, episode 2 uses seed 1001,
-and so on. Do not construct a later paper episode directly from its seed.
-RoboCasa retains some sampled Python-side scene state across hard resets, so a
-later condition is reproduced only by replaying all preceding resets in the
-same environment. The generator does this automatically.
+The original evaluator used consecutive seeds 1000–1099. That reconstructed
+historical set contains valid object identities, but 34 counter-to-sink targets
+are outside the policy camera for every embodiment. It is retained as a
+documented historical protocol, not used by the public release. The complete
+machine-readable result is in
+[`HISTORICAL_VISIBILITY_AUDIT.json`](HISTORICAL_VISIBILITY_AUDIT.json). The
+corrected protocol scans candidates sequentially from seed 1000 until it
+collects 100 visible conditions, so accepted seed IDs are not necessarily
+consecutive.
+
+The checked-in bundles scan through seed 1152, reject 53 candidates, and use
+the same 100 accepted seeds for all six embodiments. The smallest accepted
+target occupies 81 rendered pixels.
+
+Historical paper runs did not retain MuJoCo states. These bundles are
+reconstructed from the paper snapshot, not extracted from original rollouts.
+RoboCasa also retains Python-side scene state across resets, so generation must
+scan candidates sequentially rather than construct a later condition directly.
 
 Generate one bundle after installing the RoboCasa assets:
 
@@ -30,9 +40,9 @@ uv run --locked --no-dev python scripts/generate_eval_conditions.py \
 ```
 
 The public `scripts/evaluate.py` launcher loads these bundles by default and
-fails before model inference if a bundle is absent, corrupt, or incompatible
-with the current simulator. This prevents different methods from silently
-receiving different sampled objects, layouts, styles, or initial poses.
+fails before model inference if a bundle is absent, corrupt, semantically
+invalid, or places the target outside the camera. After restoring each state,
+it also checks the rendered target-pixel count before requesting an action.
 
 Restore and hash-check every condition in one generated bundle with:
 
@@ -46,3 +56,11 @@ See [historical validation](HISTORICAL_VALIDATION.md) for the video-based spot
 check against the retained paper rollouts and its limitations. If those private
 rollouts are available, the check can be repeated with
 `scripts/audit_historical_rollouts.py`.
+
+Audit every checked-in bundle without loading simulator assets:
+
+```bash
+uv run --locked --no-dev python scripts/audit_eval_conditions.py
+```
+
+The checked-in result is [`VISIBILITY_AUDIT.json`](VISIBILITY_AUDIT.json).

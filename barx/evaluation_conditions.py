@@ -118,11 +118,20 @@ def validate_condition_semantics(entry: dict[str, Any], *, task: str) -> None:
     fixture_refs = metadata.get("fixture_refs", {})
     if task == "pnp_counter_to_sink":
         expected_fixture = fixture_refs.get("counter")
+        if not expected_fixture:
+            raise ValueError(
+                f"Condition {entry['condition_id']} has no counter fixture reference"
+            )
         expected_instruction = (
             f"pick the {target_category} from the counter and place it in the sink"
         )
     elif task == "pnp_sink_to_counter":
         expected_fixture = fixture_refs.get("sink")
+        if not expected_fixture or not fixture_refs.get("counter"):
+            raise ValueError(
+                f"Condition {entry['condition_id']} has incomplete sink/counter "
+                "fixture references"
+            )
         container = object_cfgs.get("container")
         if container is None:
             raise ValueError(
@@ -133,12 +142,20 @@ def validate_condition_semantics(entry: dict[str, Any], *, task: str) -> None:
                 f"Condition {entry['condition_id']} receptacle is not on the counter"
             )
         container_category = container.get("info", {}).get("cat")
+        if not container_category:
+            raise ValueError(
+                f"Condition {entry['condition_id']} receptacle has no category"
+            )
         expected_instruction = (
             f"pick the {target_category} from the sink and place it on the "
             f"{container_category} located on the counter"
         )
     elif task == "flip_mug_upright":
         expected_fixture = fixture_refs.get("counter")
+        if not expected_fixture:
+            raise ValueError(
+                f"Condition {entry['condition_id']} has no counter fixture reference"
+            )
         expected_instruction = "flip the mug on the counter upright"
         if target.get("obj_groups") != "mug" or target_category != "mug":
             raise ValueError(f"Condition {entry['condition_id']} does not target a mug")

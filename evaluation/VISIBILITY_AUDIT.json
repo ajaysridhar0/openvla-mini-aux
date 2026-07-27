@@ -1,0 +1,443 @@
+{
+  "status": "PASS",
+  "conditions_dir": "evaluation/conditions",
+  "image_size": [
+    320,
+    180
+  ],
+  "expected_pnp_target_group": "obj_set1",
+  "expected_target_split": "A",
+  "allowed_pnp_target_categories": [
+    "apple",
+    "banana",
+    "can",
+    "carrot",
+    "cucumber",
+    "lemon",
+    "orange",
+    "sponge"
+  ],
+  "bundles": [
+    {
+      "task": "pnp_counter_to_sink",
+      "embodiment": "iiwa",
+      "condition_protocol": "visible-target-v1",
+      "condition_repository_revision": "022372b2e17af7c75bd947f722bb4b964bb29708",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "apple": 12,
+        "banana": 11,
+        "can": 7,
+        "carrot": 13,
+        "cucumber": 16,
+        "lemon": 8,
+        "orange": 17,
+        "sponge": 16
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "pnp_counter_to_sink",
+      "embodiment": "kinova3",
+      "condition_protocol": "visible-target-v1",
+      "condition_repository_revision": "022372b2e17af7c75bd947f722bb4b964bb29708",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "apple": 12,
+        "banana": 11,
+        "can": 7,
+        "carrot": 13,
+        "cucumber": 16,
+        "lemon": 8,
+        "orange": 17,
+        "sponge": 16
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "pnp_counter_to_sink",
+      "embodiment": "ur5e",
+      "condition_protocol": "visible-target-v1",
+      "condition_repository_revision": "022372b2e17af7c75bd947f722bb4b964bb29708",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "apple": 12,
+        "banana": 11,
+        "can": 7,
+        "carrot": 13,
+        "cucumber": 16,
+        "lemon": 8,
+        "orange": 17,
+        "sponge": 16
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "pnp_counter_to_sink",
+      "embodiment": "panda",
+      "condition_protocol": "visible-target-v1",
+      "condition_repository_revision": "022372b2e17af7c75bd947f722bb4b964bb29708",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "apple": 12,
+        "banana": 11,
+        "can": 7,
+        "carrot": 13,
+        "cucumber": 16,
+        "lemon": 8,
+        "orange": 17,
+        "sponge": 16
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "pnp_counter_to_sink",
+      "embodiment": "panda_og",
+      "condition_protocol": "visible-target-v1",
+      "condition_repository_revision": "022372b2e17af7c75bd947f722bb4b964bb29708",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "apple": 12,
+        "banana": 11,
+        "can": 7,
+        "carrot": 13,
+        "cucumber": 16,
+        "lemon": 8,
+        "orange": 17,
+        "sponge": 16
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "pnp_counter_to_sink",
+      "embodiment": "jaco",
+      "condition_protocol": "visible-target-v1",
+      "condition_repository_revision": "022372b2e17af7c75bd947f722bb4b964bb29708",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "apple": 12,
+        "banana": 11,
+        "can": 7,
+        "carrot": 13,
+        "cucumber": 16,
+        "lemon": 8,
+        "orange": 17,
+        "sponge": 16
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "pnp_sink_to_counter",
+      "embodiment": "iiwa",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "apple": 17,
+        "banana": 10,
+        "can": 7,
+        "carrot": 15,
+        "cucumber": 10,
+        "lemon": 9,
+        "orange": 18,
+        "sponge": 14
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "pnp_sink_to_counter",
+      "embodiment": "kinova3",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "apple": 17,
+        "banana": 10,
+        "can": 7,
+        "carrot": 15,
+        "cucumber": 10,
+        "lemon": 9,
+        "orange": 18,
+        "sponge": 14
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "pnp_sink_to_counter",
+      "embodiment": "ur5e",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "apple": 17,
+        "banana": 10,
+        "can": 7,
+        "carrot": 15,
+        "cucumber": 10,
+        "lemon": 9,
+        "orange": 18,
+        "sponge": 14
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "pnp_sink_to_counter",
+      "embodiment": "panda",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "apple": 17,
+        "banana": 10,
+        "can": 7,
+        "carrot": 15,
+        "cucumber": 10,
+        "lemon": 9,
+        "orange": 18,
+        "sponge": 14
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "pnp_sink_to_counter",
+      "embodiment": "panda_og",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "apple": 15,
+        "banana": 9,
+        "can": 7,
+        "carrot": 14,
+        "cucumber": 9,
+        "lemon": 10,
+        "orange": 20,
+        "sponge": 16
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "pnp_sink_to_counter",
+      "embodiment": "jaco",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "apple": 17,
+        "banana": 10,
+        "can": 7,
+        "carrot": 15,
+        "cucumber": 10,
+        "lemon": 9,
+        "orange": 18,
+        "sponge": 14
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "turn_on_sink_faucet",
+      "embodiment": "iiwa",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {},
+      "target_splits": {}
+    },
+    {
+      "task": "turn_on_sink_faucet",
+      "embodiment": "kinova3",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {},
+      "target_splits": {}
+    },
+    {
+      "task": "turn_on_sink_faucet",
+      "embodiment": "ur5e",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {},
+      "target_splits": {}
+    },
+    {
+      "task": "turn_on_sink_faucet",
+      "embodiment": "panda",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {},
+      "target_splits": {}
+    },
+    {
+      "task": "turn_on_sink_faucet",
+      "embodiment": "panda_og",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {},
+      "target_splits": {}
+    },
+    {
+      "task": "turn_on_sink_faucet",
+      "embodiment": "jaco",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {},
+      "target_splits": {}
+    },
+    {
+      "task": "flip_mug_upright",
+      "embodiment": "iiwa",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "mug": 100
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "flip_mug_upright",
+      "embodiment": "kinova3",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "mug": 100
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "flip_mug_upright",
+      "embodiment": "ur5e",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "mug": 100
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "flip_mug_upright",
+      "embodiment": "panda",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "mug": 100
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "flip_mug_upright",
+      "embodiment": "panda_og",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "mug": 100
+      },
+      "target_splits": {
+        "A": 100
+      }
+    },
+    {
+      "task": "flip_mug_upright",
+      "embodiment": "jaco",
+      "condition_protocol": "historical-consecutive-seeds",
+      "condition_repository_revision": "bc6cfb21e9fe295e9edcf7010067256683986261",
+      "conditions": 100,
+      "valid": 100,
+      "invalid": 0,
+      "target_categories": {
+        "mug": 100
+      },
+      "target_splits": {
+        "A": 100
+      }
+    }
+  ],
+  "invalid_conditions": []
+}

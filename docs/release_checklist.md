@@ -38,7 +38,10 @@ and recorded in the release checkout.
 ## Evaluation
 
 - [x] A one-trial headless evaluation completes from public artifacts.
-- [x] Frozen evaluation conditions and paper-protocol defaults are documented.
+- [x] Frozen evaluation conditions and the historical/visibility-validated
+      protocol distinction are documented.
+- [x] All 24 condition bundles pass instruction, object-set, object-split,
+      source-fixture, shared-seed, and policy-camera visibility checks.
 - [x] Evaluation output and aggregation are machine-readable and do not
       overwrite previous runs.
 
