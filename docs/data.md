@@ -57,7 +57,8 @@ Valid paper datasets are `xp_900`, `xp_3k`, `sp_900`, and `target_50`.
 
 The `human/` files retain the simulator states and portable metadata needed to
 prepare new MimicGen source datasets. Install the optional, separately licensed
-generator with `uv sync --locked --extra mg --no-dev`; the literal preparation,
-bounded generation, verification, and video commands are in Section 8 of
-`RELEASE_TEST_README.md`. The source-preparation wrapper always writes a new
-HDF5 and verifies that the downloaded source checksum did not change.
+generator with `uv sync --locked --extra mg --no-dev`; the preparation,
+bounded generation, and video commands are in
+[`dataset/README.md`](../dataset/README.md#extending-the-demonstrations-with-mimicgen).
+The source-preparation wrapper always writes a new HDF5 and verifies that the
+downloaded source checksum did not change.

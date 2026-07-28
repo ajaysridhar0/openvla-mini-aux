@@ -40,9 +40,7 @@ command -v cmake
 cmake --version
 ```
 
-If `command -v cmake` selects a broken user-local launcher, repair `PATH` or
-select a working system CMake before running `uv sync`. Merely having a file
-named `cmake` on `PATH` is not sufficient.
+If either CMake command fails, install CMake before running `uv sync`.
 
 Then install BARX and run its tests:
 
@@ -67,10 +65,6 @@ export BARX_VQ_ROOT="$BARX_ARTIFACT_ROOT/vq"
 uv run --locked --no-dev python scripts/download_public_artifacts.py \
   --artifact-root "$BARX_ARTIFACT_ROOT"
 ```
-
-The downloader defaults to one worker for conservative public operation and
-resumes partial Hugging Face downloads. On a reliable connection, add
-`--max-workers 8` to download independent RLDS shards concurrently.
 
 Install the training dependencies:
 
@@ -109,11 +103,11 @@ uv run --locked --extra train --no-dev python scripts/evaluate.py \
   --episodes 1 --rollout-dir "$BARX_ARTIFACT_ROOT/rollouts/one-trial"
 ```
 
-The release protocol uses 100 fixed, visibility-validated trials; omit
-`--episodes 1` to run the full set. Pick-and-place targets come from RoboCasa
-`obj_set1`, instance split `A`, and must be visible in the policy camera. See
-[`evaluation/README.md`](evaluation/README.md) for the correction to the
-historical consecutive-seed protocol.
+The benchmark uses 100 fixed trials per task and embodiment. Pick-and-place
+targets come from RoboCasa `obj_set1`, instance split `A`; each released
+condition passes the task-specific scene filters and a policy-camera visibility
+check. Omit `--episodes 1` to run the full set. See
+[`evaluation/README.md`](evaluation/README.md) for the complete protocol.
 
 To regenerate data from the released human HDF5 demonstrations, install the
 separately licensed MimicGen extra:
@@ -122,22 +116,21 @@ separately licensed MimicGen extra:
 uv sync --locked --extra mg --no-dev
 ```
 
-The complete source-preparation, bounded one-success generation, HDF5
-verification, and video-review commands are in
-[Section 8 of the release walkthrough](RELEASE_TEST_README.md#8-mimicgen-regeneration-gate).
+Follow the [raw-data guide](dataset/README.md#extending-the-demonstrations-with-mimicgen)
+to download a human source file, prepare it without modifying the original,
+generate a bounded dataset, and save a review video.
 
-See [`docs/installation.md`](docs/installation.md) for system requirements,
-[`docs/data.md`](docs/data.md) for dataset preparation, and
-[`docs/experiments.md`](docs/experiments.md) for training and evaluation. The
-maintainer launch gates are tracked in
-[`docs/release_checklist.md`](docs/release_checklist.md). Independent release
-testers should use
-[`RELEASE_TEST_README.md`](RELEASE_TEST_README.md) to capture machine-checkable
-and human-reviewable evidence for the complete paper-facing workflow. The
-latest independent result is summarized in
-[`RELEASE_ACCEPTANCE_REPORT.md`](RELEASE_ACCEPTANCE_REPORT.md), with every
-sanitized command, attempt, exit code, duration, and output hash in
-[`RELEASE_TEST_COMMAND_LOG.md`](RELEASE_TEST_COMMAND_LOG.md).
+## Guides
+
+- [`docs/installation.md`](docs/installation.md): system requirements and
+  installation
+- [`dataset/README.md`](dataset/README.md): raw HDF5 downloads, schema, RLDS
+  conversion, and MimicGen generation
+- [`docs/data.md`](docs/data.md): dataset aliases and artifact details
+- [`docs/experiments.md`](docs/experiments.md): paper configurations, training,
+  and evaluation
+- [`evaluation/README.md`](evaluation/README.md): fixed evaluation conditions
+  and result format
 
 ## Citation
 

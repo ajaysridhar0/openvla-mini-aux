@@ -55,13 +55,6 @@ validates HDF5 structure, byte sizes, demonstration counts, and SHA-256 hashes.
 Add `--dry-run` to print the exact paths and size before downloading, or
 `--skip-checksums` to skip only the final full-byte hash pass.
 
-Regenerate the checked-in views after changing the master manifest:
-
-```bash
-uv run --locked --no-dev python scripts/build_raw_subsets.py
-uv run --locked --no-dev python scripts/build_raw_subsets.py --check
-```
-
 ## Verify the archive
 
 Run the full size, structure, metadata, and SHA-256 verification before using
@@ -96,8 +89,8 @@ format; conversion to RLDS is optional.
 ## RLDS conversion
 
 `rlds/robocasa_x_dataset_builder.py` reads the normalized layout directly for
-every embodiment. The release launcher retains historical TFDS directory
-names required by training statistics and future checkpoints:
+every embodiment. The launcher writes the TFDS directory names expected by the
+released training configurations and checkpoints:
 
 ```bash
 uv run --locked --no-dev python scripts/build_rlds.py \
@@ -122,36 +115,48 @@ training compatibility.
 ## Extending the demonstrations with MimicGen
 
 The `human/` files retain actions, simulator states, environment metadata, and
-50 demonstrations per target/task, so they preserve the information needed to
-prepare MimicGen source datasets. BARX ships the compatibility snapshot under
-`third_party/mimicgen/`, pins its source revision in `configs/mimicgen.json`,
-and exposes path-independent preparation and bounded generation wrappers.
+50 demonstrations per target/task. BARX includes the MimicGen components used
+by the paper under `third_party/mimicgen/`.
 
-Install the separately licensed generator and follow the complete regeneration
-gate:
+Install the optional dependency and download one human source subset:
 
 ```bash
 uv sync --locked --extra mg --no-dev
+uv run --locked --no-dev python scripts/download_raw_data.py \
+  --dataset target_50 --target panda --task flip_mug \
+  --output-dir /data/barx-target-panda-flip-mug
 ```
 
-See [Section 8 of the release walkthrough](../RELEASE_TEST_README.md#8-mimicgen-regeneration-gate)
-for source immutability checks, preparation, bounded generation, portable HDF5
-validation, and video review. MimicGen source code retains NVIDIA's
-non-commercial research/evaluation license. Released raw and processed BARX
-demonstration data are CC BY 4.0; see
-[`docs/artifact_licenses.md`](../docs/artifact_licenses.md).
-
-## Rebuilding a portable archive
-
-Maintainers starting from an older collection tree can scrub private paths and
-normalize action metadata into a separate output tree, then rebuild the
-manifest:
+Prepare five demonstrations in a new HDF5 file. The command verifies that the
+downloaded source file is unchanged:
 
 ```bash
-uv run --locked --no-dev python scripts/stage_release_data.py \
-  /data/barx-archive /data/barx-public
-uv run --locked --no-dev python scripts/build_data_manifest.py \
-  /data/barx-public --output dataset/manifest.csv
+mkdir -p /data/barx-mimicgen
+
+MUJOCO_GL=egl PYOPENGL_PLATFORM=egl \
+uv run --locked --extra mg --no-dev python scripts/prepare_mimicgen_source.py \
+  --source /data/barx-target-panda-flip-mug/human/PandaOmron/FlipMugUpright/demo_gentex_im320.hdf5 \
+  --output /data/barx-mimicgen/panda-flip-mug-prepared.hdf5 \
+  --task flip_mug_upright --demos 5 \
+  --summary /data/barx-mimicgen/preparation-summary.json
 ```
 
-Never stage in place: the source and output roots must differ.
+Run a bounded one-success generation example:
+
+```bash
+MUJOCO_GL=egl PYOPENGL_PLATFORM=egl \
+uv run --locked --extra mg --no-dev python scripts/generate_mimicgen.py \
+  --source /data/barx-mimicgen/panda-flip-mug-prepared.hdf5 \
+  --task flip_mug_upright --embodiment panda --seed 0 \
+  --successes 1 --max-attempts 25 --source-demos 5 \
+  --output-dir /data/barx-mimicgen/panda-flip-mug-seed0 \
+  --video /data/barx-mimicgen/panda-flip-mug-seed0.mp4
+```
+
+The output directory contains the generated HDF5 data, resolved configuration,
+and summary files. Review the MP4 to verify the generated behavior. Use
+`--help` on either wrapper for the supported BARX tasks and embodiments.
+
+MimicGen source code retains NVIDIA's non-commercial research/evaluation
+license. Released raw and processed BARX demonstration data are CC BY 4.0; see
+[`docs/artifact_licenses.md`](../docs/artifact_licenses.md).
