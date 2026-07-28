@@ -1,5 +1,10 @@
 # BARX raw HDF5 dataset
 
+Most users should use the released processed RLDS datasets as shown in the
+root quick start. Download raw HDF5 data only if you want to inspect the source
+demonstrations, build another data format, rerun RLDS conversion, or generate
+new demonstrations with MimicGen.
+
 The normalized HDF5 dataset is 284.03 GiB and uses a separate data archive.
 `manifest.csv` lists all 240 files with their size, SHA-256 checksum,
 embodiment, task, demonstration count, seed, relative path, and paper dataset
@@ -21,7 +26,7 @@ pick-and-place sink-to-counter, turn-on-sink-faucet, and flip-mug-upright.
 The manifest selects the final rendered and annotated simulation files used by
 the paper's XP-900, XP-3K, SP-900, and target-50 experiments.
 
-## Download
+## Download raw data
 
 The public archive is pinned in `configs/raw_dataset.json`. Download that exact
 revision into a new directory:

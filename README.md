@@ -17,9 +17,11 @@ This repository contains:
   preparation and bounded generation commands; and
 - reproducible experiment configurations.
 
-The raw HDF5 demonstrations can be read directly, converted to RLDS, or used
-as the basis for new data-generation pipelines; see
-[`dataset/README.md`](dataset/README.md).
+For training and evaluation, start with the processed RLDS datasets used by the
+quick start below. The raw HDF5 demonstrations are optional for users who want
+to inspect simulator states, convert the data into another format, or generate
+new demonstrations with MimicGen.
+
 Public artifacts are available from the
 [BARX model collections](https://huggingface.co/collections/ajaysri/barx-pretraining-models-joint-reps-and-no-reps),
 [processed RLDS collection](https://huggingface.co/collections/ajaysri/barx-rlds-datasets-69cad164926390ebbc395496),
@@ -56,7 +58,8 @@ uv run --locked --no-dev python robocasa_x/robocasa/scripts/download_kitchen_ass
 uv run --locked --no-dev python -c "import robocasa, robosuite; print('RoboCasa-X import OK')"
 ```
 
-Choose a directory for the XP-900 PnP walkthrough artifacts and download them:
+Choose a directory and download the processed XP-900 PnP RLDS data, base
+model, and VQ tokenizer used by this walkthrough:
 
 ```bash
 export BARX_ARTIFACT_ROOT="$(pwd)/../barx-artifacts"
@@ -109,23 +112,27 @@ condition passes the task-specific scene filters and a policy-camera visibility
 check. Omit `--episodes 1` to run the full set. See
 [`evaluation/README.md`](evaluation/README.md) for the complete protocol.
 
-To regenerate data from the released human HDF5 demonstrations, install the
+### Optional: generate new data with MimicGen
+
+The training and evaluation steps above do not require raw HDF5 data. To
+generate new demonstrations from the released human sources, install the
 separately licensed MimicGen extra:
 
 ```bash
 uv sync --locked --extra mg --no-dev
 ```
 
-Follow the [raw-data guide](dataset/README.md#extending-the-demonstrations-with-mimicgen)
-to download a human source file, prepare it without modifying the original,
-generate a bounded dataset, and save a review video.
+Follow the
+[MimicGen guide](dataset/README.md#extending-the-demonstrations-with-mimicgen)
+to download only the required human HDF5 subset, prepare it without modifying
+the original, generate a bounded dataset, and save a review video.
 
 ## Guides
 
 - [`docs/installation.md`](docs/installation.md): system requirements and
   installation
-- [`dataset/README.md`](dataset/README.md): raw HDF5 downloads, schema, RLDS
-  conversion, and MimicGen generation
+- [`dataset/README.md`](dataset/README.md): optional raw HDF5 downloads, custom
+  RLDS conversion, and MimicGen generation
 - [`docs/data.md`](docs/data.md): dataset aliases and artifact details
 - [`docs/experiments.md`](docs/experiments.md): paper configurations, training,
   and evaluation

@@ -1,5 +1,10 @@
 # Data format and conversion
 
+Use the released processed RLDS repositories for standard BARX training and
+evaluation. The raw HDF5 archive and conversion tools below are optional for
+users who want source simulator states, another data format, a fresh RLDS
+conversion, or new MimicGen generation.
+
 The raw HDF5 dataset is recorded and checksummed in `dataset/manifest.csv`; see
 `dataset/README.md` for its composition, verification command, and schema. The
 archive preserves the relative `mg/` and `human/` paths.
