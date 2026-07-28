@@ -5,28 +5,14 @@ evaluation. The raw HDF5 archive and conversion tools below are optional for
 users who want source simulator states, another data format, a fresh RLDS
 conversion, or new MimicGen generation.
 
-The raw HDF5 dataset is recorded and checksummed in `dataset/manifest.csv`; see
-`dataset/README.md` for its composition, verification command, and schema. The
-archive preserves the relative `mg/` and `human/` paths.
-
-The public source archive is
+The optional raw HDF5 release contains 23,400 demonstrations and is available
+from
 [`ajaysri/barx-raw-hdf5`](https://huggingface.co/datasets/ajaysri/barx-raw-hdf5).
-Use the immutable revision recorded in `configs/raw_dataset.json`; the exact
-full-archive and selective subset commands are in `dataset/README.md`. The 24
-checked-in manifests under `dataset/subsets/` map one-to-one to the public RLDS
-repositories without duplicating the XP-900 files that are already part of
-XP-3K.
+See [`dataset/README.md`](../dataset/README.md) for full-archive and selective
+download commands, its contents, and its schema.
 
-The raw HDF5 archive and all 24 processed RLDS repositories are released under
-CC BY 4.0. Dataset cards record the source variant, task, embodiment, episode
-count, conversion provenance, and attribution. See
-[`artifact_licenses.md`](artifact_licenses.md) before redistributing or
-deriving another format.
-
-Retained episode metadata replaces installation prefixes with `<ROBOCASA>/`.
-This token preserves asset-relative paths without exposing or depending on the
-original collection machine. The frozen condition bundles store the exact
-evaluation XML and settled state needed for deterministic replay.
+The raw HDF5 and processed RLDS datasets are released under CC BY 4.0. See
+[`artifact_licenses.md`](artifact_licenses.md) for reuse guidance.
 
 ## Canonical action boundary
 
@@ -34,9 +20,7 @@ Every released RoboCasa-X HDF5 action uses:
 
 `[arm(6), gripper(1), base(3), torso(1), mode(1)]`
 
-Policies and RLDS datasets expose the first seven values. Consequently,
-`barx.action_space.canonicalize_action` and evaluation have no embodiment or
-legacy-layout branches.
+Policies and RLDS datasets expose the first seven values.
 
 ## Paper dataset aliases
 
@@ -46,8 +30,7 @@ original RLDS directory identifiers; users do not need to rename previously
 converted datasets.
 
 The HDF5 files can be consumed directly with `h5py` or another HDF5 reader.
-To build BARX's training-compatible RLDS directories, use the manifest-driven
-launcher rather than invoking the TFDS builder directly:
+To build BARX's training-compatible RLDS directories:
 
 ```bash
 uv run --locked --no-dev python scripts/build_rlds.py \
@@ -57,13 +40,12 @@ uv run --locked --no-dev python scripts/build_rlds.py \
 
 Valid paper datasets are `xp_900`, `xp_3k`, `sp_900`, and `target_50`.
 `sp_900` and `target_50` additionally require `--target panda`, `panda_og`, or
-`jaco`. The launcher validates every selected file against the byte size in
-`dataset/manifest.csv` before conversion.
+`jaco`.
 
 The `human/` files retain the simulator states and portable metadata needed to
 prepare new MimicGen source datasets. Install the optional, separately licensed
 generator with `uv sync --locked --extra mg --no-dev`; the preparation,
 bounded generation, and video commands are in
 [`dataset/README.md`](../dataset/README.md#extending-the-demonstrations-with-mimicgen).
-The source-preparation wrapper always writes a new HDF5 and verifies that the
-downloaded source checksum did not change.
+The source-preparation wrapper writes a new HDF5 rather than modifying the
+downloaded human demonstrations.

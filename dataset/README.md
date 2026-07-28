@@ -5,10 +5,7 @@ root quick start. Download raw HDF5 data only if you want to inspect the source
 demonstrations, build another data format, rerun RLDS conversion, or generate
 new demonstrations with MimicGen.
 
-The normalized HDF5 dataset is 284.03 GiB and uses a separate data archive.
-`manifest.csv` lists all 240 files with their size, SHA-256 checksum,
-embodiment, task, demonstration count, seed, relative path, and paper dataset
-membership. The archive contains 23,400 demonstrations in total.
+The optional raw HDF5 release is 284 GiB and contains 23,400 demonstrations.
 
 ## Contents
 
@@ -23,17 +20,15 @@ membership. The archive contains 23,400 demonstrations in total.
 
 All four RoboCasa-X tasks are present: pick-and-place counter-to-sink,
 pick-and-place sink-to-counter, turn-on-sink-faucet, and flip-mug-upright.
-The manifest selects the final rendered and annotated simulation files used by
-the paper's XP-900, XP-3K, SP-900, and target-50 experiments.
+These are the rendered and annotated simulation demonstrations used by the
+paper's XP-900, XP-3K, SP-900, and target-50 experiments.
 
 ## Download raw data
 
-The public archive is pinned in `configs/raw_dataset.json`. Download that exact
-revision into a new directory:
+Download the public archive into a new directory:
 
 ```bash
 hf download ajaysri/barx-raw-hdf5 --repo-type dataset \
-  --revision c8b3aba2dfbbfbafa67fa82466320945d560208f \
   --local-dir /data/barx
 ```
 
@@ -41,9 +36,8 @@ The repository is public and the download requires no Hugging Face token.
 
 ### Download one paper subset
 
-The 24 manifests under `dataset/subsets/` mirror the 24 repositories in the
-public RLDS collection. Download and fully verify only the raw files underlying
-one RLDS dataset with the paper-facing dataset, task, and target names:
+To avoid downloading the full archive, select one paper dataset using its
+dataset, task, and target names:
 
 ```bash
 uv run --locked --no-dev python scripts/download_raw_data.py \
@@ -54,24 +48,7 @@ uv run --locked --no-dev python scripts/download_raw_data.py \
   --output-dir /data/barx-target-panda-pnp
 ```
 
-The downloader is anonymous, uses the pinned raw-data revision, and writes
-`subset-manifest.csv` beside the selected `human/` or `mg/` tree. By default it
-validates HDF5 structure, byte sizes, demonstration counts, and SHA-256 hashes.
-Add `--dry-run` to print the exact paths and size before downloading, or
-`--skip-checksums` to skip only the final full-byte hash pass.
-
-## Verify the archive
-
-Run the full size, structure, metadata, and SHA-256 verification before using
-or repackaging a downloaded archive:
-
-```bash
-uv run --locked --no-dev python scripts/verify_raw_data.py /data/barx
-```
-
-For a faster preflight that does not read every byte, add `--skip-checksums`.
-This still validates every path, byte size, demonstration count, action shape,
-environment, and portable metadata.
+Add `--dry-run` to see the selected files and download size first.
 
 ## Data format
 
@@ -87,9 +64,8 @@ Each file is a standard HDF5 container with demonstrations under
 - `ep_meta`: JSON episode metadata including the language instruction.
 
 Actions use `[arm(6), gripper(1), base(3), torso(1), mode(1)]`, independent of
-embodiment. Stored metadata uses `<ROBOCASA>/` package-relative asset paths.
-Users can read these files directly with `h5py` to build another training
-format; conversion to RLDS is optional.
+embodiment. Users can read these files directly with `h5py` to build another
+training format; conversion to RLDS is optional.
 
 ## RLDS conversion
 
@@ -109,8 +85,7 @@ uv run --locked --no-dev python scripts/build_rlds.py \
 
 Run the launcher once for each dataset/task/target combination needed by an
 experiment. `pnp` includes both pick-and-place tasks, matching the jointly
-trained models in the paper. Use `--dry-run` to validate manifest selection
-without importing TensorFlow or writing output.
+trained models in the paper. Use `--dry-run` to preview the conversion.
 
 The public action schema is
 `[dx, dy, dz, droll, dpitch, dyaw, gripper]`. Legacy RLDS fields such as
@@ -132,8 +107,7 @@ uv run --locked --no-dev python scripts/download_raw_data.py \
   --output-dir /data/barx-target-panda-flip-mug
 ```
 
-Prepare five demonstrations in a new HDF5 file. The command verifies that the
-downloaded source file is unchanged:
+Prepare five demonstrations in a new HDF5 file:
 
 ```bash
 mkdir -p /data/barx-mimicgen
