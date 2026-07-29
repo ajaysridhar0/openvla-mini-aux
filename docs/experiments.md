@@ -129,16 +129,16 @@ Training writes JSONL metrics and checkpoints locally by default. To mirror a
 run to Weights & Biases, add `--use-wandb` and optionally `--wandb-project` and
 `--wandb-entity`; no account or project name is embedded in the default run.
 
-For a disposable one-GPU A40 initialization and optimizer smoke test, use the
-complete command below after setting `BARX_ARTIFACT_ROOT`, `HF_HOME`, and
-`BARX_VQ_ROOT` as shown in the root README:
+For a quick one-GPU A40 initialization and optimizer check, use the command
+below after setting `BARX_ARTIFACT_ROOT`, `HF_HOME`, and `BARX_VQ_ROOT` as
+shown in the root README:
 
 ```bash
 uv run --locked --extra train --no-dev python scripts/train.py prior \
   --prior xp_900 --task pnp --method joint_reps \
   --data-root "$BARX_ARTIFACT_ROOT/data" \
   --base-vlm "$BARX_ARTIFACT_ROOT/base-vlm" \
-  --run-root "$BARX_ARTIFACT_ROOT/runs/smoke" \
+  --run-root "$BARX_ARTIFACT_ROOT/runs/quick-check" \
   --gpus 1 --global-batch-size 1 --per-device-batch-size 1 \
   --max-steps 1 --save-interval 100 --skip-final-checkpoint
 ```

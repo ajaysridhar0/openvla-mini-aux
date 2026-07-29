@@ -75,7 +75,7 @@ They were not command retries; all final manifest checks passed.
   `XFlipMugUpright`, with the instruction “flip the mug on the counter
   upright.” Both contained actions, simulator states, observations, rewards,
   dones, action dictionaries, and auxiliary information.
-- Training metrics: the one-step smoke run reached step 1 with loss
+- Training metrics: the one-step training run reached step 1 with loss
   4.855754, L1 loss 0.272353, learning rate `2e-5`, and 10.306 s step time.
   Required config/statistics/metrics files existed and, as requested, no final
   checkpoint was written.
@@ -101,7 +101,7 @@ They were not command retries; all final manifest checks passed.
    available and structurally verified.
 3. **Paper metric reproduced: no claim.** Section 9 paper-scale reproduction
    was outside this requested acceptance scope. The one-step training,
-   one-trial evaluation, and one-success MimicGen jobs are smoke tests only.
+   one-trial evaluation, and one-success MimicGen jobs are limited checks only.
    The 0/1 evaluation outcome and 1/1 MimicGen outcome must not be interpreted
    as success-rate estimates or compared with paper metrics.
 

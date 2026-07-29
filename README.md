@@ -1,39 +1,38 @@
 # BARX: Cross-Embodiment Transfer via Behavior-Aligned Representations
 
-Official simulation-only code release for **BARX** and the **RoboCasa-X**
-benchmark, accompanying the ICRA 2026 paper
+This is the simulation-only release for **BARX** and the **RoboCasa-X**
+benchmark from the ICRA 2026 paper
 *Cross-Embodiment Transfer via Behavior-Aligned Representations*.
 
 [Project website](https://ajaysridhar.com/barx/)
 
 ## What's included
 
-This repository contains:
+This repository includes:
 
-- MiniVLA policy training and RoboCasa-X evaluation code;
+- code for training MiniVLA policies and evaluating them in RoboCasa-X;
 - the RoboCasa-X simulation benchmark;
-- dataset conversion tools;
-- a separately licensed MimicGen compatibility snapshot with BARX task
-  preparation and bounded generation commands; and
-- reproducible experiment configurations.
+- tools for converting the datasets;
+- MimicGen support for generating new demonstrations from the human data; and
+- the experiment configurations used in the paper.
 
 For training and evaluation, start with the processed RLDS datasets used by the
 quick start below. The raw HDF5 demonstrations are optional for users who want
 to inspect simulator states, convert the data into another format, or generate
 new demonstrations with MimicGen.
 
-Public artifacts are available from the
+You can download the models and data from the
 [BARX model collections](https://huggingface.co/collections/ajaysri/barx-pretraining-models-joint-reps-and-no-reps),
 [processed RLDS collection](https://huggingface.co/collections/ajaysri/barx-rlds-datasets-69cad164926390ebbc395496),
 and [raw HDF5 collection](https://huggingface.co/collections/ajaysri/barx-raw-hdf5-data-6a61b2d60e2a7ca90b75fb68).
-They are ungated and do not require a Hugging Face token.
+No Hugging Face token is needed.
 
 ## Quick start
 
-The supported release platform is Linux x86-64 with Python 3.10 and CUDA 12.1.
-The walkthrough with the released checkpoint requires about 70 GiB of free
-space. Install [uv](https://docs.astral.sh/uv/) 0.11.11 or newer and check that
-CMake is available:
+BARX is tested on Linux x86-64 with Python 3.10 and CUDA 12.1. The walkthrough
+needs about 70 GiB of free space. Install
+[uv](https://docs.astral.sh/uv/) 0.11.11 or newer and check that CMake is
+available:
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -75,21 +74,21 @@ Install the training dependencies:
 uv sync --locked --extra train --no-dev
 ```
 
-Run a one-GPU training smoke test:
+Run a one-GPU, one-step training check:
 
 ```bash
 uv run --locked --extra train --no-dev python scripts/train.py prior \
   --prior xp_900 --task pnp --method joint_reps \
   --data-root "$BARX_ARTIFACT_ROOT/data" \
   --base-vlm "$BARX_ARTIFACT_ROOT/base-vlm" \
-  --run-root "$BARX_ARTIFACT_ROOT/runs/smoke" \
+  --run-root "$BARX_ARTIFACT_ROOT/runs/quick-check" \
   --gpus 1 --global-batch-size 1 --per-device-batch-size 1 \
   --max-steps 1 --save-interval 100 --skip-final-checkpoint
 ```
 
-To evaluate the released Joint Reps checkpoint, first add
-`--include-pretrain-checkpoint` to the artifact download command above. Then
-verify the model and VQ paths before paying model-loading cost:
+To try the released Joint Reps checkpoint, first add
+`--include-pretrain-checkpoint` to the download command above. Check that both
+files are present:
 
 ```bash
 test -f "$BARX_ARTIFACT_ROOT/runs/xp900-pnp-joint-reps/checkpoints/step-050000-epoch-15-loss=0.2577.pt"
@@ -107,16 +106,16 @@ uv run --locked --extra train --no-dev python scripts/evaluate.py \
 ```
 
 The benchmark uses 100 fixed trials per task and embodiment. Pick-and-place
-targets come from RoboCasa `obj_set1`, instance split `A`; each released
-condition passes the task-specific scene filters and a policy-camera visibility
-check. Omit `--episodes 1` to run the full set. See
+targets come from RoboCasa `obj_set1`, instance split `A`. The included trials
+use the task-specific scene filters and keep the target visible to the policy
+camera. Omit `--episodes 1` to run the full set. See
 [`evaluation/README.md`](evaluation/README.md) for the complete protocol.
 
 ### Optional: generate new data with MimicGen
 
 The training and evaluation steps above do not require raw HDF5 data. To
-generate new demonstrations from the released human sources, install the
-separately licensed MimicGen extra:
+generate new demonstrations from the human data, install the optional MimicGen
+dependencies:
 
 ```bash
 uv sync --locked --extra mg --no-dev
@@ -124,8 +123,8 @@ uv sync --locked --extra mg --no-dev
 
 Follow the
 [MimicGen guide](dataset/README.md#extending-the-demonstrations-with-mimicgen)
-to download only the required human HDF5 subset, prepare it without modifying
-the original, generate a bounded dataset, and save a review video.
+to download only the human HDF5 subset you need, prepare it, generate a small
+dataset, and save a video for review.
 
 ## Guides
 

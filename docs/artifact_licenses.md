@@ -18,11 +18,10 @@ embodiment, episode count, conversion code, and raw source. Cite the BARX paper
 and preserve the dataset-card attribution when redistributing the data or a
 derived format.
 
-Some demonstrations were generated with the separately licensed MimicGen
-software, while target-50 demonstrations were collected by human
-teleoperation in simulation. The NVIDIA source-code license applies to the
-vendored MimicGen implementation; BARX distributes the released demonstration
-data under CC BY 4.0.
+Some demonstrations were generated with MimicGen, while target-50
+demonstrations were collected by human teleoperation in simulation. The
+included MimicGen code uses NVIDIA's source-code license; BARX distributes the
+released demonstration data under CC BY 4.0.
 
 ## Model artifacts: Apache 2.0
 
@@ -46,8 +45,8 @@ replace a separately applicable upstream license.
 - MiniVLA/OpenVLA-derived policy code retains the MIT license in
   `policy/LICENSE`.
 - RoboCasa-X retains the MIT license in `robocasa_x/LICENSE`.
-- The vendored MimicGen compatibility snapshot retains NVIDIA's
-  non-commercial research/evaluation license in
+- The included MimicGen code retains NVIDIA's non-commercial
+  research/evaluation license in
   `third_party/mimicgen/LICENSE`.
 
 See [`THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md) for pinned versions

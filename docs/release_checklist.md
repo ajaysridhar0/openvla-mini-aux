@@ -19,9 +19,9 @@ and recorded in the release checkout.
 
 - [x] Raw HDF5-to-RLDS conversion completes for one paper dataset and matches
       the published RLDS schema.
-- [x] The BARX MimicGen compatibility snapshot, license, and task
-      configurations are vendored and dependency-locked.
-- [x] Human source preparation and one MimicGen generation smoke test complete
+- [x] The BARX MimicGen code, license, and task configurations are included and
+      dependency-locked.
+- [x] Human source preparation and one MimicGen generation check complete
       without cluster-specific paths.
 - [x] Generated HDF5 output passes the same portable-data verifier.
 
@@ -29,7 +29,7 @@ and recorded in the release checkout.
 
 - [x] Pretraining model checkpoints are public, ungated, and revision-pinned.
 - [x] Training configuration aliases cover the released paper datasets.
-- [x] A one-step training smoke test completes from downloaded public artifacts.
+- [x] A one-step training check completes from downloaded public artifacts.
 - [x] The documented full training commands and expected resource requirements
       are accurate.
 - [x] The base VLM, VQ tokenizer, and 12 policy-checkpoint cards state Apache

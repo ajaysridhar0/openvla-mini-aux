@@ -22,11 +22,11 @@ The acceptance run has two levels:
 2. **Paper-scale reproduction** expands the same interfaces to the paper's full
    datasets, training schedules, three-checkpoint selection, and 100 frozen
    evaluation conditions. It is expensive and is not implied by a one-step or
-   one-trial smoke test.
+   one-trial check.
 
-MimicGen regeneration is a hard public-release gate. Section 8 installs the
-separately licensed compatibility snapshot, prepares public human
-demonstrations without modifying them, and runs one bounded generation smoke.
+MimicGen generation must also work. Section 8 installs the optional MimicGen
+dependencies, prepares the public human demonstrations, and runs one small
+generation check.
 
 ## Rules for the independent runner
 
@@ -545,7 +545,7 @@ uv run --locked --extra train --no-dev python scripts/train.py prior \
   --prior xp_900 --task pnp --method joint_reps \
   --data-root "$BARX_ARTIFACT_ROOT/data" \
   --base-vlm "$BARX_ARTIFACT_ROOT/base-vlm" \
-  --run-root "$BARX_ARTIFACT_ROOT/runs/smoke" \
+  --run-root "$BARX_ARTIFACT_ROOT/runs/quick-check" \
   --gpus 1 --global-batch-size 1 --per-device-batch-size 1 \
   --max-steps 1 --save-interval 100 --skip-final-checkpoint \
   2>&1 | tee "$BARX_EVIDENCE/06-training/one-step-training.txt"
@@ -564,7 +564,7 @@ from pathlib import Path
 run = (
     Path(os.environ["BARX_ARTIFACT_ROOT"])
     / "runs"
-    / "smoke"
+    / "quick-check"
     / "joint_reps--xp_900_pnp"
 )
 required = ["config.json", "config.yaml", "dataset_statistics.json", "run-metrics.jsonl"]
@@ -719,8 +719,7 @@ The paper uses MimicGen to synthesize the XP and SP prior datasets from human
 source demonstrations. A credible public release must provide all of the
 following:
 
-- a pinned BARX-compatible MimicGen fork or vendored package with its upstream
-  license;
+- the BARX-compatible MimicGen code and its NVIDIA license;
 - task interfaces for PnP Counter to Sink, PnP Sink to Counter, Turn On Sink
   Faucet, and Flip Mug Upright;
 - robot/task configurations with no private filesystem paths;
@@ -728,12 +727,11 @@ following:
   in place;
 - a generation launcher with explicit source, task, embodiment, seed, number
   of requested successes, output directory, and video path;
-- a one-success smoke mode suitable for acceptance testing; and
+- a one-success check suitable for acceptance testing; and
 - output that can be inspected with the same portable HDF5 structural checks
   used in Section 3.
 
-Install the separately licensed optional dependency and verify its public
-interface:
+Install the optional MimicGen dependencies and check the command-line tools:
 
 ```bash
 uv sync --locked --extra mg --no-dev \
@@ -768,8 +766,9 @@ uv run --locked --extra mg --no-dev python \
   2>&1 | tee "$BARX_EVIDENCE/08-mimicgen/preparation.txt"
 ```
 
-Run one explicit, bounded generation job. The local graphics cache avoids slow
-shader-cache writes to a network-mounted home directory:
+Run one generation job with a limit on the number of attempts. The local
+graphics cache avoids slow shader-cache writes to a network-mounted home
+directory:
 
 ```bash
 mkdir -p "$BARX_MG_ROOT/gl-cache" "$BARX_MG_ROOT/xdg-cache"
@@ -845,7 +844,7 @@ PY
 
 Machine pass criteria:
 
-- The vendored snapshot and its NVIDIA non-commercial license are present.
+- The included MimicGen code and its NVIDIA non-commercial license are present.
 - Five demonstrations receive datagen annotations in a separate HDF5.
 - The original human HDF5 SHA-256 is identical before and after preparation.
 - Generation reaches exactly one success within 25 attempts and exits zero.
@@ -859,7 +858,7 @@ Human review:
 - Open the MP4 and confirm it shows a Panda attempting Flip Mug Upright, frames
   advance normally, and at least one visibly successful trajectory appears.
 - Compare the visible attempt count with `generation-summary.json`. Do not
-  interpret this smoke result as a paper success-rate estimate.
+  interpret this one-success result as a paper success-rate estimate.
 
 Human evidence:
 
@@ -903,7 +902,7 @@ For each paper experiment, save:
 The paper reports comparisons among No Reps, single representations, ECoT, and
 Joint Reps; comparisons across no prior, XP-900, XP-3K, and SP-900; a
 representation-inference ablation; and action-free transfer. A release may
-support only a declared subset, but it must not imply that a smoke test
+support only a declared subset, but it must not imply that a quick check
 reproduces every paper figure.
 
 ## 10. Repository cleanliness

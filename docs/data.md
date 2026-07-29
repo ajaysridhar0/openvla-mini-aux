@@ -42,10 +42,10 @@ Valid paper datasets are `xp_900`, `xp_3k`, `sp_900`, and `target_50`.
 `sp_900` and `target_50` additionally require `--target panda`, `panda_og`, or
 `jaco`.
 
-The `human/` files retain the simulator states and portable metadata needed to
-prepare new MimicGen source datasets. Install the optional, separately licensed
-generator with `uv sync --locked --extra mg --no-dev`; the preparation,
-bounded generation, and video commands are in
+The `human/` files include the simulator states and metadata needed to make new
+MimicGen datasets. Install the optional MimicGen dependencies with
+`uv sync --locked --extra mg --no-dev`; the preparation, generation, and video
+commands are in
 [`dataset/README.md`](../dataset/README.md#extending-the-demonstrations-with-mimicgen).
 The source-preparation wrapper writes a new HDF5 rather than modifying the
 downloaded human demonstrations.

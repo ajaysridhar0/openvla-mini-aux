@@ -130,7 +130,7 @@ class TrainingLauncherTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "divisible"):
             train.build_command(self.args(gpus=7))
 
-    def test_reduced_one_gpu_smoke_batch_is_explicit(self):
+    def test_reduced_one_gpu_quick_check_batch_is_explicit(self):
         command = train.build_command(
             self.args(
                 gpus=1,
