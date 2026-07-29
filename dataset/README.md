@@ -131,7 +131,3 @@ uv run --locked --extra mg --no-dev python scripts/generate_mimicgen.py \
 The output directory contains the generated HDF5 data, resolved configuration,
 and summary files. Review the MP4 to verify the generated behavior. Use
 `--help` on either wrapper for the supported BARX tasks and embodiments.
-
-MimicGen source code retains NVIDIA's non-commercial research/evaluation
-license. Released raw and processed BARX demonstration data are CC BY 4.0; see
-[`docs/artifact_licenses.md`](../docs/artifact_licenses.md).

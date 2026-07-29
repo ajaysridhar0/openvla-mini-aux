@@ -11,9 +11,6 @@ from
 See [`dataset/README.md`](../dataset/README.md) for full-archive and selective
 download commands, its contents, and its schema.
 
-The raw HDF5 and processed RLDS datasets are released under CC BY 4.0. See
-[`artifact_licenses.md`](artifact_licenses.md) for reuse guidance.
-
 ## Canonical action boundary
 
 Every released RoboCasa-X HDF5 action uses:

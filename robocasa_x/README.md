@@ -18,6 +18,3 @@ Additional asset utilities are available under `robocasa/scripts/`.
 See the root [installation](../docs/installation.md),
 [data](../docs/data.md), and [experiment](../docs/experiments.md)
 documentation for the supported workflow.
-
-RoboCasa retains its MIT license in `LICENSE`. See the root
-`THIRD_PARTY_NOTICES.md` for attribution.
