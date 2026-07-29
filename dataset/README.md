@@ -69,9 +69,7 @@ training format; conversion to RLDS is optional.
 
 ## RLDS conversion
 
-`rlds/robocasa_x_dataset_builder.py` reads the normalized layout directly for
-every embodiment. The launcher writes the TFDS directory names expected by the
-released training configurations and checkpoints:
+Convert the raw HDF5 data into the RLDS format used by BARX training:
 
 ```bash
 uv run --locked --no-dev python scripts/build_rlds.py \
@@ -87,10 +85,8 @@ Run the launcher once for each dataset/task/target combination needed by an
 experiment. `pnp` includes both pick-and-place tasks, matching the jointly
 trained models in the paper. Use `--dry-run` to preview the conversion.
 
-The public action schema is
-`[dx, dy, dz, droll, dpitch, dyaw, gripper]`. Legacy RLDS fields such as
-`ee_pose_2D`, `obj_bboxes`, and `language_motions` remain unchanged to preserve
-training compatibility.
+The RLDS action schema is
+`[dx, dy, dz, droll, dpitch, dyaw, gripper]`.
 
 ## Extending the demonstrations with MimicGen
 
@@ -120,7 +116,7 @@ uv run --locked --extra mg --no-dev python scripts/prepare_mimicgen_source.py \
   --summary /data/barx-mimicgen/preparation-summary.json
 ```
 
-Run a bounded one-success generation example:
+Generate one successful demonstration with at most 25 attempts:
 
 ```bash
 MUJOCO_GL=egl PYOPENGL_PLATFORM=egl \

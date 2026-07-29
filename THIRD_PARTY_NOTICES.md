@@ -12,7 +12,7 @@ original copyright notices and licenses.
 | VQ-BeT | uv Git dependency | commit `09d4851` | MIT |
 | robosuite-models | locked package dependency | 1.0.0 | upstream terms |
 | robomimic | locked package dependency | 0.3.0 | upstream terms |
-| MimicGen (BARX compatibility snapshot) | `third_party/mimicgen/` | upstream 1.0.1 plus BARX task/runtime patches, source revision `62aca46` | NVIDIA Source Code License — non-commercial research or evaluation (`third_party/mimicgen/LICENSE`) |
+| MimicGen support | `third_party/mimicgen/` | upstream 1.0.1 plus BARX task/runtime patches, source revision `62aca46` | NVIDIA Source Code License — non-commercial research or evaluation (`third_party/mimicgen/LICENSE`) |
 
 MimicGen was used to synthesize the rendered training data and is available as
 the optional `mg` dependency. It is not covered by BARX's MIT license. Training

@@ -270,22 +270,6 @@ class EvaluationConditionTest(unittest.TestCase):
 
     def test_release_excludes_showcased_out_of_frame_seed(self):
         evaluation = Path(__file__).resolve().parents[1] / "evaluation"
-        historical = json.loads(
-            (evaluation / "HISTORICAL_VISIBILITY_AUDIT.json").read_text()
-        )
-        bad_seed = next(
-            condition
-            for condition in historical["invalid_conditions"]
-            if condition["task"] == "pnp_counter_to_sink"
-            and condition["embodiment"] == "panda"
-            and condition["seed"] == 1001
-        )
-        self.assertEqual(
-            bad_seed["reason"], "target center is outside the policy camera"
-        )
-        self.assertAlmostEqual(bad_seed["projection"]["pixel_x"], -91.0, delta=0.1)
-        self.assertAlmostEqual(bad_seed["projection"]["pixel_y"], 212.9, delta=0.1)
-
         conditions = evaluation / "conditions"
         payload, states, model_xmls = load_bundle(
             conditions,

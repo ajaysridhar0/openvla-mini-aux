@@ -156,7 +156,7 @@ dataset, and save a video for review.
 - BARX base-model, VQ-tokenizer, and policy-checkpoint artifacts are released
   under Apache 2.0, subject to the separately identified upstream components
   and their terms.
-- The vendored MimicGen source retains NVIDIA's non-commercial research and
+- The included MimicGen code uses NVIDIA's non-commercial research and
   evaluation license; it is not covered by BARX's MIT license.
 
 See [`docs/artifact_licenses.md`](docs/artifact_licenses.md) for artifact

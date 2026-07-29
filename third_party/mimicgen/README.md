@@ -1,29 +1,17 @@
-# BARX MimicGen subset
+# MimicGen support
 
-This directory contains the MimicGen components required to reproduce BARX
-data generation for:
+This directory contains the MimicGen code used by BARX to generate
+demonstrations for:
 
 - PnP Counter to Sink
 - PnP Sink to Counter
 - Turn On Sink Faucet
 - Flip Mug Upright
 
-The code is derived from NVIDIA's MimicGen 1.0 release and Jensen Gao's BARX
-cross-embodiment extensions at source revision
-`62aca464ee14edeac48769c6be82464a7337a5d3`.
+For setup and example commands, see the
+[MimicGen data guide](../../dataset/README.md#extending-the-demonstrations-with-mimicgen).
+The generator supports all six BARX embodiments and lets you limit the number
+of attempts for a run.
 
-BARX changes:
-
-- register only the RoboCasa interfaces used by BARX;
-- use RoboCasa's MuJoCo-native environment wrapper instead of legacy
-  `mujoco_py`;
-- support RoboSuite 1.5 composite controllers and the canonical 12-D mobile
-  robot action order;
-- add the Flip Mug Upright configuration and environment interface;
-- reconstruct model-free public episodes from portable `ep_meta`;
-- add a bounded `max_attempts` generation option; and
-- lazy-load the unrelated Google Drive download dependency.
-
-The complete NVIDIA license is retained in [`LICENSE`](LICENSE). This package
-and derivatives are restricted to non-commercial research or evaluation use
-under that license.
+The code uses NVIDIA's non-commercial research and evaluation license. See
+[`LICENSE`](LICENSE) for the full terms.

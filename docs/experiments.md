@@ -8,7 +8,7 @@ The released BARX base VLM, VQ action tokenizer, and policy checkpoints are
 Apache 2.0 model artifacts with explicit model cards. Their cards identify the
 Qwen2.5, DINOv2, SigLIP, MiniVLA/OpenVLA, RoboCasa-X, and BARX provenance that
 must remain visible in downstream releases. The underlying datasets are CC BY
-4.0, and the vendored MimicGen source has separate non-commercial terms. See
+4.0, and the included MimicGen code has separate non-commercial terms. See
 [`artifact_licenses.md`](artifact_licenses.md).
 
 For the public XP-900 PnP walkthrough, download the already prepared RLDS data,
@@ -98,11 +98,9 @@ explicitly want to mirror those metrics to Weights & Biases.
   reused during co-finetuning
 - the two pick-and-place tasks trained jointly; other tasks trained separately
 
-The original source-prior checkpoint selected for adaptation was 50k steps for
-XP-900, 150k for XP-3K No Reps, and 250k for XP-3K with BARX
-representations. Each public training command must provide its base VLM,
-data root, and (for adaptation) selected prior checkpoint explicitly; no
-private filesystem paths are embedded in release entry points.
+For adaptation, use the 50k-step XP-900 checkpoint, the 150k-step XP-3K No Reps
+checkpoint, or the 250k-step XP-3K checkpoint with BARX representations. Pass
+the base VLM, data root, and selected prior checkpoint to the training command.
 
 Paper-facing launchers print the complete underlying command before running it.
 For example:
@@ -158,11 +156,6 @@ processed MuJoCo model and post-settling simulator state. Robot, gripper, and
 calibrated agent camera are selected together from the embodiment; they are not
 independent command-line choices.
 
-The original consecutive 1000–1099 protocol placed 34 counter-to-sink targets
-outside the camera. The public `visible-target-v1` protocol skips those
-candidates, so its accepted counter-to-sink seed IDs are nonconsecutive. See
-[`evaluation/README.md`](../evaluation/README.md) for the protocol distinction.
-
 | Task | Maximum steps |
 | --- | ---: |
 | PnP Counter to Sink | 600 |
@@ -173,8 +166,7 @@ candidates, so its accepted counter-to-sink seed IDs are nonconsecutive. See
 The paper evaluates three checkpoints per model and reports the best success
 rate separately for each task/embodiment combination.
 
-Literal one-trial execution check for the optional public source-prior
-checkpoint downloaded by `scripts/download_public_artifacts.py` with
+To try the optional source-prior checkpoint downloaded with
 `--include-pretrain-checkpoint`:
 
 ```bash
@@ -185,19 +177,16 @@ uv run --locked --extra train --no-dev python scripts/evaluate.py \
 ```
 
 One trial checks execution but is not a success-rate estimate. Omit
-`--episodes 1` for the 100-condition release protocol. Both commands default to
+`--episodes 1` to run all 100 conditions. Both commands default to
 action-only inference, as used for the main results. For the inference
 ablation, add `--inference-representation bounding_box`,
 `language_motion`, or `end_effector_trace`. The launcher maps Panda-OG and Jaco
 to their registered internal simulator classes.
 
-Each invocation creates a non-overwriting directory under
-`rollouts/<task>/<embodiment>/`. It contains the resolved `config.json`, one
-record per trial in `episodes.jsonl`, an atomic `summary.json`, a readable
-`log.txt`, and rollout videos. Failed runs retain their completed episode
-records and write the exception to the summary before returning a nonzero exit
-status. Add `--use-wandb` to mirror metrics and first-trial videos; the local
-files remain the source of record.
+Each run creates a new directory under `rollouts/<task>/<embodiment>/` with its
+configuration, per-trial results, summary, log, and rollout videos. Add
+`--use-wandb` to also send metrics and the first-trial videos to Weights &
+Biases.
 
 Aggregate any collection of complete and failed runs without parsing text logs:
 
